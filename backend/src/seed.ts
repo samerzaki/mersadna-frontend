@@ -36,31 +36,53 @@ const products: SeedProduct[] = [
   { key: 'crypto-solana', kind: MarketKind.CRYPTO, displayName: 'Solana', currency: 'USD', price: 178, raw: { symbol: 'sol', change24h: 2.1, change7d: 6.4 } },
 ];
 
-async function main() {
-  const existing = await prisma.ingestionRun.findFirst({ where: { source: 'seed:market', status: 'success' } });
-  if (existing) {
-    console.log('Market seed already exists; no changes made.');
-    return;
-  }
+async function upsertProducts() {
+  return Promise.all(products.map(item => prisma.marketProduct.upsert({
+    where: { key: item.key },
+    create: { key: item.key, kind: item.kind, displayName: item.displayName, karat: item.karat, currency: item.currency, source: 'seed' },
+    update: { kind: item.kind, displayName: item.displayName, karat: item.karat, currency: item.currency, source: 'seed', active: true },
+  })));
+}
 
-  const run = await prisma.ingestionRun.create({ data: { source: 'seed:market', status: 'running' } });
+function priceMultiplier(item: SeedProduct, daysAgo: number) {
+  const dailyTrend = item.kind === MarketKind.GOLD ? 0.00078 : item.kind === MarketKind.SILVER ? 0.00062 : item.kind === MarketKind.CRYPTO ? 0.00045 : 0.00012;
+  const volatility = item.kind === MarketKind.GOLD ? 0.009 : item.kind === MarketKind.SILVER ? 0.014 : item.kind === MarketKind.CRYPTO ? 0.055 : 0.004;
+  return (1 - dailyTrend * daysAgo) * (1 + volatility * Math.sin(daysAgo * 0.31) + volatility * 0.35 * Math.sin(daysAgo * 0.07));
+}
+
+async function addPrices(days: number[], source: string) {
+  const seeded = await upsertProducts();
+  const productIds = new Map(seeded.map(product => [product.key, product.id]));
   let records = 0;
   for (const item of products) {
-    const product = await prisma.marketProduct.upsert({
-      where: { key: item.key },
-      create: { key: item.key, kind: item.kind, displayName: item.displayName, karat: item.karat, currency: item.currency, source: 'seed' },
-      update: { kind: item.kind, displayName: item.displayName, karat: item.karat, currency: item.currency, source: 'seed', active: true },
-    });
-    for (let day = 6; day >= 0; day--) {
-      const factor = 1 - day * 0.002;
+    for (const day of days) {
+      const factor = priceMultiplier(item, day);
       await prisma.marketPrice.create({
-        data: { productId: product.id, buy: item.buy ? item.buy * factor : undefined, sell: item.sell ? item.sell * factor : undefined, price: (item.price ?? item.sell ?? item.buy ?? 0) * factor, raw: { ...(item.raw ?? {}), seed: true }, recordedAt: new Date(Date.now() - day * 86400000) },
+        data: { productId: productIds.get(item.key)!, buy: item.buy ? item.buy * factor : undefined, sell: item.sell ? item.sell * factor : undefined, price: (item.price ?? item.sell ?? item.buy ?? 0) * factor, raw: { ...(item.raw ?? {}), seed: true, source }, recordedAt: new Date(Date.now() - day * 86400000) },
       });
       records++;
     }
   }
+  return records;
+}
+
+async function runSeed(source: string, days: number[]) {
+  const complete = await prisma.ingestionRun.findFirst({ where: { source, status: 'success' } });
+  if (complete) return 0;
+  const run = await prisma.ingestionRun.create({ data: { source, status: 'running' } });
+  const records = await addPrices(days, source);
   await prisma.ingestionRun.update({ where: { id: run.id }, data: { status: 'success', records, completedAt: new Date() } });
-  console.log(`Seeded ${records} fake market prices across gold, silver, currency, and crypto.`);
+  return records;
+}
+
+async function main() {
+  const currentWeek = await runSeed('seed:market', [6, 5, 4, 3, 2, 1, 0]);
+  const historical = await runSeed('seed:market:history-v2', Array.from({ length: 174 }, (_, index) => 180 - index));
+  if (!currentWeek && !historical) {
+    console.log('Market seed already exists; no changes made.');
+    return;
+  }
+  console.log(`Seeded ${currentWeek + historical} fake market prices, including 180 days of realistic historical trends.`);
 }
 
 main().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => prisma.$disconnect());
