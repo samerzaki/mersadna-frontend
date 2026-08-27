@@ -150,7 +150,7 @@ export function CryptoMarketTable({ cryptos, pagination, onPageChange, isLoading
                           <img src={crypto.image} alt={crypto.symbol} className="h-8 w-8 rounded-full shrink-0" loading="lazy" />
                         ) : (
                           <div className="h-8 w-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                            {crypto.symbol.substring(0, 1)}
+                            {(crypto.symbol || crypto.name || '?').slice(0, 1)}
                           </div>
                         )}
                         <div>

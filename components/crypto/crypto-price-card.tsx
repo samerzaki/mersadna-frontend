@@ -113,7 +113,7 @@ export function CryptoPriceCard({ crypto, isHero = false }: CryptoPriceCardProps
               />
             ) : (
               <div className="h-10 w-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold">
-                {crypto.symbol.substring(0, 1)}
+                {(crypto.symbol || crypto.name || '?').slice(0, 1)}
               </div>
             )}
             <div>

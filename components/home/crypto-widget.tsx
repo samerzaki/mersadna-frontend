@@ -65,7 +65,7 @@ export function CryptoWidgetClient({ cryptos }: CryptoWidgetClientProps) {
                     />
                   ) : (
                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold shrink-0">
-                      {crypto.symbol.substring(0, 1)}
+                      {(crypto.symbol || crypto.name || '?').slice(0, 1)}
                     </div>
                   )}
 

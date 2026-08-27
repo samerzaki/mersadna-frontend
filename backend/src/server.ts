@@ -77,8 +77,8 @@ app.get('/api/gold/calculate', async (request, reply) => { const q = z.object({ 
 app.get('/api/gold/gold-history', async (request, reply) => ok(reply, await goldHistory(request)));
 app.get('/api/gold/get-all-prices', async (_request, reply) => ok(reply, { gold: await goldOverview() }));
 app.get('/api/silver/get-all-prices', async (request, reply) => history(request, reply, MarketKind.SILVER));
-app.get('/api/crypto', async (_request, reply) => { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.CRYPTO } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' }, include: { product: true } }); return ok(reply, rows.map(r => ({ id: r.product.key.replace('crypto-', ''), name: r.product.displayName, current_price: decimal(r.price), updated_at: r.recordedAt, ...(typeof r.raw === 'object' && r.raw ? r.raw : {}) }))); });
-app.get('/api/crypto/top', async (_request, reply) => { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.CRYPTO } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' }, take: 10, include: { product: true } }); return ok(reply, rows.map(r => ({ id: r.product.key.replace('crypto-', ''), name: r.product.displayName, current_price: decimal(r.price), updated_at: r.recordedAt }))); });
+app.get('/api/crypto', async (_request, reply) => { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.CRYPTO } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' }, include: { product: true } }); return ok(reply, rows.map(cryptoResponse)); });
+app.get('/api/crypto/top', async (_request, reply) => { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.CRYPTO } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' }, take: 10, include: { product: true } }); return ok(reply, rows.map(cryptoResponse)); });
 app.get('/api/currency/banks', async (_request, reply) => { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.CURRENCY } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' }, include: { product: true } }); return ok(reply, rows.map(r => ({ code: r.product.key, name: r.product.displayName, buy_price: decimal(r.buy), sell_price: decimal(r.sell), updated_at: r.recordedAt }))); });
 app.get('/api/currency/averages', async (_request, reply) => currencyAverage(reply));
 app.get('/api/currency/highest-buy-price', async (_request, reply) => currencyExtreme(reply, 'buy'));
@@ -116,6 +116,23 @@ async function goldHistory(request: any) {
     return { currency: 'EGP', buy_price: decimal(latestRow?.buy), sell_price: decimal(latestRow?.sell ?? latestRow?.price), spread_egp: 0, spread_percent: 0, chart_points: prices.map(row => ({ date: row.recordedAt.toISOString(), price: decimal(row.price ?? row.sell) })), chart_color: color, recorded_at: latestRow?.recordedAt ?? new Date(0) };
   };
   return { period, currency: 'EGP', karat_24: item('gold-24', '#FFD700'), karat_21: item('gold-21', '#FFA500'), karat_18: item('gold-18', '#FF8C00') };
+}
+function cryptoResponse(row: any) {
+  const raw = typeof row.raw === 'object' && row.raw ? row.raw as Record<string, unknown> : {};
+  const coinId = row.product.key.replace('crypto-', '');
+  return {
+    coin_id: coinId,
+    symbol: typeof raw.symbol === 'string' ? raw.symbol.toUpperCase() : coinId.slice(0, 5).toUpperCase(),
+    name: row.product.displayName,
+    image: typeof raw.image === 'string' ? raw.image : '',
+    price_usd: decimal(row.price),
+    change_24h: Number(raw.change24h ?? 0),
+    change_7d: Number(raw.change7d ?? 0),
+    volume_24h: Number(raw.volume ?? 0),
+    market_cap: Number(raw.marketCap ?? 0),
+    rank: Number(raw.marketCapRank ?? 0),
+    recorded_at: row.recordedAt,
+  };
 }
 async function currencyAverage(reply: any) { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.CURRENCY } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' } }); if (!rows.length) return fail(reply, 404, 'No data found', 'PRICE_UNAVAILABLE'); return ok(reply, { banks: { avg_buy_rate: rows.reduce((s,r)=>s+decimal(r.buy),0)/rows.length, avg_sell_rate: rows.reduce((s,r)=>s+decimal(r.sell),0)/rows.length, count: rows.length } }); }
 async function currencyExtreme(reply: any, field: 'buy' | 'sell') { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.CURRENCY } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' }, include: { product: true } }); if (!rows.length) return fail(reply, 404, 'No data found', 'PRICE_UNAVAILABLE'); const selected = rows.sort((a,b)=>decimal(b[field])-decimal(a[field]))[0]; return ok(reply, { bank: selected.product.displayName, rate: decimal(selected[field]), updated_at: selected.recordedAt }); }
