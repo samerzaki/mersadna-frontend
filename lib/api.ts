@@ -407,7 +407,7 @@ export async function fetchNewsList(
     throw new Error('Failed to fetch news list');
   }
 
-  const apiResponse: ApiNewsListResponse = await response.json();
+  const apiResponse: ApiNewsListResponse & { meta?: { pagination?: { current_page?: number; per_page?: number; total?: number; last_page?: number } } } = await response.json();
 
   // Transform API response to frontend format
   let newsItems = apiResponse.data.map(adaptApiNewsToNewsItem);
@@ -418,7 +418,17 @@ export async function fetchNewsList(
   }
 
   // Adapt pagination
-  const pagination = adaptApiPagination(apiResponse.pagination);
+  const legacyPagination = apiResponse.meta?.pagination;
+  const pagination = apiResponse.pagination
+    ? adaptApiPagination(apiResponse.pagination)
+    : {
+        currentPage: legacyPagination?.current_page ?? page,
+        totalPages: legacyPagination?.last_page ?? 1,
+        totalItems: legacyPagination?.total ?? newsItems.length,
+        perPage: legacyPagination?.per_page ?? limit,
+        hasNextPage: (legacyPagination?.current_page ?? page) < (legacyPagination?.last_page ?? 1),
+        hasPreviousPage: (legacyPagination?.current_page ?? page) > 1,
+      };
 
   return {
     status: apiResponse.status,
