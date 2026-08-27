@@ -353,7 +353,12 @@ export async function fetchChildCategories(
     throw new Error('Failed to fetch categories');
   }
 
-  return await response.json();
+  const payload: unknown = await response.json();
+  if (Array.isArray(payload)) return payload as ApiCategoryItem[];
+  if (payload && typeof payload === 'object' && Array.isArray((payload as { data?: unknown }).data)) {
+    return (payload as { data: ApiCategoryItem[] }).data;
+  }
+  return [];
 }
 
 /**
