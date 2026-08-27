@@ -66,20 +66,15 @@ export async function apiFetch<T>(
   });
 
   if (!response.ok) {
-    if (response.status === 401) {
-      removeStoredToken();
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('unauthorized'));
-      }
-      throw new ApiError('انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى', 401);
-    }
-
     let errorMessage = 'حدث خطأ غير متوقع';
     let errorCode: number | string = response.status;
 
     try {
       const errorData = await response.json();
-      if (errorData.error?.message) {
+      if (errorData.meta?.message) {
+        errorMessage = errorData.meta.message;
+        errorCode = errorData.meta.code || response.status;
+      } else if (errorData.error?.message) {
         errorMessage = errorData.error.message;
         errorCode = errorData.error.code || response.status;
       } else if (errorData.message) {
@@ -94,6 +89,16 @@ export async function apiFetch<T>(
       }
     } catch {
       // Response wasn't JSON
+    }
+
+    // Only an expired/missing cookie session is a session-expired event. A
+    // rejected login also uses HTTP 401, but must show its own API message.
+    if (response.status === 401 && errorCode === 'UNAUTHENTICATED') {
+      removeStoredToken();
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('unauthorized'));
+      }
+      throw new ApiError('انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى', 401, errorCode);
     }
 
     throw new ApiError(errorMessage, response.status, errorCode);
