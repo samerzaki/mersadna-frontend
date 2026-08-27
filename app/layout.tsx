@@ -8,6 +8,10 @@ import { HeroStatsBannerServer, HeroStatsBannerSkeleton } from "@/components/hom
 import { Suspense } from "react";
 import { SEO_CONFIG } from "@/lib/seo-config";
 
+// The API container starts after the frontend image is built. Avoid caching
+// build-time fetch failures into pages that render live market widgets.
+export const dynamic = "force-dynamic";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
