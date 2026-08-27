@@ -42,20 +42,23 @@ export function UnifiedGoldChart({ data, title = 'تاريخ أسعار الذه
   // Merge all karat data with USD rates into single chart data array
   const chartData = useMemo(() => {
     if (!data) return [];
+    const points24 = data.karat_24?.chart_points ?? [];
+    const points21 = data.karat_21?.chart_points ?? [];
+    const points18 = data.karat_18?.chart_points ?? [];
 
     // Get the longest array to ensure we have all dates
     const maxLength = Math.max(
-      data.karat_24.chart_points.length,
-      data.karat_21.chart_points.length,
-      data.karat_18.chart_points.length
+      points24.length,
+      points21.length,
+      points18.length
     );
 
     const mergedData = [];
 
     for (let i = 0; i < maxLength; i++) {
-      const point24 = data.karat_24.chart_points[i];
-      const point21 = data.karat_21.chart_points[i];
-      const point18 = data.karat_18.chart_points[i];
+      const point24 = points24[i];
+      const point21 = points21[i];
+      const point18 = points18[i];
 
       // Use date from first available point
       const date = point24?.date || point21?.date || point18?.date;
@@ -69,7 +72,7 @@ export function UnifiedGoldChart({ data, title = 'تاريخ أسعار الذه
 
       // Add USD rates if available
       if (data.usd_rates) {
-        const usdPoint = data.usd_rates.chart_points.find(usd => usd.date === date);
+        const usdPoint = (data.usd_rates.chart_points ?? []).find(usd => usd.date === date);
         if (usdPoint) {
           dataPoint.usdSellRate = usdPoint.sell_rate;
           dataPoint.usdBuyRate = usdPoint.buy_rate;

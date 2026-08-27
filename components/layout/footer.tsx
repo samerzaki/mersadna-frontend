@@ -105,10 +105,10 @@ const footerLinks = {
     title: 'Support',
     titleAr: 'الدعم',
     links: [
-      { label: 'Help', labelAr: 'المساعدة', href: '/help' },
-      { label: 'Docs', labelAr: 'الوثائق', href: '/docs' },
-      { label: 'FAQ', labelAr: 'الأسئلة', href: '/faq' },
-      { label: 'Status', labelAr: 'الحالة', href: '/status' },
+      { label: 'Help', labelAr: 'المساعدة', href: '/contact' },
+      { label: 'Docs', labelAr: 'الوثائق', href: '/about' },
+      { label: 'FAQ', labelAr: 'الأسئلة', href: '/contact' },
+      { label: 'Status', labelAr: 'الحالة', href: '/' },
     ],
   },
 };

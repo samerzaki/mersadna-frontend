@@ -24,7 +24,7 @@ export default function HomeClient() {
         {/* Action Buttons */}
         <div className="hidden md:flex items-center gap-2">
           <Link
-            href="/calculator"
+            href="/gold/calculator"
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 rounded-lg transition-colors"
           >
             <Calculator className="h-4 w-4" />

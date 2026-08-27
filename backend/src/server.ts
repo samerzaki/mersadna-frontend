@@ -55,16 +55,27 @@ app.post('/api/auth/login', { config: { rateLimit: { max: 10, timeWindow: '15 mi
   await prisma.session.deleteMany({ where: { userId: user.id } }); const raw = token(); await prisma.session.create({ data: { userId: user.id, tokenHash: digest(raw), expiresAt: new Date(Date.now() + 30 * 86400000) } }); setSession(reply, raw);
   return ok(reply, publicUser(user));
 });
-app.get('/api/auth/who-am-i', { preHandler: authenticate }, async (request, reply) => { const user = await prisma.user.findUniqueOrThrow({ where: { id: request.userId! } }); return ok(reply, publicUser(user)); });
+app.get('/api/auth/who-am-i', async (request, reply) => {
+  const raw = request.cookies[config.SESSION_COOKIE_NAME];
+  if (!raw) return ok(reply, null);
+  const session = await prisma.session.findUnique({ where: { tokenHash: digest(raw) } });
+  if (!session || session.expiresAt <= new Date()) {
+    if (session) await prisma.session.delete({ where: { id: session.id } });
+    clearSession(reply);
+    return ok(reply, null);
+  }
+  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  return ok(reply, user ? publicUser(user) : null);
+});
 app.post('/api/auth/logout', { preHandler: authenticate }, async (request, reply) => { await prisma.session.deleteMany({ where: { userId: request.userId! } }); clearSession(reply); return ok(reply, { logged_out: true }); });
 app.post('/api/auth/forgot-password', { config: { rateLimit: { max: 5, timeWindow: '15 minutes' } } }, async (request, reply) => { const email = z.object({ email: z.string().email() }).safeParse(request.body); if (email.success) { const user = await prisma.user.findUnique({ where: { email: email.data.email.toLowerCase() } }); if (user) { const raw = token(); await prisma.authToken.create({ data: { userId: user.id, kind: TokenKind.RESET_PASSWORD, tokenHash: digest(raw), expiresAt: new Date(Date.now() + 3600000) } }); app.log.info({ userId: user.id }, 'Password reset token generated; deliver through SMTP integration'); } } return ok(reply, { message: 'If the account exists, an email will be sent.' }); });
 app.post('/api/auth/reset-password', { config: { rateLimit: { max: 5, timeWindow: '15 minutes' } } }, async (request, reply) => { const body = z.object({ token: z.string().min(20), password: z.string().min(12).max(128), password_confirmation: z.string() }).refine(v => v.password === v.password_confirmation).safeParse(request.body); if (!body.success) return fail(reply, 422, 'Invalid reset request', 'VALIDATION_ERROR'); const record = await prisma.authToken.findUnique({ where: { tokenHash: digest(body.data.token) } }); if (!record || record.kind !== TokenKind.RESET_PASSWORD || record.consumedAt || record.expiresAt < new Date()) return fail(reply, 422, 'Invalid or expired reset token', 'INVALID_TOKEN'); await prisma.$transaction([prisma.user.update({ where: { id: record.userId }, data: { passwordHash: await argon2.hash(body.data.password, { type: argon2.argon2id }) } }), prisma.authToken.update({ where: { id: record.id }, data: { consumedAt: new Date() } }), prisma.session.deleteMany({ where: { userId: record.userId } })]); return ok(reply, { reset: true }); });
 
-app.get('/api/gold/get-overview', async (_request, reply) => { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.GOLD } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' }, include: { product: true } }); return ok(reply, rows.map(r => ({ id: r.product.key, name: r.product.displayName, karat: r.product.karat, buy_price: decimal(r.buy), sell_price: decimal(r.sell ?? r.price), price: decimal(r.price ?? r.sell), updated_at: r.recordedAt }))); });
+app.get('/api/gold/get-overview', async (_request, reply) => ok(reply, { gold: await goldOverview() }));
 app.get('/api/silver/get-overview', async (_request, reply) => { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.SILVER } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' }, include: { product: true } }); return ok(reply, rows.map(r => ({ id: r.product.key, name: r.product.displayName, sell_price: decimal(r.sell ?? r.price), price: decimal(r.price ?? r.sell), updated_at: r.recordedAt }))); });
 app.get('/api/gold/calculate', async (request, reply) => { const q = z.object({ grams: z.coerce.number().positive().max(100000), karat: z.coerce.number().int().refine(k => [14, 18, 21, 22, 24].includes(k)) }).safeParse(request.query); if (!q.success) return fail(reply, 422, 'Invalid grams or karat', 'VALIDATION_ERROR'); const row = await latest(`gold-${q.data.karat}`); if (!row) return fail(reply, 404, 'Price unavailable', 'PRICE_UNAVAILABLE'); const unitPrice = decimal(row.sell ?? row.price); return ok(reply, { grams: q.data.grams, karat: q.data.karat, price_per_gram: unitPrice, total: unitPrice * q.data.grams, currency: 'EGP', updated_at: row.recordedAt }); });
-app.get('/api/gold/gold-history', async (request, reply) => history(request, reply, MarketKind.GOLD));
-app.get('/api/gold/get-all-prices', async (request, reply) => history(request, reply, MarketKind.GOLD));
+app.get('/api/gold/gold-history', async (request, reply) => ok(reply, await goldHistory(request)));
+app.get('/api/gold/get-all-prices', async (_request, reply) => ok(reply, { gold: await goldOverview() }));
 app.get('/api/silver/get-all-prices', async (request, reply) => history(request, reply, MarketKind.SILVER));
 app.get('/api/crypto', async (_request, reply) => { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.CRYPTO } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' }, include: { product: true } }); return ok(reply, rows.map(r => ({ id: r.product.key.replace('crypto-', ''), name: r.product.displayName, current_price: decimal(r.price), updated_at: r.recordedAt, ...(typeof r.raw === 'object' && r.raw ? r.raw : {}) }))); });
 app.get('/api/crypto/top', async (_request, reply) => { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.CRYPTO } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' }, take: 10, include: { product: true } }); return ok(reply, rows.map(r => ({ id: r.product.key.replace('crypto-', ''), name: r.product.displayName, current_price: decimal(r.price), updated_at: r.recordedAt }))); });
@@ -85,6 +96,27 @@ app.delete('/api/asset-portfolio/:id', { preHandler: authenticate }, async (requ
 app.post('/api/auth/feature-disabled', async (_request, reply) => fail(reply, 503, 'This external provider is not configured', 'FEATURE_DISABLED'));
 
 async function history(request: any, reply: any, kind: MarketKind) { const period = z.object({ period: z.enum(['24h', '7d', '30d', '1y', 'all']).default('30d') }).parse(request.query).period; const days: Record<string, number> = { '24h': 1, '7d': 7, '30d': 30, '1y': 365, all: 3650 }; const after = new Date(Date.now() - days[period] * 86400000); const rows = await prisma.marketPrice.findMany({ where: { product: { kind }, recordedAt: { gte: after } }, include: { product: true }, orderBy: { recordedAt: 'asc' } }); return ok(reply, rows.map(r => ({ product: r.product.key, name: r.product.displayName, karat: r.product.karat, price: decimal(r.price ?? r.sell), buy_price: decimal(r.buy), sell_price: decimal(r.sell), date: r.recordedAt })), { period }); }
+async function goldOverview() {
+  const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.GOLD } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' }, include: { product: true } });
+  const byKey = new Map(rows.map(row => [row.product.key, row]));
+  const item = (key: string, color: string) => {
+    const row = byKey.get(key);
+    return row ? { currency: 'EGP', buy_price: decimal(row.buy), sell_price: decimal(row.sell ?? row.price), spread_egp: 0, spread_percent: 0, chart_points: [], chart_color: color, recorded_at: row.recordedAt } : null;
+  };
+  return { '24': item('gold-24', '#FFD700'), '21': item('gold-21', '#FFA500'), '18': item('gold-18', '#FF8C00'), gold_pound: item('gold-pound', '#B8860B'), ounce: null };
+}
+async function goldHistory(request: any) {
+  const period = z.object({ period: z.enum(['24h', '7d', '30d', '1y', 'all']).default('30d') }).parse(request.query).period;
+  const days: Record<string, number> = { '24h': 1, '7d': 7, '30d': 30, '1y': 365, all: 3650 };
+  const after = new Date(Date.now() - days[period] * 86400000);
+  const rows = await prisma.marketPrice.findMany({ where: { product: { key: { in: ['gold-24', 'gold-21', 'gold-18'] } }, recordedAt: { gte: after } }, include: { product: true }, orderBy: { recordedAt: 'asc' } });
+  const item = (key: string, color: string) => {
+    const prices = rows.filter(row => row.product.key === key);
+    const latestRow = prices.at(-1);
+    return { currency: 'EGP', buy_price: decimal(latestRow?.buy), sell_price: decimal(latestRow?.sell ?? latestRow?.price), spread_egp: 0, spread_percent: 0, chart_points: prices.map(row => ({ date: row.recordedAt.toISOString(), price: decimal(row.price ?? row.sell) })), chart_color: color, recorded_at: latestRow?.recordedAt ?? new Date(0) };
+  };
+  return { period, currency: 'EGP', karat_24: item('gold-24', '#FFD700'), karat_21: item('gold-21', '#FFA500'), karat_18: item('gold-18', '#FF8C00') };
+}
 async function currencyAverage(reply: any) { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.CURRENCY } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' } }); if (!rows.length) return fail(reply, 404, 'No data found', 'PRICE_UNAVAILABLE'); return ok(reply, { banks: { avg_buy_rate: rows.reduce((s,r)=>s+decimal(r.buy),0)/rows.length, avg_sell_rate: rows.reduce((s,r)=>s+decimal(r.sell),0)/rows.length, count: rows.length } }); }
 async function currencyExtreme(reply: any, field: 'buy' | 'sell') { const rows = await prisma.marketPrice.findMany({ where: { product: { kind: MarketKind.CURRENCY } }, distinct: ['productId'], orderBy: { recordedAt: 'desc' }, include: { product: true } }); if (!rows.length) return fail(reply, 404, 'No data found', 'PRICE_UNAVAILABLE'); const selected = rows.sort((a,b)=>decimal(b[field])-decimal(a[field]))[0]; return ok(reply, { bank: selected.product.displayName, rate: decimal(selected[field]), updated_at: selected.recordedAt }); }
 async function portfolio(userId: number) { const items = await prisma.portfolioItem.findMany({ where: { userId }, orderBy: { purchasedAt: 'desc' } }); return Promise.all(items.map(async item => { const price = await latest(item.productKey); const currentUnitPrice = price ? decimal(price.sell ?? price.price) : null; const amount = decimal(item.amount); const buyPrice = decimal(item.buyPrice); return { ...item, amount, buyPrice, current_unit_price: currentUnitPrice, cost_basis: amount * buyPrice, current_value: currentUnitPrice === null ? null : amount * currentUnitPrice, profit_loss: currentUnitPrice === null ? null : amount * (currentUnitPrice - buyPrice) }; })); }
