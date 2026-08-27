@@ -10,6 +10,7 @@
     "worker": "tsx src/worker.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
+    "seed": "tsx src/seed.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
