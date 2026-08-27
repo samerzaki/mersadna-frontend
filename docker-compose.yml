@@ -1,0 +1,72 @@
+services:
+  gateway:
+    image: nginx:1.27-alpine
+    ports: ["${APP_PORT:-8080}:80"]
+    volumes: ["./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro"]
+    depends_on:
+      web: { condition: service_started }
+      api: { condition: service_healthy }
+    networks: [public, private]
+  web:
+    build:
+      context: .
+      args: { NEXT_PUBLIC_API_URL: /api, INTERNAL_API_URL: http://api:3001/api }
+    environment: { NODE_ENV: production, INTERNAL_API_URL: http://api:3001/api }
+    networks: [private]
+  api:
+    build: { context: ./backend }
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: mysql://gold:${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}@mysql:3306/gold
+      REDIS_URL: redis://redis:6379
+      APP_ORIGIN: http://localhost:${APP_PORT:-8080}
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET}
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+    healthcheck: { test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/health/ready"], interval: 10s, timeout: 3s, retries: 15 }
+    networks: [private]
+  migrate:
+    build: { context: ./backend, target: migrator }
+    environment:
+      DATABASE_URL: mysql://gold:${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}@mysql:3306/gold
+    depends_on: { mysql: { condition: service_healthy } }
+    restart: "no"
+    networks: [private]
+  worker:
+    build: { context: ./backend }
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: mysql://gold:${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}@mysql:3306/gold
+      REDIS_URL: redis://redis:6379
+      APP_ORIGIN: http://localhost:${APP_PORT:-8080}
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET}
+      GOLD_BULLION_URL: ${GOLD_BULLION_URL:-}
+      SILVER_BULLION_URL: ${SILVER_BULLION_URL:-}
+    command: ["node", "dist/worker.js"]
+    depends_on: { api: { condition: service_healthy } }
+    networks: [private]
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: gold
+      MYSQL_USER: gold
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD}
+    volumes: [mysql_data:/var/lib/mysql]
+    healthcheck: { test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"], interval: 10s, timeout: 5s, retries: 15 }
+    networks: [private]
+  redis:
+    image: redis:7-alpine
+    healthcheck: { test: ["CMD", "redis-cli", "ping"], interval: 10s, timeout: 3s, retries: 10 }
+    networks: [private]
+  mailpit:
+    image: axllent/mailpit:v1.24
+    profiles: ["mail"]
+    ports: ["${MAILPIT_PORT:-8025}:8025"]
+    networks: [private]
+volumes:
+  mysql_data: {}
+networks:
+  public: {}
+  private: { internal: true }

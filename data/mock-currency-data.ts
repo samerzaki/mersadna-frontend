@@ -1,0 +1,66 @@
+// Mock currency data for development
+
+import { CurrencyPrice } from '@/types';
+
+export const mockCurrencyPrices: CurrencyPrice[] = [
+  {
+    code: 'USD',
+    name: 'الدولار الأمريكي',
+    symbol: '$',
+    flag: '🇺🇸',
+    price: 50.85,
+    change: -0.06,
+    changePercent: -0.12,
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    code: 'EUR',
+    name: 'اليورو',
+    symbol: '€',
+    flag: '🇪🇺',
+    price: 54.20,
+    change: 0.14,
+    changePercent: 0.25,
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    code: 'GBP',
+    name: 'الجنيه الإسترليني',
+    symbol: '£',
+    flag: '🇬🇧',
+    price: 63.50,
+    change: 0.11,
+    changePercent: 0.18,
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    code: 'SAR',
+    name: 'الريال السعودي',
+    symbol: 'ر.س',
+    flag: '🇸🇦',
+    price: 13.56,
+    change: 0,
+    changePercent: 0,
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    code: 'AED',
+    name: 'الدرهم الإماراتي',
+    symbol: 'د.إ',
+    flag: '🇦🇪',
+    price: 13.84,
+    change: -0.01,
+    changePercent: -0.05,
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    code: 'KWD',
+    name: 'الدينار الكويتي',
+    symbol: 'د.ك',
+    flag: '🇰🇼',
+    price: 165.30,
+    change: 0.53,
+    changePercent: 0.32,
+    updatedAt: new Date().toISOString(),
+  },
+];

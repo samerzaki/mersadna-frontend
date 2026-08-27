@@ -1,0 +1,164 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum MarketKind {
+  GOLD
+  SILVER
+  CRYPTO
+  CURRENCY
+}
+
+enum TokenKind {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+  CHANGE_EMAIL
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique @db.VarChar(254)
+  passwordHash String
+  firstName String @db.VarChar(100)
+  lastName String @db.VarChar(100)
+  avatarPath String? @db.VarChar(255)
+  emailVerifiedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sessions Session[]
+  tokens AuthToken[]
+  portfolioItems PortfolioItem[]
+  alerts PriceAlert[]
+  bookmarks NewsBookmark[]
+}
+
+model Session {
+  id Int @id @default(autoincrement())
+  userId Int
+  tokenHash String @unique @db.VarChar(128)
+  expiresAt DateTime
+  lastSeenAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, expiresAt])
+}
+
+model AuthToken {
+  id Int @id @default(autoincrement())
+  userId Int
+  kind TokenKind
+  tokenHash String @unique @db.VarChar(128)
+  expiresAt DateTime
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, kind])
+}
+
+model MarketProduct {
+  id Int @id @default(autoincrement())
+  key String @unique @db.VarChar(100)
+  kind MarketKind
+  displayName String @db.VarChar(160)
+  karat Int?
+  currency String? @db.VarChar(8)
+  source String? @db.VarChar(100)
+  active Boolean @default(true)
+  prices MarketPrice[]
+}
+
+model MarketPrice {
+  id BigInt @id @default(autoincrement())
+  productId Int
+  buy Decimal? @db.Decimal(18, 6)
+  sell Decimal? @db.Decimal(18, 6)
+  price Decimal? @db.Decimal(18, 6)
+  raw Json?
+  recordedAt DateTime @default(now())
+  product MarketProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+  @@index([productId, recordedAt])
+}
+
+model IngestionRun {
+  id Int @id @default(autoincrement())
+  source String @db.VarChar(100)
+  status String @db.VarChar(20)
+  records Int @default(0)
+  error String? @db.Text
+  startedAt DateTime @default(now())
+  completedAt DateTime?
+  @@index([source, startedAt])
+}
+
+model PortfolioItem {
+  id Int @id @default(autoincrement())
+  userId Int
+  kind MarketKind
+  productKey String @db.VarChar(100)
+  amount Decimal @db.Decimal(18, 6)
+  buyPrice Decimal @db.Decimal(18, 6)
+  currency String @default("EGP") @db.VarChar(8)
+  purchasedAt DateTime
+  notes String? @db.VarChar(1000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+}
+
+model PriceAlert {
+  id Int @id @default(autoincrement())
+  userId Int
+  productKey String @db.VarChar(100)
+  direction String @db.VarChar(8)
+  target Decimal @db.Decimal(18, 6)
+  active Boolean @default(true)
+  triggeredAt DateTime?
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, active])
+}
+
+model NewsCategory {
+  id Int @id @default(autoincrement())
+  slug String @unique
+  title String
+  articles NewsArticle[]
+}
+
+model NewsArticle {
+  id Int @id @default(autoincrement())
+  slug String @unique
+  sourceUrl String @db.Text
+  sourceHash String @unique @db.Char(64)
+  sourceName String
+  originalTitle String @db.Text
+  title String? @db.Text
+  description String? @db.Text
+  body String? @db.LongText
+  keyPoints Json?
+  imageUrl String? @db.Text
+  publishedAt DateTime?
+  categoryId Int?
+  published Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  category NewsCategory? @relation(fields: [categoryId], references: [id])
+  bookmarks NewsBookmark[]
+  @@index([published, publishedAt])
+}
+
+model NewsBookmark {
+  userId Int
+  articleId Int
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  @@id([userId, articleId])
+}

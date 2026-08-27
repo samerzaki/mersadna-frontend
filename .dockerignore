@@ -1,0 +1,12 @@
+.git
+.next
+node_modules
+backend
+logs
+plans
+.claude
+.env*
+env.local
+env.production
+*.log
+*.tsbuildinfo
