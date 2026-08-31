@@ -66,7 +66,7 @@ const selectClassName =
   "flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:border-slate-800 dark:bg-slate-950 dark:focus-visible:ring-slate-300";
 
 const ALLOCATION_COLORS: Record<string, string> = {
-  gold: "#D4740C",   // --primary
+  gold: "var(--primary)",
   silver: "#94a3b8",  // slate-400
   currency: "#64748b", // slate-500
 };

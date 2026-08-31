@@ -79,7 +79,7 @@ export async function HeroStatsBannerServer() {
 
 export function HeroStatsBannerSkeleton() {
   return (
-    <div className="md:sticky md:top-16 md:z-40 bg-linear-to-r from-amber-500/10 via-amber-400/5 to-transparent border-b border-amber-200/20 dark:border-amber-800/20 backdrop-blur-sm">
+    <div className="md:sticky md:top-16 md:z-40 bg-linear-to-r from-primary-500/10 via-primary-400/5 to-transparent border-b border-primary-200/20 dark:border-primary-800/20 backdrop-blur-sm">
       <div className="px-4 md:px-8 py-3">
         <div className="mx-auto max-w-7xl">
           <div className="flex gap-6 overflow-x-auto scrollbar-hide">

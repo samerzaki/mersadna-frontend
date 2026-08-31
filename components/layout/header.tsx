@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { TrendingUp, LogOut, Settings, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LogOut, Settings, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
 import { ThemeToggle } from './theme-toggle';
@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export function Header() {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const { user, isAuthenticated, logout } = useAuth();
   const { isCollapsed, toggleCollapse } = useSidebar();
   const isRTL = language === 'ar';
@@ -33,29 +33,30 @@ export function Header() {
       <div className="flex h-16 items-center">
         {/* Logo section - above sidebar on desktop */}
         <div className={cn(
-          "flex items-center justify-between px-4 transition-all duration-300",
+          "relative flex h-full flex-1 items-center justify-between px-4 transition-all duration-300 md:flex-none",
           isCollapsed ? "md:w-20" : "md:w-64",
           "md:shrink-0",
           isRTL ? "md:border-l" : "md:border-r",
           "md:border-slate-200 dark:md:border-slate-800"
         )}>
-          <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#D4740C] to-[#b5600a]">
-              <TrendingUp className="h-6 w-6 text-white" />
-            </div>
-            {!isCollapsed && (
-              <div>
-                <h1 className="text-xl font-bold">{t.header.title}</h1>
-                <p className="text-xs text-muted-foreground">{t.header.subtitle}</p>
-              </div>
-            )}
+          <Link href="/" className="relative flex h-full w-full min-w-0 items-center px-2.5 py-3">
+            {/* CDN-hosted brand asset; use its original file directly. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={isCollapsed
+                ? "https://mersadna-cdn.b-cdn.net/assets/images/logos/square.png"
+                : "https://mersadna-cdn.b-cdn.net/assets/images/logos/logo.png"}
+              alt="Mersadna"
+              className="block h-full w-full object-contain"
+            />
           </Link>
 
           {/* Collapse Button - Desktop only */}
           <button
             onClick={toggleCollapse}
             className={cn(
-              "hidden md:flex items-center justify-center",
+              "absolute top-1/2 z-10 hidden -translate-y-1/2 md:flex items-center justify-center",
+              isRTL ? "left-4" : "right-4",
               "w-8 h-8 rounded-lg",
               "text-slate-600 dark:text-slate-300",
               "hover:bg-slate-100 dark:hover:bg-slate-800",
