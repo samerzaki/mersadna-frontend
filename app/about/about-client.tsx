@@ -16,8 +16,8 @@ export default function AboutPage() {
         </h1>
         <p className="text-lg text-muted-foreground">
           {isRTL
-            ? 'منصة نِزِل ذهب - وجهتك الموثوقة لمتابعة أسعار الذهب والعملات في مصر'
-            : 'Nezzel Gold - Your trusted platform for tracking gold and currency prices in Egypt'}
+            ? 'منصة مرصادنا - وجهتك الموثوقة لمتابعة أسعار الذهب والعملات في مصر'
+            : 'Mersadna - Your trusted platform for tracking gold and currency prices in Egypt'}
         </p>
       </div>
 
@@ -26,12 +26,12 @@ export default function AboutPage() {
         {/* About Section */}
         <section className="rounded-lg border bg-card p-6">
           <h2 className="mb-4 text-2xl font-semibold">
-            {isRTL ? 'عن نِزِل ذهب' : 'About Nezzel Gold'}
+            {isRTL ? 'عن مرصادنا' : 'About Mersadna'}
           </h2>
           <p className="leading-relaxed text-muted-foreground">
             {isRTL
-              ? 'نِزِل ذهب هي منصة شاملة لمتابعة أسعار الذهب والعملات والعملات الرقمية في مصر. نوفر لك بيانات دقيقة ومحدثة لحظياً لمساعدتك في اتخاذ قرارات استثمارية مدروسة. نسعى لتقديم تجربة مستخدم متميزة مع أدوات حسابية ذكية وتحليلات شاملة للسوق.'
-              : 'Nezzel Gold is a comprehensive platform for tracking gold, currency, and cryptocurrency prices in Egypt. We provide accurate, real-time data to help you make informed investment decisions. We strive to deliver an exceptional user experience with smart calculation tools and comprehensive market analytics.'}
+              ? 'مرصادنا هي منصة شاملة لمتابعة أسعار الذهب والعملات والعملات الرقمية في مصر. نوفر لك بيانات دقيقة ومحدثة لحظياً لمساعدتك في اتخاذ قرارات استثمارية مدروسة. نسعى لتقديم تجربة مستخدم متميزة مع أدوات حسابية ذكية وتحليلات شاملة للسوق.'
+              : 'Mersadna is a comprehensive platform for tracking gold, currency, and cryptocurrency prices in Egypt. We provide accurate, real-time data to help you make informed investment decisions. We strive to deliver an exceptional user experience with smart calculation tools and comprehensive market analytics.'}
           </p>
         </section>
 

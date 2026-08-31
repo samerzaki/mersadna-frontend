@@ -71,7 +71,7 @@ export async function ModernGoldPricesServer() {
       });
     }
 
-    return <ModernGoldPricesClient goldData={goldData} />;
+    return <ModernGoldPricesClient goldData={goldData} referenceTime={new Date().toISOString()} />;
   } catch (error) {
     return (
       <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg p-6">

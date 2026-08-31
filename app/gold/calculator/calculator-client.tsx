@@ -340,13 +340,13 @@ export default function GoldCalculatorPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="karat24">
-                              24K - {LIVE_PRICES.karat24.toLocaleString('ar-EG')} {t.common.egp}
+                              24K - {LIVE_PRICES.karat24.toLocaleString('en-US')} {t.common.egp}
                             </SelectItem>
                             <SelectItem value="karat21">
-                              21K - {LIVE_PRICES.karat21.toLocaleString('ar-EG')} {t.common.egp}
+                              21K - {LIVE_PRICES.karat21.toLocaleString('en-US')} {t.common.egp}
                             </SelectItem>
                             <SelectItem value="karat18">
-                              18K - {LIVE_PRICES.karat18.toLocaleString('ar-EG')} {t.common.egp}
+                              18K - {LIVE_PRICES.karat18.toLocaleString('en-US')} {t.common.egp}
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -431,13 +431,13 @@ export default function GoldCalculatorPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="karat24">
-                              24K - {LIVE_PRICES.karat24.toLocaleString('ar-EG')} {t.common.egp}
+                              24K - {LIVE_PRICES.karat24.toLocaleString('en-US')} {t.common.egp}
                             </SelectItem>
                             <SelectItem value="karat21">
-                              21K - {LIVE_PRICES.karat21.toLocaleString('ar-EG')} {t.common.egp}
+                              21K - {LIVE_PRICES.karat21.toLocaleString('en-US')} {t.common.egp}
                             </SelectItem>
                             <SelectItem value="karat18">
-                              18K - {LIVE_PRICES.karat18.toLocaleString('ar-EG')} {t.common.egp}
+                              18K - {LIVE_PRICES.karat18.toLocaleString('en-US')} {t.common.egp}
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -538,13 +538,13 @@ export default function GoldCalculatorPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="karat24">
-                              24K - {LIVE_PRICES.karat24.toLocaleString('ar-EG')} {t.common.egp}
+                              24K - {LIVE_PRICES.karat24.toLocaleString('en-US')} {t.common.egp}
                             </SelectItem>
                             <SelectItem value="karat21">
-                              21K - {LIVE_PRICES.karat21.toLocaleString('ar-EG')} {t.common.egp}
+                              21K - {LIVE_PRICES.karat21.toLocaleString('en-US')} {t.common.egp}
                             </SelectItem>
                             <SelectItem value="karat18">
-                              18K - {LIVE_PRICES.karat18.toLocaleString('ar-EG')} {t.common.egp}
+                              18K - {LIVE_PRICES.karat18.toLocaleString('en-US')} {t.common.egp}
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -624,7 +624,7 @@ export default function GoldCalculatorPage() {
                       {t.pages.calculator.totalInvested}
                     </p>
                     <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                      {plResults.totalCost.toLocaleString()} {t.common.egp}
+                      {plResults.totalCost.toLocaleString('en-US')} {t.common.egp}
                     </p>
                   </div>
                   <div className="space-y-1.5">
@@ -632,7 +632,7 @@ export default function GoldCalculatorPage() {
                       {t.pages.calculator.currentValue}
                     </p>
                     <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                      {plResults.totalCurrentValue.toLocaleString()} {t.common.egp}
+                      {plResults.totalCurrentValue.toLocaleString('en-US')} {t.common.egp}
                     </p>
                   </div>
                   <div className="pt-4 border-t space-y-1.5">
@@ -646,7 +646,7 @@ export default function GoldCalculatorPage() {
                       )}
                     >
                       {plResults.isProfit ? "+" : ""}
-                      {plResults.difference.toLocaleString()}
+                      {plResults.difference.toLocaleString('en-US')}
                     </p>
                     <p
                       className={cn(
@@ -666,7 +666,7 @@ export default function GoldCalculatorPage() {
                       {t.pages.calculator.marketValue}
                     </p>
                     <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                      {sellResults.totalMarketValue.toLocaleString()} {t.common.egp}
+                      {sellResults.totalMarketValue.toLocaleString('en-US')} {t.common.egp}
                     </p>
                   </div>
                   <div className="space-y-1.5">
@@ -674,7 +674,7 @@ export default function GoldCalculatorPage() {
                       {t.pages.calculator.totalDeduction}
                     </p>
                     <p className="text-lg font-semibold text-amber-600 dark:text-amber-400">
-                      - {sellResults.totalDeduction.toLocaleString()}
+                      - {sellResults.totalDeduction.toLocaleString('en-US')}
                     </p>
                   </div>
                   <div className="pt-4 border-t space-y-1.5">
@@ -682,7 +682,7 @@ export default function GoldCalculatorPage() {
                       {t.pages.calculator.netCash}
                     </p>
                     <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-                      {sellResults.totalCash.toLocaleString()}
+                      {sellResults.totalCash.toLocaleString('en-US')}
                     </p>
                   </div>
                 </div>
@@ -693,7 +693,7 @@ export default function GoldCalculatorPage() {
                       {t.pages.calculator.rawGold}
                     </p>
                     <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                      {buyResults.totalBasePrice.toLocaleString()} {t.common.egp}
+                      {buyResults.totalBasePrice.toLocaleString('en-US')} {t.common.egp}
                     </p>
                   </div>
                   <div className="space-y-1.5">
@@ -701,7 +701,7 @@ export default function GoldCalculatorPage() {
                       {t.pages.calculator.workmanship}
                     </p>
                     <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                      {buyResults.totalWorkmanship.toLocaleString()} {t.common.egp}
+                      {buyResults.totalWorkmanship.toLocaleString('en-US')} {t.common.egp}
                     </p>
                   </div>
                   <div className="pt-4 border-t space-y-1.5">
@@ -709,7 +709,7 @@ export default function GoldCalculatorPage() {
                       {t.pages.calculator.totalCost}
                     </p>
                     <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-                      {buyResults.totalCost.toLocaleString()}
+                      {buyResults.totalCost.toLocaleString('en-US')}
                     </p>
                   </div>
                 </div>
@@ -739,7 +739,7 @@ export default function GoldCalculatorPage() {
                   "text-xl font-bold",
                   plResults.isProfit ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
                 )}>
-                  {plResults.isProfit ? "+" : ""}{plResults.difference.toLocaleString()}
+                  {plResults.isProfit ? "+" : ""}{plResults.difference.toLocaleString('en-US')}
                 </p>
               </div>
               <div className="text-start">
@@ -763,7 +763,7 @@ export default function GoldCalculatorPage() {
                   {t.pages.calculator.netCash}
                 </p>
                 <p className="text-xl font-bold text-slate-900 dark:text-slate-50">
-                  {sellResults.totalCash.toLocaleString()}
+                  {sellResults.totalCash.toLocaleString('en-US')}
                 </p>
               </div>
               <div className="text-start">
@@ -771,7 +771,7 @@ export default function GoldCalculatorPage() {
                   {t.pages.calculator.deduction}
                 </p>
                 <p className="text-lg font-semibold text-amber-600 dark:text-amber-400">
-                  - {sellResults.totalDeduction.toLocaleString()}
+                  - {sellResults.totalDeduction.toLocaleString('en-US')}
                 </p>
               </div>
             </div>
@@ -784,7 +784,7 @@ export default function GoldCalculatorPage() {
                   {t.pages.calculator.totalCost}
                 </p>
                 <p className="text-xl font-bold text-slate-900 dark:text-slate-50">
-                  {buyResults.totalCost.toLocaleString()}
+                  {buyResults.totalCost.toLocaleString('en-US')}
                 </p>
               </div>
               <div className="text-start">
@@ -792,7 +792,7 @@ export default function GoldCalculatorPage() {
                   {t.pages.calculator.work}
                 </p>
                 <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">
-                  {buyResults.totalWorkmanship.toLocaleString()}
+                  {buyResults.totalWorkmanship.toLocaleString('en-US')}
                 </p>
               </div>
             </div>

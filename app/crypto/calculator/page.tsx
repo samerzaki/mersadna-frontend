@@ -8,7 +8,7 @@ export const metadata: Metadata = buildMetadata('cryptoCalculator', {
 });
 
 const jsonLd = generateSoftwareAppSchema({
-  name: 'حاسبة العملات الرقمية - nezzel gold',
+  name: 'حاسبة العملات الرقمية - Mersadna',
   description: 'احسب قيمة العملات الرقمية مثل البيتكوين والإيثيريوم بالجنيه المصري',
   url: '/crypto/calculator',
 });

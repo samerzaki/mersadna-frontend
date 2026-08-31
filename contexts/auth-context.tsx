@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { NotificationChannels, LinkedAccounts } from '@/types/user';
-import { login as loginApi, register as registerApi, whoAmI, logout as logoutApi } from '@/lib/api-auth';
-import { removeStoredToken } from '@/lib/auth-utils';
+import { login as loginApi, register as registerApi, whoAmI } from '@/lib/api-auth';
+import { removeStoredToken, setStoredToken } from '@/lib/auth-utils';
 import type { AuthUser } from '@/types/auth';
 
 export interface User {
@@ -34,7 +34,7 @@ export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string, turnstileToken?: string) => Promise<{ success: boolean; error?: string }>;
   register: (userData: RegisterData) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -48,6 +48,7 @@ export interface RegisterData {
   lastName: string;
   phone?: string;
   confirmPassword: string;
+  turnstileToken?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -100,13 +101,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('unauthorized', handleUnauthorized);
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, turnstileToken?: string) => {
     setIsLoading(true);
 
     try {
-      const response = await loginApi({ email, password });
+      const response = await loginApi({
+        email,
+        password,
+        'cf-turnstile-response': turnstileToken || getTurnstileToken(),
+      });
 
       if (response.success && response.data) {
+        setStoredToken(response.access_token);
         setUser(mapAuthUser(response.data));
         setIsLoading(false);
         return { success: true };
@@ -132,9 +138,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password: userData.password,
         password_confirmation: userData.confirmPassword,
         mobile_number: userData.phone || undefined,
+        'cf-turnstile-response': userData.turnstileToken || getTurnstileToken(),
       });
 
       if (response.success && response.data) {
+        setStoredToken(response.access_token);
         setUser(mapAuthUser(response.data));
         setIsLoading(false);
         return { success: true };
@@ -150,7 +158,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = useCallback(() => {
-    void logoutApi().catch(() => undefined);
     setUser(null);
     removeStoredToken();
   }, []);
@@ -191,6 +198,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+/** Cloudflare's public test token is used only for local development. */
+function getTurnstileToken(): string | undefined {
+  const configuredToken = process.env.NEXT_PUBLIC_TURNSTILE_TOKEN;
+  if (configuredToken) return configuredToken;
+  return process.env.NODE_ENV === 'development'
+    ? '1x0000000000000000000000000000000AA'
+    : undefined;
 }
 
 export function useAuth() {

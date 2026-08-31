@@ -25,7 +25,10 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      await forgotPassword(email);
+      await forgotPassword({
+        email,
+        'cf-turnstile-response': getTurnstileToken(),
+      });
       setSuccess(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : t.pages.forgotPassword.errorDefault;
@@ -282,4 +285,9 @@ export default function ForgotPasswordPage() {
       </div>
     </div>
   );
+}
+
+function getTurnstileToken(): string | undefined {
+  return process.env.NEXT_PUBLIC_TURNSTILE_TOKEN ||
+    (process.env.NODE_ENV === 'development' ? '1x0000000000000000000000000000000AA' : undefined);
 }

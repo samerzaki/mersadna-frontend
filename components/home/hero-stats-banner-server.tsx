@@ -1,12 +1,13 @@
 import { fetchGoldOverview, fetchHighestBuyPrice, fetchHighestSellPrice } from '@/lib/api';
+import { isPriceLive } from '@/lib/format';
 import { HeroStatsBannerClient } from './hero-stats-banner';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export interface HeroStatsBannerData {
-  gold24: { sell_price: number; spread_percent: number; recorded_at: string } | null;
-  gold21: { sell_price: number; spread_percent: number; recorded_at: string } | null;
-  gold18: { sell_price: number; spread_percent: number; recorded_at: string } | null;
-  ounce: { sell_price: number; recorded_at: string } | null;
+  gold24: { sell_price: number; spread_percent: number; is_live: boolean } | null;
+  gold21: { sell_price: number; spread_percent: number; is_live: boolean } | null;
+  gold18: { sell_price: number; spread_percent: number; is_live: boolean } | null;
+  ounce: { sell_price: number; is_live: boolean } | null;
   usdBuy: {
     price: string;
     bank: {
@@ -37,21 +38,21 @@ export async function HeroStatsBannerServer() {
       gold24: gold?.['24'] ? {
         sell_price: gold['24'].sell_price,
         spread_percent: gold['24'].spread_percent,
-        recorded_at: gold['24'].recorded_at,
+        is_live: isPriceLive(gold['24'].recorded_at),
       } : null,
       gold21: gold?.['21'] ? {
         sell_price: gold['21'].sell_price,
         spread_percent: gold['21'].spread_percent,
-        recorded_at: gold['21'].recorded_at,
+        is_live: isPriceLive(gold['21'].recorded_at),
       } : null,
       gold18: gold?.['18'] ? {
         sell_price: gold['18'].sell_price,
         spread_percent: gold['18'].spread_percent,
-        recorded_at: gold['18'].recorded_at,
+        is_live: isPriceLive(gold['18'].recorded_at),
       } : null,
       ounce: gold?.ounce ? {
         sell_price: gold.ounce.sell_price,
-        recorded_at: gold.ounce.recorded_at,
+        is_live: isPriceLive(gold.ounce.recorded_at),
       } : null,
       usdBuy: usdBuyData?.data ? {
         price: usdBuyData.data.price,

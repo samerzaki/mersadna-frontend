@@ -10,8 +10,8 @@ import type { Metadata } from 'next';
 export const SEO_CONFIG = {
   // --- Site-wide settings ---
   site: {
-    name: 'nezzel gold',
-    nameAr: 'نِزِل ذهب',
+    name: 'Mersadna',
+    nameAr: 'مرصادنا',
     domain: 'https://nezzel.com',
     twitter: '@nezzelgold',
   },
@@ -100,27 +100,27 @@ export const SEO_CONFIG = {
     // Static pages
     about: {
       title: 'من نحن',
-      description: 'تعرف على منصة nezzel gold - وجهتك الموثوقة لمتابعة أسعار الذهب والعملات في مصر.',
-      keywords: ['nezzel gold', 'نزل ذهب', 'من نحن', 'about nezzel gold'],
+      description: 'تعرف على منصة Mersadna - وجهتك الموثوقة لمتابعة أسعار الذهب والعملات في مصر.',
+      keywords: ['Mersadna', 'مرصادنا', 'من نحن', 'about Mersadna'],
     },
     contact: {
       title: 'اتصل بنا',
-      description: 'تواصل مع فريق nezzel gold. نسعد بالإجابة على استفساراتك ومقترحاتك.',
-      keywords: ['اتصل بنا', 'تواصل معنا', 'contact nezzel gold'],
+      description: 'تواصل مع فريق Mersadna. نسعد بالإجابة على استفساراتك ومقترحاتك.',
+      keywords: ['اتصل بنا', 'تواصل معنا', 'contact Mersadna'],
     },
     pricing: {
       title: 'الأسعار والباقات',
-      description: 'اختر الباقة المناسبة لك من خطط nezzel gold للوصول إلى جميع المزايا.',
-      keywords: ['أسعار الاشتراك', 'باقات', 'pricing', 'nezzel gold plans'],
+      description: 'اختر الباقة المناسبة لك من خطط Mersadna للوصول إلى جميع المزايا.',
+      keywords: ['أسعار الاشتراك', 'باقات', 'pricing', 'Mersadna plans'],
     },
     privacy: {
       title: 'سياسة الخصوصية',
-      description: 'سياسة الخصوصية وحماية البيانات الشخصية في منصة nezzel gold.',
+      description: 'سياسة الخصوصية وحماية البيانات الشخصية في منصة Mersadna.',
       keywords: ['سياسة الخصوصية', 'حماية البيانات', 'privacy policy'],
     },
     terms: {
       title: 'شروط الاستخدام',
-      description: 'شروط وأحكام استخدام منصة nezzel gold لمتابعة أسعار الذهب والعملات.',
+      description: 'شروط وأحكام استخدام منصة Mersadna لمتابعة أسعار الذهب والعملات.',
       keywords: ['شروط الاستخدام', 'الأحكام', 'terms of service'],
     },
 
@@ -149,11 +149,11 @@ export const SEO_CONFIG = {
     // Auth pages (noindex)
     authLogin: {
       title: 'تسجيل الدخول',
-      description: 'سجل دخولك إلى حسابك في nezzel gold.',
+      description: 'سجل دخولك إلى حسابك في Mersadna.',
     },
     authRegister: {
       title: 'إنشاء حساب',
-      description: 'أنشئ حسابك المجاني في nezzel gold.',
+      description: 'أنشئ حسابك المجاني في Mersadna.',
     },
     authForgotPassword: {
       title: 'نسيت كلمة المرور',

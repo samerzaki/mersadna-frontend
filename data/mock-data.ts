@@ -88,7 +88,7 @@ export function generateMockChartData(days: number): ChartDataPoint[] {
 
     chartData.push({
       timestamp: date.toISOString(),
-      date: date.toLocaleDateString('ar-EG', { 
+      date: date.toLocaleDateString('ar-EG-u-nu-latn', {
         month: 'short', 
         day: 'numeric' 
       }),

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Language, translations } from '@/lib/translations';
+import { changeLanguage } from '@/lib/api-auth';
 
 interface LanguageContextType {
   language: Language;
@@ -30,6 +31,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     setLanguageState(lang);
     if (mounted) {
       localStorage.setItem('language', lang);
+      void changeLanguage(lang).catch(() => undefined);
     }
   };
 

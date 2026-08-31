@@ -196,7 +196,7 @@ export function UnifiedGoldChart({ data, title = 'تاريخ أسعار الذه
               yAxisId="gold"
               stroke="#64748b"
               style={{ fontSize: '12px' }}
-              tickFormatter={(value) => `${value.toLocaleString('ar-EG')}`}
+              tickFormatter={(value) => `${value.toLocaleString('en-US')}`}
             />
             {data.usd_rates && (
               <YAxis

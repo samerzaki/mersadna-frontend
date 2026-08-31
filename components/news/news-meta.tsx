@@ -78,7 +78,7 @@ export function NewsMeta({
           <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
             <Eye className="w-4 h-4" />
             <span>
-              {viewCount.toLocaleString()} {isRTL ? 'مشاهدة' : 'views'}
+              {viewCount.toLocaleString('en-US')} {isRTL ? 'مشاهدة' : 'views'}
             </span>
           </div>
         )}
@@ -118,7 +118,7 @@ export function NewsMeta({
       {showViews && viewCount !== undefined && (
         <div className="flex items-center gap-1.5">
           <Eye className="w-4 h-4" />
-          <span>{viewCount.toLocaleString()}</span>
+          <span>{viewCount.toLocaleString('en-US')}</span>
         </div>
       )}
     </div>

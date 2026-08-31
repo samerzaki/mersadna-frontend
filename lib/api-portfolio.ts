@@ -57,6 +57,7 @@ export async function deletePortfolioItem(id: number): Promise<void> {
 
   const response = await fetch(`${API_BASE_URL}/asset-portfolio/${id}`, {
     method: 'DELETE',
+    credentials: 'include',
     headers,
   });
 

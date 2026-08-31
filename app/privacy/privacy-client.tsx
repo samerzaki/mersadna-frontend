@@ -25,8 +25,8 @@ export default function PrivacyPage() {
       <div className="mb-8 rounded-lg border bg-card p-6">
         <p className="leading-relaxed text-muted-foreground">
           {isRTL
-            ? 'في نِزِل ذهب، نحن ملتزمون بحماية خصوصيتك وأمان بياناتك. توضح هذه السياسة كيفية جمع واستخدام وحماية معلوماتك الشخصية عند استخدام منصتنا.'
-            : 'At Nezzel Gold, we are committed to protecting your privacy and data security. This policy explains how we collect, use, and protect your personal information when using our platform.'}
+            ? 'في مرصادنا، نحن ملتزمون بحماية خصوصيتك وأمان بياناتك. توضح هذه السياسة كيفية جمع واستخدام وحماية معلوماتك الشخصية عند استخدام منصتنا.'
+            : 'At Mersadna, we are committed to protecting your privacy and data security. This policy explains how we collect, use, and protect your personal information when using our platform.'}
         </p>
       </div>
 

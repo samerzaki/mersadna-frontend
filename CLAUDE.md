@@ -1,7 +1,7 @@
 # CLAUDE.md - Project Documentation
 
 > **Last Updated:** January 27, 2026
-> **Project Name:** nezzel gold (نِزِل ذهب)
+> **Project Name:** Mersadna (مرصادنا)
 > **Version:** 0.1.0
 
 ---
@@ -31,7 +31,7 @@
 
 ## 📖 Project Overview
 
-**nezzel gold** is a comprehensive web application for tracking real-time gold and currency prices in Egypt. The platform provides:
+**Mersadna** is a comprehensive web application for tracking real-time gold and currency prices in Egypt. The platform provides:
 
 - **Live Gold Prices**: Real-time tracking of gold prices across all karats (24k, 21k, 18k) plus gold pound and ounce
 - **Currency Exchange Rates**: Live currency exchange rates from Egyptian banks and parallel markets
@@ -362,7 +362,7 @@ if (error) {
 - **Node.js**: v20.x or higher
 - **npm**: v10.x or higher
 - **Windows/Linux/macOS**: Any OS
-- **Backend API**: Nezzel Gold API running at `http://nezzel.test/api`
+- **Backend API**: Mersadna API running at `http://nezzel.test/api`
 
 ### Installation
 
@@ -942,3 +942,13 @@ Private project - All rights reserved.
 **End of Documentation**
 
 > This file is intended to help AI assistants (like Claude) and developers understand the project structure, conventions, and architecture at a glance.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

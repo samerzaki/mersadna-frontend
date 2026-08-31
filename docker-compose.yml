@@ -10,7 +10,7 @@ services:
   web:
     build:
       context: .
-      args: { NEXT_PUBLIC_API_URL: /api, INTERNAL_API_URL: http://api:3001/api }
+      args: { NEXT_PUBLIC_API_URL: http://api.mersadna.test/api, INTERNAL_API_URL: http://api:3001/api }
     environment: { NODE_ENV: production, INTERNAL_API_URL: http://api:3001/api }
     networks: [private]
   api:

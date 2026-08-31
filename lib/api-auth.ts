@@ -8,6 +8,7 @@ import type {
   ApiResponse,
   AuthUser,
   CheckEmailExistsData,
+  ForgotPasswordRequest,
   ResetPasswordRequest,
   ChangePasswordApiRequest,
   ChangeEmailApiRequest,
@@ -24,7 +25,7 @@ import type {
  * POST /user/login
  */
 export async function login(data: LoginRequest): Promise<AuthResponse> {
-  return apiFetch<AuthResponse>('/auth/login', {
+  return apiFetch<AuthResponse>('/user/login', {
     method: 'POST',
     body: JSON.stringify(data),
   });
@@ -35,7 +36,7 @@ export async function login(data: LoginRequest): Promise<AuthResponse> {
  * POST /user/register
  */
 export async function register(data: RegisterRequest): Promise<AuthResponse> {
-  return apiFetch<AuthResponse>('/auth/register', {
+  return apiFetch<AuthResponse>('/user/register', {
     method: 'POST',
     body: JSON.stringify(data),
   });
@@ -70,10 +71,10 @@ export async function verifyEmail(
  * Request password reset email with link
  * POST /user/forgot-password
  */
-export async function forgotPassword(email: string): Promise<ApiResponse<null>> {
-  return apiFetch<ApiResponse<null>>('/auth/forgot-password', {
+export async function forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse<null>> {
+  return apiFetch<ApiResponse<null>>('/user/forgot-password', {
     method: 'POST',
-    body: JSON.stringify({ email }),
+    body: JSON.stringify(data),
   });
 }
 
@@ -82,7 +83,7 @@ export async function forgotPassword(email: string): Promise<ApiResponse<null>> 
  * POST /user/reset-password
  */
 export async function resetPassword(data: ResetPasswordRequest): Promise<ApiResponse<null>> {
-  return apiFetch<ApiResponse<null>>('/auth/reset-password', {
+  return apiFetch<ApiResponse<null>>('/user/reset-password', {
     method: 'POST',
     body: JSON.stringify(data),
   });
@@ -125,12 +126,19 @@ export async function changeEmail(data: ChangeEmailApiRequest): Promise<ApiRespo
  * GET /user/who-am-i
  */
 export async function whoAmI(): Promise<ApiResponse<AuthUser>> {
-  return apiFetch<ApiResponse<AuthUser>>('/auth/who-am-i');
+  return apiFetch<ApiResponse<AuthUser>>('/user/who-am-i');
 }
 
-export async function logout(): Promise<ApiResponse<{ logged_out: boolean }>> {
-  return apiFetch<ApiResponse<{ logged_out: boolean }>>('/auth/logout', { method: 'POST' });
+/** Persist the selected app language for the current API session. */
+export async function changeLanguage(lang: 'ar' | 'en'): Promise<ApiResponse<null>> {
+  return apiFetch<ApiResponse<null>>('/core/change-language', {
+    method: 'POST',
+    body: JSON.stringify({ lang }),
+  });
 }
+
+// The documented API uses bearer tokens and has no logout endpoint. Clearing
+// the locally stored token ends this browser session.
 
 /**
  * Update user profile (authenticated)

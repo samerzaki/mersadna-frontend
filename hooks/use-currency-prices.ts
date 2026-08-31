@@ -1,4 +1,4 @@
-// React Query hooks for Currency API - Nezzel Gold
+// React Query hooks for the Mersadna currency API
 
 import { useQuery } from '@tanstack/react-query';
 import {

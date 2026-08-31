@@ -23,9 +23,11 @@ export const KARAT_COLORS = {
   k18: '#FFA500',  // Orange gold
 } as const;
 
+const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 export const API_BASE_URL = typeof window === 'undefined'
-  ? (process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api')
-  : (process.env.NEXT_PUBLIC_API_URL || '/api');
+  ? (process.env.INTERNAL_API_URL || publicApiUrl || 'http://gold.test/api')
+  : (publicApiUrl?.startsWith('http') ? publicApiUrl : 'http://gold.test/api');
 
 export const REFRESH_INTERVAL = 60000; // 1 minute in milliseconds
 

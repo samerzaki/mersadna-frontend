@@ -93,19 +93,17 @@ export interface CryptoTopApiItem {
 export interface CryptoApiPagination {
   total: number;
   count: number;
-  per_page: number;
-  current_page: number;
-  total_pages: number;
+  perPage: number;
+  currentPage: number;
+  totalPages: number;
 }
 
 export interface CryptoListApiResponse {
   status: number;
   success: boolean;
   data: CryptoApiItem[];
-  meta: {
-    message: string;
-    pagination: CryptoApiPagination;
-  };
+  message: string;
+  pagination: CryptoApiPagination;
 }
 
 export interface CryptoTopApiResponse {

@@ -299,7 +299,7 @@ export function calculateConversionScenarios(
       amount: amount * creditCardRate,
       rate: creditCardRate,
       description: 'Bank rate + 10% international fee',
-      descriptionAr: 'سعر البنك + ١٠٪ رسوم دولية',
+      descriptionAr: 'سعر البنك + 10٪ رسوم دولية',
     },
   ];
 }

@@ -151,7 +151,7 @@ export default function SavedNewsPage() {
                   <p className="text-xs text-slate-400 mt-2">
                     {isRTL ? 'تم الحفظ: ' : 'Saved: '}
                     {new Date(bookmark.bookmarkedAt).toLocaleDateString(
-                      isRTL ? 'ar-EG' : 'en-US',
+                      isRTL ? 'ar-EG-u-nu-latn' : 'en-US',
                       { year: 'numeric', month: 'short', day: 'numeric' }
                     )}
                   </p>

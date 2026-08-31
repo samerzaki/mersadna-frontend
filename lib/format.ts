@@ -1,6 +1,6 @@
 // Formatting utilities
 
-import { format, formatDistanceToNow } from 'date-fns';
+import { format, formatDistance, formatDistanceToNow } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import type { Language } from './translations';
 
@@ -20,7 +20,7 @@ export function formatPriceWithCurrency(
       minimumFractionDigits: currency === 'USD' ? 2 : 0,
       maximumFractionDigits: currency === 'USD' ? 2 : 0,
       currencyDisplay: 'symbol', // Show $ or EGP symbol
-      numberingSystem: locale === 'en-US' ? 'latn' : undefined, // Force latin numerals for English
+      numberingSystem: 'latn',
     }).format(0);
   }
 
@@ -35,11 +35,11 @@ export function formatPriceWithCurrency(
       minimumFractionDigits: currency === 'USD' ? 2 : 0,
       maximumFractionDigits: currency === 'USD' ? 2 : 0,
       currencyDisplay: 'symbol', // Show $ or EGP symbol
-      numberingSystem: locale === 'en-US' ? 'latn' : undefined, // Force latin numerals for English
+      numberingSystem: 'latn',
     }).format(0);
   }
 
-  // Force English locale for USD to show "$ 99.29" instead of "٩٩٫٢٩ US$"
+  // Force English locale for USD to show "$ 99.29" consistently.
   const effectiveLocale = currency === 'USD' ? 'en-US' : locale;
 
   return new Intl.NumberFormat(effectiveLocale, {
@@ -48,7 +48,7 @@ export function formatPriceWithCurrency(
     minimumFractionDigits: currency === 'USD' ? 2 : 0,
     maximumFractionDigits: currency === 'USD' ? 2 : 0,
     currencyDisplay: 'symbol',
-    numberingSystem: effectiveLocale === 'en-US' ? 'latn' : undefined,
+    numberingSystem: 'latn',
   }).format(numPrice);
 }
 
@@ -119,10 +119,10 @@ export function formatRelativeTime(date: string | Date, lang?: Language): string
 }
 
 /**
- * Format number with Arabic numerals
+ * Format a number with Latin (English) digits.
  */
 export function formatNumber(num: number): string {
-  return new Intl.NumberFormat('ar-EG').format(num);
+  return new Intl.NumberFormat('en-US', { numberingSystem: 'latn' }).format(num);
 }
 
 /**
@@ -130,7 +130,10 @@ export function formatNumber(num: number): string {
  * @param recordedAt - ISO timestamp of when the price was recorded
  * @returns true if the price is less than 5 minutes old
  */
-export function isPriceLive(recordedAt: string | Date | null | undefined): boolean {
+export function isPriceLive(
+  recordedAt: string | Date | null | undefined,
+  referenceTime: string | Date = new Date()
+): boolean {
   if (!recordedAt) return false;
 
   const dateObj = typeof recordedAt === 'string' ? new Date(recordedAt) : recordedAt;
@@ -138,7 +141,7 @@ export function isPriceLive(recordedAt: string | Date | null | undefined): boole
   // Check for invalid date
   if (isNaN(dateObj.getTime())) return false;
 
-  const now = new Date();
+  const now = typeof referenceTime === 'string' ? new Date(referenceTime) : referenceTime;
   const diffInMinutes = (now.getTime() - dateObj.getTime()) / (1000 * 60);
   return diffInMinutes < 5;
 }
@@ -150,12 +153,22 @@ export function isPriceLive(recordedAt: string | Date | null | undefined): boole
  * @param lang - Language for formatting ('ar' or 'en')
  * @returns Formatted string for display
  */
-export function formatLastUpdate(recordedAt: string | Date | null | undefined, lang?: Language): string {
+export function formatLastUpdate(
+  recordedAt: string | Date | null | undefined,
+  lang?: Language,
+  referenceTime?: string | Date
+): string {
   if (!recordedAt) return lang === 'en' ? 'N/A' : 'غير متوفر';
 
-  if (isPriceLive(recordedAt)) {
+  if (isPriceLive(recordedAt, referenceTime)) {
     return lang === 'en' ? 'Live' : 'مباشر';
   }
+  if (referenceTime) {
+    const dateObj = typeof recordedAt === 'string' ? new Date(recordedAt) : recordedAt;
+    const referenceDate = typeof referenceTime === 'string' ? new Date(referenceTime) : referenceTime;
+    return formatDistance(dateObj, referenceDate, { addSuffix: true, locale: lang === 'en' ? enUS : ar });
+  }
+
   return formatRelativeTime(recordedAt, lang);
 }
 

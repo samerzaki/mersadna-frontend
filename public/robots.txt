@@ -1,4 +1,4 @@
-# nezzel gold - Robots.txt
+# Mersadna - Robots.txt
 # Allow search engines to crawl the site
 
 User-agent: *

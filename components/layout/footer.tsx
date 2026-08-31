@@ -1,11 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import {
   Coins,
-  Building2,
-  ShoppingCart,
-  ListChecks,
   Twitter,
   Facebook,
   Instagram,
@@ -14,8 +12,15 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
-import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
+/*
 interface EcosystemItem {
   name: string;
   nameAr: string;
@@ -29,7 +34,7 @@ interface EcosystemItem {
 
 const ecosystemItems: EcosystemItem[] = [
   {
-    name: 'Nezzel Gold',
+    name: 'Mersadna',
     nameAr: 'نِزِل دهب',
     description: 'Gold & currency tracking',
     descriptionAr: 'تتبع أسعار الذهب والعملات',
@@ -69,6 +74,7 @@ const ecosystemItems: EcosystemItem[] = [
     iconBg: 'bg-red-500',
   },
 ];
+*/
 
 const footerLinks = {
   products: {
@@ -123,6 +129,7 @@ const socialLinks = [
 export function Footer() {
   const { language } = useLanguage();
   const isRTL = language === 'ar';
+  const [isAppNoticeOpen, setIsAppNoticeOpen] = useState(false);
 
   return (
     <footer className="w-full border-t bg-card">
@@ -135,8 +142,8 @@ export function Footer() {
                 {isRTL ? section.titleAr : section.title}
               </h3>
               <ul className="space-y-2">
-                {section.links.map((link) => (
-                  <li key={link.href}>
+                {section.links.map((link, index) => (
+                  <li key={`${key}-${link.href}-${index}`}>
                     <Link
                       href={link.href}
                       className="text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -155,24 +162,26 @@ export function Footer() {
               {isRTL ? 'حمّل التطبيق' : 'Download App'}
             </h3>
             <div className="flex flex-col items-start gap-3">
-              <a
-                href="#"
+              <button
+                type="button"
+                onClick={() => setIsAppNoticeOpen(true)}
                 className="inline-flex items-center gap-2 rounded-lg bg-foreground px-3 py-2 text-sm font-medium text-background transition-opacity hover:opacity-80"
               >
                 <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
                   <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
                 </svg>
                 <span>App Store</span>
-              </a>
-              <a
-                href="#"
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsAppNoticeOpen(true)}
                 className="inline-flex items-center gap-2 rounded-lg bg-foreground px-3 py-2 text-sm font-medium text-background transition-opacity hover:opacity-80"
               >
                 <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
                   <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.802 8.99l-2.303 2.303-8.635-8.635z" />
                 </svg>
                 <span>Google Play</span>
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -185,74 +194,17 @@ export function Footer() {
               {isRTL ? (
                 <>
                   الأسعار المعروضة للإشارة فقط ويتم تحديثها دورياً. قد تختلف الأسعار
-                  الفعلية. نِزِل ذهب ليس مسؤولاً عن قرارات التداول. يرجى استشارة مستشار مالي
+                  الفعلية. مرصادنا ليس مسؤولاً عن قرارات التداول. يرجى استشارة مستشار مالي
                   قبل اتخاذ قرارات استثمارية.
                 </>
               ) : (
                 <>
                   Prices shown are for reference only and updated periodically. Actual prices
-                  may vary. Nezzel Gold is not responsible for trading decisions. Please
+                  may vary. Mersadna is not responsible for trading decisions. Please
                   consult a financial advisor before making investment decisions.
                 </>
               )}
             </p>
-          </div>
-        </div>
-
-        {/* Nezzel Ecosystem */}
-        <div className="mb-12">
-          <h2 className="mb-6 text-center text-lg font-semibold">
-            {isRTL ? 'منظومة نِزِل' : 'Nezzel Ecosystem'}
-          </h2>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {ecosystemItems.map((item) => {
-              const Icon = item.icon;
-              const isSoon = item.status === 'soon';
-
-              return (
-                <Link
-                  key={item.name}
-                  href={isSoon ? '#' : item.href}
-                  className={cn(
-                    'group relative overflow-hidden rounded-lg border bg-card p-4 transition-all',
-                    'hover:border-primary/50 hover:shadow-md',
-                    isSoon && 'cursor-not-allowed opacity-60'
-                  )}
-                  onClick={(e) => isSoon && e.preventDefault()}
-                >
-                  {/* Status Badge */}
-                  {isSoon && (
-                    <div className="absolute end-3 top-3 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                      {isRTL ? 'قريباً' : 'Soon'}
-                    </div>
-                  )}
-
-                  <div className="flex items-start gap-3">
-                    {/* Icon */}
-                    <div
-                      className={cn(
-                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-md',
-                        item.iconBg,
-                        'transition-transform group-hover:scale-110'
-                      )}
-                    >
-                      <Icon className="h-5 w-5 text-primary-foreground" />
-                    </div>
-
-                    {/* Content */}
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-sm">
-                        {isRTL ? item.nameAr : item.name}
-                      </h3>
-                      <p className="text-xs text-muted-foreground">
-                        {isRTL ? item.descriptionAr : item.description}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
           </div>
         </div>
 
@@ -262,7 +214,7 @@ export function Footer() {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Coins className="h-4 w-4" />
             <span>
-              © {new Date().getFullYear()} {isRTL ? 'نِزِل ذهب' : 'Nezzel Gold'}
+              © {new Date().getFullYear()} {isRTL ? 'مرصادنا' : 'Mersadna'}
             </span>
           </div>
 
@@ -295,6 +247,19 @@ export function Footer() {
           </a>
         </div>
       </div>
+
+      <Dialog open={isAppNoticeOpen} onOpenChange={setIsAppNoticeOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{isRTL ? 'التطبيق قريباً' : 'Coming soon'}</DialogTitle>
+            <DialogDescription>
+              {isRTL
+                ? 'تطبيقات الهاتف ستكون متاحة قريباً على App Store وGoogle Play.'
+                : 'Our mobile apps will be available soon on the App Store and Google Play.'}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </footer>
   );
 }

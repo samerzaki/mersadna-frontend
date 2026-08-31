@@ -1,7 +1,7 @@
 # API Integration - Home Page
 
 ## Summary
-Successfully integrated the Nezzel Gold API with the home page UI. The application now fetches real-time gold prices from the backend API.
+Successfully integrated the Mersadna API with the home page UI. The application now fetches real-time gold prices from the backend API.
 
 ## Changes Made
 

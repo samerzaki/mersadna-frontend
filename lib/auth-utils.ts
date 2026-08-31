@@ -3,15 +3,18 @@
 import { API_BASE_URL } from './constants';
 
 export function getStoredToken(): string | null {
-  return null;
+  if (typeof window === 'undefined') return null;
+  return window.localStorage.getItem('gold_access_token');
 }
 
-export function setStoredToken(_token: string): void {
-  // Session identifiers are never exposed to JavaScript.
+export function setStoredToken(token: string): void {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem('gold_access_token', token);
 }
 
 export function removeStoredToken(): void {
-  // Server-side logout revokes cookie sessions.
+  if (typeof window === 'undefined') return;
+  window.localStorage.removeItem('gold_access_token');
 }
 
 export function getAuthHeaders(includeContentType = true): HeadersInit {
@@ -23,6 +26,9 @@ export function getAuthHeaders(includeContentType = true): HeadersInit {
   if (includeContentType) {
     (headers as Record<string, string>)['Content-Type'] = 'application/json';
   }
+
+  const token = getStoredToken();
+  if (token) (headers as Record<string, string>).Authorization = `Bearer ${token}`;
 
   if (typeof document !== 'undefined') {
     const csrf = document.cookie.split('; ').find((item) => item.startsWith('gold_csrf='))?.split('=')[1];

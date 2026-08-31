@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, ArrowRight, Newspaper, Zap, Clock } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/language-context';
 import { useNewsCategories } from '@/hooks/use-news';
 import { getCategoryColors, getCategoryInfo } from '@/lib/news-constants';
@@ -13,11 +14,22 @@ import type { NewsItem } from '@/types';
 
 interface HotNewsSectionClientProps {
   news: NewsItem[];
+  /** Server timestamp used to keep relative dates stable during hydration. */
+  referenceTime: string;
 }
 
-export function HotNewsSectionClient({ news }: HotNewsSectionClientProps) {
+export function HotNewsSectionClient({ news, referenceTime }: HotNewsSectionClientProps) {
   const { language } = useLanguage();
-  const isRTL = language === 'ar';
+  // This streamed boundary can hydrate after the language provider restores a
+  // saved client preference. Begin with the server's Arabic default, then
+  // switch languages only after hydration has completed.
+  const [displayLanguage, setDisplayLanguage] = useState<'ar' | 'en'>('ar');
+
+  useEffect(() => {
+    setDisplayLanguage(language);
+  }, [language]);
+
+  const isRTL = displayLanguage === 'ar';
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
   const { categories } = useNewsCategories();
 
@@ -66,7 +78,7 @@ export function HotNewsSectionClient({ news }: HotNewsSectionClientProps) {
             ? isRTL ? categoryInfo.nameAr : categoryInfo.nameEn
             : item.category;
 
-          const timeAgo = formatDistanceToNow(new Date(item.publishedAt), {
+          const timeAgo = formatDistance(new Date(item.publishedAt), new Date(referenceTime), {
             addSuffix: true,
             locale: isRTL ? ar : enUS,
           });

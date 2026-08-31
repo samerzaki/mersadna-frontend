@@ -71,12 +71,12 @@ export function adaptCryptoTopItem(item: CryptoTopApiItem): CryptoPrice {
 
 export function adaptCryptoPagination(p: CryptoApiPagination): CryptoPagination {
   return {
-    currentPage: p.current_page,
-    totalPages: p.total_pages,
+    currentPage: p.currentPage,
+    totalPages: p.totalPages,
     totalItems: p.total,
-    perPage: p.per_page,
-    hasNextPage: p.current_page < p.total_pages,
-    hasPreviousPage: p.current_page > 1,
+    perPage: p.perPage,
+    hasNextPage: p.currentPage < p.totalPages,
+    hasPreviousPage: p.currentPage > 1,
   };
 }
 

@@ -1,8 +1,8 @@
-# React Native Mobile App Specification - Nezzel Gold
+# React Native Mobile App Specification - Mersadna
 
 > **Document Version:** 1.0.0
 > **Created:** January 28, 2026
-> **Project Name:** Nezzel Gold Mobile (نِزِل ذهب)
+> **Project Name:** Mersadna Mobile (مرصادنا)
 > **Platform:** iOS & Android
 > **Based on:** Next.js Web Application
 
@@ -37,7 +37,7 @@
 
 ### Project Overview
 
-**Nezzel Gold Mobile** is a React Native cross-platform mobile application that brings the comprehensive gold and currency tracking platform to iOS and Android devices. The app provides real-time market data, smart calculators, and analytics tools for gold investors, currency traders, and financial enthusiasts in Egypt.
+**Mersadna Mobile** is a React Native cross-platform mobile application that brings the comprehensive gold and currency tracking platform to iOS and Android devices. The app provides real-time market data, smart calculators, and analytics tools for gold investors, currency traders, and financial enthusiasts in Egypt.
 
 ### Target Audience
 - Gold investors and traders in Egypt
@@ -1175,7 +1175,7 @@ export async function shareGoldPrices(componentRef: any) {
 
   await Share.open({
     url: uri,
-    message: 'أسعار الذهب اليوم من تطبيق نِزِل ذهب',
+    message: 'أسعار الذهب اليوم من تطبيق مرصادنا',
   });
 }
 ```
@@ -1929,7 +1929,7 @@ export default i18n;
 ```json
 // src/locales/ar/common.json
 {
-  "app_name": "نِزِل ذهب",
+  "app_name": "مرصادنا",
   "loading": "جاري التحميل...",
   "error": "حدث خطأ",
   "retry": "إعادة المحاولة",
@@ -2352,7 +2352,7 @@ Private project - All rights reserved.
 
 **End of React Native App Specification**
 
-> This document serves as a comprehensive guide for AI assistants and developers to build the Nezzel Gold mobile app. It covers business requirements, technical architecture, UI/UX guidelines, and implementation details.
+> This document serves as a comprehensive guide for AI assistants and developers to build the Mersadna mobile app. It covers business requirements, technical architecture, UI/UX guidelines, and implementation details.
 
 **Last Updated**: January 28, 2026
 **Document Version**: 1.0.0

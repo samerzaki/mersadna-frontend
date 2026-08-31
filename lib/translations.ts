@@ -617,7 +617,7 @@ export interface Translations {
 export const translations: Record<Language, Translations> = {
   ar: {
     header: {
-      title: 'نِزِل ذهب',
+      title: 'مرصادنا',
       subtitle: 'متابعة أسعار الذهب',
     },
     sidebar: {
@@ -709,7 +709,7 @@ export const translations: Record<Language, Translations> = {
       egp: 'ج.م',
       loading: 'جاري التحميل...',
       error: 'حدث خطأ',
-      appName: 'نِزِل ذهب',
+      appName: 'مرصادنا',
       errorPasswordMismatch: 'كلمات المرور غير متطابقة',
       errorPasswordLength: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
     },
@@ -718,7 +718,7 @@ export const translations: Record<Language, Translations> = {
     },
     pages: {
       login: {
-        appTitle: 'نِزِل ذهب',
+        appTitle: 'مرصادنا',
         appSubtitle: 'تتبع أسعار الذهب والعملات في الوقت الحقيقي',
         title: 'تسجيل الدخول',
         subtitle: 'أدخل بياناتك للوصول إلى حسابك',
@@ -739,7 +739,7 @@ export const translations: Record<Language, Translations> = {
         errorDefault: 'حدث خطأ أثناء تسجيل الدخول',
       },
       register: {
-        appTitle: 'نِزِل ذهب',
+        appTitle: 'مرصادنا',
         appSubtitle: 'انضم لمتابعة أسعار الذهب والعملات',
         title: 'إنشاء حساب جديد',
         subtitle: 'أنشئ حسابك للوصول إلى الميزات المتقدمة',
@@ -1156,7 +1156,7 @@ export const translations: Record<Language, Translations> = {
         creditCard: 'بطاقة ائتمان',
         officialDescription: 'سعر البيع الرسمي للبنوك',
         parallelDescription: 'سعر البيع في السوق الموازي',
-        creditCardDescription: 'سعر البنك + ١٠٪ رسوم',
+        creditCardDescription: 'سعر البنك + 10٪ رسوم',
         popular: 'شائع',
         official: 'رسمي',
       },
@@ -1207,7 +1207,7 @@ export const translations: Record<Language, Translations> = {
   },
   en: {
     header: {
-      title: 'nezzel gold',
+      title: 'Mersadna',
       subtitle: 'Gold Price Tracker',
     },
     sidebar: {
@@ -1299,7 +1299,7 @@ export const translations: Record<Language, Translations> = {
       egp: 'EGP',
       loading: 'Loading...',
       error: 'Error occurred',
-      appName: 'nezzel gold',
+      appName: 'Mersadna',
       errorPasswordMismatch: 'Passwords do not match',
       errorPasswordLength: 'Password must be at least 6 characters',
     },
@@ -1308,7 +1308,7 @@ export const translations: Record<Language, Translations> = {
     },
     pages: {
       login: {
-        appTitle: 'nezzel gold',
+        appTitle: 'Mersadna',
         appSubtitle: 'Track gold and currency prices in real-time',
         title: 'Sign In',
         subtitle: 'Enter your credentials to access your account',
@@ -1329,7 +1329,7 @@ export const translations: Record<Language, Translations> = {
         errorDefault: 'An error occurred while signing in',
       },
       register: {
-        appTitle: 'nezzel gold',
+        appTitle: 'Mersadna',
         appSubtitle: 'Join to track gold and currency prices',
         title: 'Create New Account',
         subtitle: 'Create your account to access advanced features',

@@ -483,7 +483,7 @@ export default function AlertsPage() {
                   {alert.createdAt && (
                     <div className="mt-2.5 pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
                       <p className="text-xs text-muted-foreground">
-                        {t.pages.alerts.createdAt}: {new Date(alert.createdAt).toLocaleDateString("ar-EG")}
+                        {t.pages.alerts.createdAt}: {new Date(alert.createdAt).toLocaleDateString("ar-EG-u-nu-latn")}
                       </p>
                     </div>
                   )}
@@ -492,7 +492,7 @@ export default function AlertsPage() {
                   {alert.triggeredAt && (
                     <div className="mt-0.5">
                       <p className="text-xs text-muted-foreground">
-                        {t.pages.alerts.triggeredOn}: {new Date(alert.triggeredAt).toLocaleDateString("ar-EG")}
+                        {t.pages.alerts.triggeredOn}: {new Date(alert.triggeredAt).toLocaleDateString("ar-EG-u-nu-latn")}
                       </p>
                     </div>
                   )}
@@ -573,7 +573,7 @@ function HowAlertsWork({ onDismiss, onAddAlert }: HowAlertsWorkProps) {
                 variant="secondary"
                 className="absolute -bottom-1.5 start-0 text-[9px] px-1 py-0 h-4 bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 shadow-sm"
               >
-                ٣٬٥٠٠
+                3,500
               </Badge>
             </div>
             <p className="text-[11px] font-semibold text-foreground leading-tight">

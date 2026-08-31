@@ -1,4 +1,4 @@
-// React Query hooks for Nezzel Gold API
+// React Query hooks for the Mersadna API
 
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { fetchGoldOverview, fetchAllGoldPrices, fetchGoldCalculation, fetchGoldHistory } from '@/lib/api';

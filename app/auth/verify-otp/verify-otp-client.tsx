@@ -7,7 +7,8 @@ import { useLanguage } from "@/contexts/language-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { OTPInput } from "@/components/auth/otp-input";
-import { verifyEmail, sendOtp, verifyTempMobileNumber, sendMobileOtp } from "@/lib/api-auth";
+import { verifyEmail, sendOtp, verifyTempMobileNumber, sendMobileOtp, changeEmail } from "@/lib/api-auth";
+import { useAuth, type RegisterData } from "@/contexts/auth-context";
 import { RefreshCw, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
 
 function VerifyOTPContent() {
@@ -21,6 +22,7 @@ function VerifyOTPContent() {
   const phone = searchParams.get("phone") || "";
   const purpose = searchParams.get("purpose") || "registration";
   const isMobilePurpose = purpose === "mobile-phone";
+  const { register } = useAuth();
 
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,6 +60,18 @@ function VerifyOTPContent() {
         await verifyTempMobileNumber(phone, otpValue);
       } else {
         await verifyEmail(email, otpValue);
+      }
+
+      if (purpose === "registration") {
+        const pending = sessionStorage.getItem("gold_pending_registration");
+        if (!pending) throw new Error(language === "ar" ? "انتهت جلسة التسجيل. يرجى المحاولة مرة أخرى." : "Your registration session has expired. Please try again.");
+        const result = await register(JSON.parse(pending) as RegisterData);
+        if (!result.success) throw new Error(result.error || t.pages.verifyOtp.errorDefault);
+        sessionStorage.removeItem("gold_pending_registration");
+      }
+
+      if (purpose === "email-change") {
+        await changeEmail({ email, verification_code: otpValue });
       }
       setIsVerified(true);
 

@@ -1,4 +1,4 @@
-# Nezzel Gold API Endpoints Reference
+# Mersadna API Endpoints Reference
 
 ## Base URL
 ```

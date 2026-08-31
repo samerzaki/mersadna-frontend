@@ -112,7 +112,7 @@ export function NewsCard({ news, variant = 'default', showBookmark = true }: New
               {news.viewCount && (
                 <span className="flex items-center gap-1">
                   <Eye className="w-3 h-3" />
-                  {news.viewCount.toLocaleString()}
+                  {news.viewCount.toLocaleString('en-US')}
                 </span>
               )}
             </div>

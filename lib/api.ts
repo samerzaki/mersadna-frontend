@@ -1,4 +1,4 @@
-// API client functions - Nezzel Gold API
+// API client functions - Mersadna API
 
 import {
   GoldOverviewResponse,
@@ -394,6 +394,7 @@ export async function fetchNewsList(
 ): Promise<NewsListResponse> {
   const params = new URLSearchParams({
     page: page.toString(),
+    per_page: limit.toString(),
     sort_by: sortBy,
   });
 
@@ -591,7 +592,8 @@ export async function fetchCryptoList(
     if (response.status === 404) {
       return {
         status: 404, success: false, data: [],
-        meta: { message: 'No data found', pagination: { total: 0, count: 0, per_page: perPage, current_page: page, total_pages: 0 } },
+        message: 'No data found',
+        pagination: { total: 0, count: 0, perPage, currentPage: page, totalPages: 0 },
       };
     }
     throw new Error('Failed to fetch crypto prices');

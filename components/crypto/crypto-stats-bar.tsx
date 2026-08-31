@@ -57,8 +57,8 @@ export function CryptoStatsBar({ stats }: CryptoStatsBarProps) {
       <StatCard
         icon={BarChart3}
         label="العملات النشطة"
-        value={stats.active_cryptos.toLocaleString()}
-        subValue={stats.markets > 0 ? `${stats.markets.toLocaleString()} أسواق` : undefined}
+        value={stats.active_cryptos.toLocaleString('en-US')}
+        subValue={stats.markets > 0 ? `${stats.markets.toLocaleString('en-US')} أسواق` : undefined}
       />
     </div>
   );

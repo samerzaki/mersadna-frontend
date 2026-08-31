@@ -8,7 +8,7 @@ export async function HotNewsSectionServer() {
     const response = await fetchNewsList(undefined, 1);
     const news = response.data.news.slice(0, 4);
 
-    return <HotNewsSectionClient news={news} />;
+    return <HotNewsSectionClient news={news} referenceTime={new Date().toISOString()} />;
   } catch (error) {
     return (
       <section>

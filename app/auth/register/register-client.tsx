@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/auth-context";
 import { useLanguage } from "@/contexts/language-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +10,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { PhoneInputField, type PhoneInputValue } from "@/components/ui/phone-input";
 import { CheckCircle } from "lucide-react";
+import { checkEmailExists, sendOtp } from "@/lib/api-auth";
+import { Turnstile } from "@/components/auth/turnstile";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -29,10 +30,12 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { register } = useAuth();
+  const [turnstileToken, setTurnstileToken] = useState("");
   const router = useRouter();
   const { t, language } = useLanguage();
   const isRTL = language === "ar";
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -43,6 +46,10 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
     setSuccess("");
+    if (!turnstileToken) {
+      setError(language === "ar" ? "يرجى إكمال التحقق الأمني" : "Please complete the security check.");
+      return;
+    }
     setIsLoading(true);
 
     // Validate passwords match
@@ -59,26 +66,29 @@ export default function RegisterPage() {
       return;
     }
 
-    const result = await register({
-      email: formData.email,
-      password: formData.password,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      phone: phoneData.phone || undefined,
-      confirmPassword: formData.confirmPassword,
-    });
+    try {
+      const availability = await checkEmailExists(formData.email);
+      if (!availability.data?.available) {
+        setError(language === "ar" ? "هذا البريد الإلكتروني مستخدم بالفعل" : "This email address is already in use");
+        return;
+      }
 
-    if (result.success) {
-      setSuccess(t.pages.register.successMessage);
-      setTimeout(() => {
-        router.push("/");
-        router.refresh();
-      }, 1500);
-    } else {
-      setError(result.error || t.pages.register.errorDefault);
+      await sendOtp(formData.email);
+      sessionStorage.setItem("gold_pending_registration", JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: phoneData.phone || undefined,
+        confirmPassword: formData.confirmPassword,
+        turnstileToken,
+      }));
+      router.push(`/auth/verify-otp?email=${encodeURIComponent(formData.email)}&purpose=registration`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t.pages.register.errorDefault);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -236,6 +246,12 @@ export default function RegisterPage() {
               >
                 {isLoading ? t.pages.register.submitting : t.pages.register.submitButton}
               </Button>
+
+              <Turnstile
+                onVerify={handleTurnstileVerify}
+                onExpire={handleTurnstileExpire}
+                language={language}
+              />
             </form>
 
             <div className="mt-6 text-center text-sm">

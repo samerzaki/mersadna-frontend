@@ -25,8 +25,8 @@ export default function TermsPage() {
       <div className="mb-8 rounded-lg border bg-card p-6">
         <p className="leading-relaxed text-muted-foreground">
           {isRTL
-            ? 'مرحباً بك في نِزِل ذهب. باستخدامك لهذه المنصة، فإنك توافق على الالتزام بالشروط والأحكام التالية. يرجى قراءتها بعناية.'
-            : 'Welcome to Nezzel Gold. By using this platform, you agree to comply with the following terms and conditions. Please read them carefully.'}
+            ? 'مرحباً بك في مرصادنا. باستخدامك لهذه المنصة، فإنك توافق على الالتزام بالشروط والأحكام التالية. يرجى قراءتها بعناية.'
+            : 'Welcome to Mersadna. By using this platform, you agree to comply with the following terms and conditions. Please read them carefully.'}
         </p>
       </div>
 
@@ -44,8 +44,8 @@ export default function TermsPage() {
           </div>
           <p className="text-muted-foreground">
             {isRTL
-              ? 'باستخدامك لمنصة نِزِل ذهب، فإنك توافق على هذه الشروط والأحكام وسياسة الخصوصية الخاصة بنا. إذا كنت لا توافق على أي من هذه الشروط، يرجى عدم استخدام المنصة.'
-              : 'By using the Nezzel Gold platform, you agree to these terms and conditions and our privacy policy. If you do not agree with any of these terms, please do not use the platform.'}
+              ? 'باستخدامك لمنصة مرصادنا، فإنك توافق على هذه الشروط والأحكام وسياسة الخصوصية الخاصة بنا. إذا كنت لا توافق على أي من هذه الشروط، يرجى عدم استخدام المنصة.'
+              : 'By using the Mersadna platform, you agree to these terms and conditions and our privacy policy. If you do not agree with any of these terms, please do not use the platform.'}
           </p>
         </section>
 
@@ -61,8 +61,8 @@ export default function TermsPage() {
           </div>
           <p className="mb-3 text-muted-foreground">
             {isRTL
-              ? 'نِزِل ذهب منصة معلوماتية توفر:'
-              : 'Nezzel Gold is an information platform that provides:'}
+              ? 'مرصادنا منصة معلوماتية توفر:'
+              : 'Mersadna is an information platform that provides:'}
           </p>
           <ul className="space-y-2 text-muted-foreground">
             <li className="flex gap-2">
@@ -110,8 +110,8 @@ export default function TermsPage() {
             </p>
             <p className="font-semibold">
               {isRTL
-                ? 'نِزِل ذهب ليس مسؤولاً عن أي قرارات استثمارية أو تداول تتخذها بناءً على المعلومات المقدمة.'
-                : 'Nezzel Gold is not responsible for any investment or trading decisions you make based on the information provided.'}
+                ? 'مرصادنا ليس مسؤولاً عن أي قرارات استثمارية أو تداول تتخذها بناءً على المعلومات المقدمة.'
+                : 'Mersadna is not responsible for any investment or trading decisions you make based on the information provided.'}
             </p>
             <p>
               {isRTL
@@ -242,8 +242,8 @@ export default function TermsPage() {
           </div>
           <p className="text-muted-foreground">
             {isRTL
-              ? 'جميع المحتويات والتصاميم والشعارات على المنصة هي ملكية خاصة لنِزِل ذهب ومحمية بموجب قوانين حقوق الملكية الفكرية.'
-              : 'All content, designs, and logos on the platform are proprietary to Nezzel Gold and protected under intellectual property laws.'}
+              ? 'جميع المحتويات والتصاميم والشعارات على المنصة هي ملكية خاصة لمرصادنا ومحمية بموجب قوانين حقوق الملكية الفكرية.'
+              : 'All content, designs, and logos on the platform are proprietary to Mersadna and protected under intellectual property laws.'}
           </p>
         </section>
 

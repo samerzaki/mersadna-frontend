@@ -136,7 +136,7 @@ export function GoldHistoryChart({ title, data, color, usdRates }: GoldHistoryCh
               yAxisId="gold"
               stroke="#64748b"
               style={{ fontSize: '12px' }}
-              tickFormatter={(value) => `${value.toLocaleString('ar-EG')}`}
+              tickFormatter={(value) => `${value.toLocaleString('en-US')}`}
             />
             {usdRates && (
               <YAxis

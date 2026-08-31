@@ -21,7 +21,7 @@ export async function CryptoPageServer() {
       topCryptos: topRes.data.map(adaptCryptoTopItem),
       initialList: {
         cryptos: listRes.data.map(adaptCryptoApiItem),
-        pagination: adaptCryptoPagination(listRes.meta.pagination),
+        pagination: adaptCryptoPagination(listRes.pagination),
       },
     };
 

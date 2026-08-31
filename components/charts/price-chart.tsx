@@ -31,7 +31,7 @@ export function PriceChart({ data, activeKarats, title }: PriceChartProps) {
     const groupedByDate: Record<string, any> = {};
 
     data.forEach((item) => {
-      const date = new Date(item.recordedAt).toLocaleDateString('ar-EG', {
+      const date = new Date(item.recordedAt).toLocaleDateString('ar-EG-u-nu-latn', {
         month: 'short',
         day: 'numeric',
       });
@@ -86,7 +86,7 @@ export function PriceChart({ data, activeKarats, title }: PriceChartProps) {
             <YAxis
               className="text-xs"
               tick={{ fill: 'hsl(var(--muted-foreground))' }}
-              tickFormatter={(value) => `${value.toLocaleString('ar-EG')} ${t.common.egp}`}
+              tickFormatter={(value) => `${value.toLocaleString('en-US')} ${t.common.egp}`}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend

@@ -1,9 +1,11 @@
 'use client';
 
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, Minus, Coins, CircleDollarSign, Globe } from 'lucide-react';
-import { formatPrice, formatPercent, isPriceLive } from '@/lib/format';
+import { formatPrice, formatPercent } from '@/lib/format';
 import { useLanguage } from '@/contexts/language-context';
+import { translations, type Language } from '@/lib/translations';
 import type { HeroStatsBannerData } from './hero-stats-banner-server';
 
 interface HeroStatsBannerClientProps {
@@ -11,7 +13,17 @@ interface HeroStatsBannerClientProps {
 }
 
 export function HeroStatsBannerClient({ data }: HeroStatsBannerClientProps) {
-  const { t } = useLanguage();
+  const { language } = useLanguage();
+  // This async server-rendered boundary can hydrate after the provider has read
+  // a saved client language. Start from the server's Arabic default, then apply
+  // the current language after this boundary has hydrated.
+  const [displayLanguage, setDisplayLanguage] = useState<Language>('ar');
+
+  useEffect(() => {
+    setDisplayLanguage(language);
+  }, [language]);
+
+  const t = translations[displayLanguage];
 
   const { gold24, gold21, gold18, ounce, usdBuy, usdSell } = data;
 
@@ -21,28 +33,28 @@ export function HeroStatsBannerClient({ data }: HeroStatsBannerClientProps) {
       label: t.gold.karat24,
       value: gold24 ? formatPrice(gold24.sell_price) : '-',
       change: gold24?.spread_percent || 0,
-      isLive: gold24?.recorded_at ? isPriceLive(gold24.recorded_at) : false,
+      isLive: gold24?.is_live ?? false,
     },
     {
       icon: Coins,
       label: t.gold.karat21,
       value: gold21 ? formatPrice(gold21.sell_price) : '-',
       change: gold21?.spread_percent || 0,
-      isLive: gold21?.recorded_at ? isPriceLive(gold21.recorded_at) : false,
+      isLive: gold21?.is_live ?? false,
     },
     {
       icon: Coins,
       label: t.gold.karat18,
       value: gold18 ? formatPrice(gold18.sell_price) : '-',
       change: gold18?.spread_percent || 0,
-      isLive: gold18?.recorded_at ? isPriceLive(gold18.recorded_at) : false,
+      isLive: gold18?.is_live ?? false,
     },
     {
       icon: Globe,
       label: t.gold.ounce,
-      value: ounce ? `$${ounce.sell_price.toLocaleString()}` : '-',
+      value: ounce ? `$${new Intl.NumberFormat('en-US').format(ounce.sell_price)}` : '-',
       change: 0,
-      isLive: ounce?.recorded_at ? isPriceLive(ounce.recorded_at) : false,
+      isLive: ounce?.is_live ?? false,
     },
   ];
 

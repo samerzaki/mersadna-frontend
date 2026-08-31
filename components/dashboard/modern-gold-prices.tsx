@@ -1,15 +1,18 @@
 'use client';
 
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import { formatPrice, formatPercent, formatPriceWithCurrency } from '@/lib/format';
+import { formatPercent, formatPriceWithCurrency } from '@/lib/format';
+import { useEffect, useId, useState } from 'react';
 import { useLanguage } from '@/contexts/language-context';
 import { LastUpdateIndicator } from '@/components/ui/last-update-indicator';
+import { translations, type Language } from '@/lib/translations';
 import type { ModernGoldDataItem } from './modern-gold-prices-server';
 
 interface GoldPriceCardProps {
   item: ModernGoldDataItem;
   isHero?: boolean;
   t: any;
+  referenceTime: string;
 }
 
 const getName = (nameKey: string, t: any) => {
@@ -30,6 +33,7 @@ function Sparkline({
   data: number[]; 
   isPositive: boolean;
 }) {
+  const gradientId = useId();
   const width = 120;
   const height = 32;
   const padding = 4;
@@ -52,8 +56,6 @@ function Sparkline({
     .join(' ');
 
   const areaPath = `${pathD} L ${points[points.length - 1].x} ${height - padding} L ${padding} ${height - padding} Z`;
-
-  const gradientId = `gradient-${isPositive ? 'up' : 'down'}-${Math.random().toString(36).substr(2, 9)}`;
 
   return (
     <svg
@@ -84,9 +86,8 @@ function Sparkline({
   );
 }
 
-function GoldPriceCard({ item, isHero = false, t }: GoldPriceCardProps) {
-  const { language } = useLanguage();
-  const locale = language === 'en' ? 'en-US' : 'ar-EG';
+function GoldPriceCard({ item, isHero = false, t, referenceTime }: GoldPriceCardProps) {
+  const locale = t === translations.en ? 'en-US' : 'ar-EG';
   const spread = item.sellPrice - item.buyPrice;
   const isPositive = item.trend === 'up';
   const TrendIcon = isPositive ? TrendingUp : TrendingDown;
@@ -115,7 +116,7 @@ function GoldPriceCard({ item, isHero = false, t }: GoldPriceCardProps) {
               {getName(item.nameKey, t)}
             </h3>
           </div>
-          <LastUpdateIndicator recordedAt={item.recordedAt} />
+          <LastUpdateIndicator recordedAt={item.recordedAt} referenceTime={referenceTime} />
         </div>
 
         {/* Main Price (Sell) */}
@@ -175,10 +176,21 @@ function GoldPriceCard({ item, isHero = false, t }: GoldPriceCardProps) {
 
 interface ModernGoldPricesClientProps {
   goldData: ModernGoldDataItem[];
+  referenceTime: string;
 }
 
-export function ModernGoldPricesClient({ goldData }: ModernGoldPricesClientProps) {
-  const { t } = useLanguage();
+export function ModernGoldPricesClient({ goldData, referenceTime }: ModernGoldPricesClientProps) {
+  const { language } = useLanguage();
+  // This streamed boundary can hydrate after the provider restores a saved
+  // language preference. Match the server's Arabic default on the initial
+  // client render, then apply the selected language after hydration.
+  const [displayLanguage, setDisplayLanguage] = useState<Language>('ar');
+
+  useEffect(() => {
+    setDisplayLanguage(language);
+  }, [language]);
+
+  const t = translations[displayLanguage];
 
   // Separate hero and secondary items
   const heroItems = goldData.filter((item) =>
@@ -193,14 +205,14 @@ export function ModernGoldPricesClient({ goldData }: ModernGoldPricesClientProps
       {/* Hero Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {heroItems.map((item) => (
-          <GoldPriceCard key={item.id} item={item} isHero t={t} />
+          <GoldPriceCard key={item.id} item={item} isHero t={t} referenceTime={referenceTime} />
         ))}
       </div>
 
       {/* Secondary Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {secondaryItems.map((item) => (
-          <GoldPriceCard key={item.id} item={item} t={t} />
+          <GoldPriceCard key={item.id} item={item} t={t} referenceTime={referenceTime} />
         ))}
       </div>
     </div>

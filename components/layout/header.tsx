@@ -2,12 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { TrendingUp, User, LogOut, Settings, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TrendingUp, LogOut, Settings, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
 import { ThemeToggle } from './theme-toggle';
 import { LanguageSwitcher } from './language-switcher';
-import { CountrySwitcher } from './country-switcher';
 import { QuickSearch } from './quick-search';
 import { useLanguage } from '@/contexts/language-context';
 import { useAuth } from '@/contexts/auth-context';
@@ -111,13 +110,6 @@ export function Header() {
 
                   <div className="px-2 py-1.5">
                     <div className="w-full flex items-center justify-between">
-                      <span className="text-sm">Country</span>
-                      <CountrySwitcher />
-                    </div>
-                  </div>
-
-                  <div className="px-2 py-1.5">
-                    <div className="w-full flex items-center justify-between">
                       <span className="text-sm">Language</span>
                       <LanguageSwitcher />
                     </div>
@@ -129,12 +121,12 @@ export function Header() {
                       <ThemeToggle />
                     </div>
                   </div>
+
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Desktop: Country, Language and Theme toggles */}
+              {/* Desktop: Language and Theme toggles */}
               <div className="hidden md:flex md:items-center md:gap-2">
-                <CountrySwitcher />
                 <LanguageSwitcher />
                 <ThemeToggle />
               </div>

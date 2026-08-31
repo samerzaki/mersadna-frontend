@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Cairo } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { Header } from "@/components/layout/header";
 import { AppShell } from "@/components/layout/app-shell";
+import { Header } from "@/components/layout/header";
 import { HeroStatsBannerServer, HeroStatsBannerSkeleton } from "@/components/home/hero-stats-banner-server";
 import { Suspense } from "react";
 import { SEO_CONFIG } from "@/lib/seo-config";
@@ -30,14 +30,14 @@ const cairo = Cairo({
 
 export const metadata: Metadata = {
   title: {
-    default: "nezzel gold - نِزِل ذهب | أسعار الذهب الحية في مصر",
-    template: "%s | nezzel gold"
+    default: "Mersadna - مرصادنا | أسعار الذهب الحية في مصر",
+    template: "%s | Mersadna"
   },
   description: "تابع أسعار الذهب الحية في مصر بالجنيه المصري لجميع العيارات (24، 21، 18، 14) مع حاسبة الزكاة، حاسبة الذهب، وتحليلات السوق المجانية.",
   keywords: ["أسعار الذهب", "ذهب في مصر", "اسعار الذهب اليوم", "ذهب عيار 24", "ذهب عيار 21", "ذهب عيار 18", "زكاة الذهب", "حاسبة الذهب", "سعر الذهب", "Egypt gold prices", "gold price Egypt"],
-  authors: [{ name: "nezzel gold" }],
-  creator: "nezzel gold",
-  publisher: "nezzel gold",
+  authors: [{ name: "Mersadna" }],
+  creator: "Mersadna",
+  publisher: "Mersadna",
   manifest: "/manifest.json",
   robots: {
     index: true,
@@ -55,38 +55,29 @@ export const metadata: Metadata = {
     locale: "ar_EG",
     alternateLocale: ["en_US"],
     url: "https://nezzel.com",
-    siteName: "nezzel gold",
-    title: "nezzel gold - نِزِل ذهب | أسعار الذهب الحية في مصر",
+    siteName: "Mersadna",
+    title: "Mersadna - مرصادنا | أسعار الذهب الحية في مصر",
     description: "تابع أسعار الذهب الحية في مصر بالجنيه المصري لجميع العيارات مع حاسبة الزكاة وتحليلات السوق المجانية",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "nezzel gold - أسعار الذهب في مصر"
+        alt: "Mersadna - أسعار الذهب في مصر"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "nezzel gold - نِزِل ذهب | أسعار الذهب الحية في مصر",
+    title: "Mersadna - مرصادنا | أسعار الذهب الحية في مصر",
     description: "تابع أسعار الذهب الحية في مصر بالجنيه المصري لجميع العيارات مع حاسبة الزكاة وتحليلات السوق المجانية",
     images: ["/og-image.png"],
     creator: "@nezzelgold"
   },
   icons: {
     icon: [
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/app-icon.svg", sizes: "any", type: "image/svg+xml" },
     ],
-    apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
   },
   verification: {
     ...(SEO_CONFIG.verification.google ? { google: SEO_CONFIG.verification.google } : {}),
@@ -94,12 +85,18 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 // JSON-LD Structured Data
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: 'nezzel gold',
-  alternateName: 'نِزِل ذهب',
+  name: 'Mersadna',
+  alternateName: 'مرصادنا',
   url: 'https://nezzel.com',
   description: 'تابع أسعار الذهب الحية في مصر بالجنيه المصري لجميع العيارات مع حاسبة الزكاة وتحليلات السوق المجانية',
   applicationCategory: 'FinanceApplication',

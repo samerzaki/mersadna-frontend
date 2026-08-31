@@ -20,7 +20,7 @@ export function useCryptoPrices(page: number = 1, perPage: number = 20) {
       const response = await fetchCryptoList(page, perPage);
       return {
         cryptos: response.data.map(adaptCryptoApiItem),
-        pagination: adaptCryptoPagination(response.meta.pagination),
+        pagination: adaptCryptoPagination(response.pagination),
       };
     },
     staleTime: 30000,

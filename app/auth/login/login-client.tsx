@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useLanguage } from "@/contexts/language-context";
@@ -10,22 +9,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Turnstile } from "@/components/auth/turnstile";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const { login } = useAuth();
-  const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!turnstileToken) {
+      setError(language === "ar" ? "يرجى إكمال التحقق الأمني" : "Please complete the security check.");
+      return;
+    }
     setIsLoading(true);
 
-    const result = await login(email, password);
+    const result = await login(email, password, turnstileToken);
 
     if (!result.success) {
       setError(result.error || t.pages.login.errorDefault);
@@ -115,6 +121,12 @@ export default function LoginPage() {
                 {isLoading && <Loader2 className="animate-spin" />}
                 {isLoading ? t.pages.login.submitting : t.pages.login.submitButton}
               </Button>
+
+              <Turnstile
+                onVerify={handleTurnstileVerify}
+                onExpire={handleTurnstileExpire}
+                language={language}
+              />
             </form>
 
             <div className="mt-6 text-center text-sm">

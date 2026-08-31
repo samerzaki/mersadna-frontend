@@ -75,12 +75,14 @@ export interface RegisterRequest {
   password: string;
   password_confirmation: string;
   mobile_number?: string;
+  'cf-turnstile-response'?: string;
 }
 
 // Login request
 export interface LoginRequest {
   email: string;
   password: string;
+  'cf-turnstile-response'?: string;
 }
 
 // Send OTP request
@@ -97,6 +99,7 @@ export interface VerifyEmailRequest {
 // Forgot password request
 export interface ForgotPasswordRequest {
   email: string;
+  'cf-turnstile-response'?: string;
 }
 
 // Reset password request (via email link with token)
@@ -105,6 +108,7 @@ export interface ResetPasswordRequest {
   token: string;
   password: string;
   password_confirmation: string;
+  'cf-turnstile-response'?: string;
 }
 
 // Reset password by mobile number
