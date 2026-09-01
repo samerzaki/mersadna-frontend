@@ -11,7 +11,8 @@ export interface SilverDataItem {
   currency: string;
 }
 
-export const HOMEPAGE_SILVER_KEYS = ['ounce', '999_egyptian', '925', '999_swiss'] as const;
+// Keep the homepage concise: show the three locally traded grades in one card.
+export const HOMEPAGE_SILVER_KEYS = ['999_egyptian', '925', '999_swiss'] as const;
 
 export function transformSilverItem(
   key: string,

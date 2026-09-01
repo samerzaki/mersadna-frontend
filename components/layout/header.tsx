@@ -51,7 +51,8 @@ export function Header() {
             />
           </Link>
 
-          {/* Collapse Button - Desktop only */}
+          {/* Desktop sidebar remains permanently expanded. */}
+          {false && (
           <button
             onClick={toggleCollapse}
             className={cn(
@@ -70,6 +71,7 @@ export function Header() {
               isRTL ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />
             )}
           </button>
+          )}
         </div>
 
         {/* Icons section - aligned with main content */}

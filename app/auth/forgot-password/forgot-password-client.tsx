@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/contexts/language-context";
 import { Button } from "@/components/ui/button";
@@ -9,25 +9,35 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { forgotPassword } from "@/lib/api-auth";
 import { ArrowRight, ArrowLeft, Mail, CheckCircle } from "lucide-react";
+import { Turnstile } from "@/components/auth/turnstile";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const { t, language } = useLanguage();
   const isRTL = language === "ar";
   const BackArrow = isRTL ? ArrowLeft : ArrowRight;
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!turnstileToken) {
+      setError(isRTL ? "يرجى إكمال التحقق الأمني قبل المتابعة." : "Please complete the security check before continuing.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       await forgotPassword({
         email,
-        'cf-turnstile-response': getTurnstileToken(),
+        'cf-turnstile-response': turnstileToken,
       });
       setSuccess(true);
     } catch (err) {
@@ -240,6 +250,12 @@ export default function ForgotPasswordPage() {
                 </p>
               </div>
 
+              <Turnstile
+                onVerify={handleTurnstileVerify}
+                onExpire={handleTurnstileExpire}
+                language={isRTL ? "ar" : "en"}
+              />
+
               {error && (
                 <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-md border border-red-200 dark:border-red-800">
                   {error}
@@ -249,7 +265,7 @@ export default function ForgotPasswordPage() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isLoading}
+                disabled={isLoading || !turnstileToken}
               >
                 <Mail className={`h-4 w-4 ${isRTL ? "ms-2" : "me-2"}`} />
                 {isLoading ? t.pages.forgotPassword.submitting : t.pages.forgotPassword.submitButton}
@@ -285,9 +301,4 @@ export default function ForgotPasswordPage() {
       </div>
     </div>
   );
-}
-
-function getTurnstileToken(): string | undefined {
-  return process.env.NEXT_PUBLIC_TURNSTILE_TOKEN ||
-    (process.env.NODE_ENV === 'development' ? '1x0000000000000000000000000000000AA' : undefined);
 }

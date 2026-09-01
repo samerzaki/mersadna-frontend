@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/language-context';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import type { NewsItem } from '@/types/news';
+import { newsDetailPath } from '@/lib/news-routes';
 
 export function QuickSearch() {
   const { language } = useLanguage();
@@ -140,7 +141,7 @@ export function QuickSearch() {
                     {filteredNews.map((news) => (
                       <Link
                         key={news.id}
-                        href={`/news/${news.id}`}
+                        href={newsDetailPath(news.id, news.slug, news.title)}
                         onClick={handleItemClick}
                         className={cn(
                           'flex items-start gap-3 px-3 py-2.5 rounded-md',

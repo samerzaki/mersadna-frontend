@@ -12,6 +12,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
+import { SEO_CONFIG } from '@/lib/seo-config';
 import {
   Dialog,
   DialogContent,
@@ -20,62 +21,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-/*
-interface EcosystemItem {
-  name: string;
-  nameAr: string;
-  description: string;
-  descriptionAr: string;
-  icon: React.ComponentType<{ className?: string }>;
-  href: string;
-  status: 'current' | 'soon';
-  iconBg: string;
-}
-
-const ecosystemItems: EcosystemItem[] = [
-  {
-    name: 'Mersadna',
-    nameAr: 'نِزِل دهب',
-    description: 'Gold & currency tracking',
-    descriptionAr: 'تتبع أسعار الذهب والعملات',
-    icon: Coins,
-    href: '/',
-    status: 'current',
-    iconBg: 'bg-orange-500',
-  },
-  {
-    name: 'Nezzel',
-    nameAr: 'نِزِل',
-    description: 'Best e-commerce prices',
-    descriptionAr: 'أرخص أسعار متاجر إلكترونية',
-    icon: ShoppingCart,
-    href: '#',
-    status: 'soon',
-    iconBg: 'bg-primary-500',
-  },
-  {
-    name: 'Nezzel Todo',
-    nameAr: 'نِزِل تودو',
-    description: 'Home shopping lists',
-    descriptionAr: 'متخصص لشراء الطلبات المنِزِلية',
-    icon: ListChecks,
-    href: '#',
-    status: 'soon',
-    iconBg: 'bg-green-500',
-  },
-  {
-    name: 'Nezzel Estate',
-    nameAr: 'نِزِل عقار',
-    description: 'Real estate opportunities',
-    descriptionAr: 'فرص العقارات المتاحة للشراء',
-    icon: Building2,
-    href: '#',
-    status: 'soon',
-    iconBg: 'bg-red-500',
-  },
-];
-*/
-
 const footerLinks = {
   products: {
     title: 'Products',
@@ -83,48 +28,41 @@ const footerLinks = {
     links: [
       { label: 'Gold Prices', labelAr: 'أسعار الذهب', href: '/gold' },
       { label: 'Currencies', labelAr: 'العملات', href: '/currencies' },
+      { label: 'Silver', labelAr: 'الفضة', href: '/silver' },
       { label: 'Crypto', labelAr: 'العملات الرقمية', href: '/crypto' },
-      { label: 'Charts', labelAr: 'الرسوم البيانية', href: '/chart' },
+      { label: 'News', labelAr: 'الأخبار', href: '/news' },
     ],
   },
   tools: {
     title: 'Tools',
     titleAr: 'الأدوات',
     links: [
-      { label: 'Calculator', labelAr: 'الحاسبة', href: '/gold/calculator' },
-      { label: 'Zakat', labelAr: 'الزكاة', href: '/gold/zakat' },
-      { label: 'Converter', labelAr: 'المحول', href: '/currencies/calculator' },
-      { label: 'Alerts', labelAr: 'التنبيهات', href: '/me/alerts' },
+      { label: 'Gold Calculator', labelAr: 'حاسبة الذهب', href: '/gold/calculator' },
+      { label: 'Zakat Calculator', labelAr: 'حاسبة الزكاة', href: '/gold/zakat' },
+      { label: 'Currency Converter', labelAr: 'محول العملات', href: '/currencies/calculator' },
+      { label: 'Silver Converter', labelAr: 'محول الفضة', href: '/silver/calculator' },
+      { label: 'Crypto Converter', labelAr: 'محول العملات الرقمية', href: '/crypto/calculator' },
     ],
   },
   company: {
-    title: 'Company',
-    titleAr: 'الشركة',
+    title: 'Company & Support',
+    titleAr: 'الشركة والدعم',
     links: [
       { label: 'About', labelAr: 'من نحن', href: '/about' },
-      { label: 'Contact', labelAr: 'اتصل بنا', href: '/contact' },
+      { label: 'Contact Us', labelAr: 'اتصل بنا', href: '/contact' },
       { label: 'Privacy', labelAr: 'الخصوصية', href: '/privacy' },
       { label: 'Terms', labelAr: 'الشروط', href: '/terms' },
-    ],
-  },
-  support: {
-    title: 'Support',
-    titleAr: 'الدعم',
-    links: [
-      { label: 'Help', labelAr: 'المساعدة', href: '/contact' },
-      { label: 'Docs', labelAr: 'الوثائق', href: '/about' },
       { label: 'FAQ', labelAr: 'الأسئلة', href: '/contact' },
-      { label: 'Status', labelAr: 'الحالة', href: '/' },
     ],
   },
 };
 
 const socialLinks = [
-  { icon: Twitter, href: 'https://twitter.com/nezzelgold', label: 'Twitter' },
-  { icon: Facebook, href: 'https://facebook.com/nezzelgold', label: 'Facebook' },
-  { icon: Instagram, href: 'https://instagram.com/nezzelgold', label: 'Instagram' },
-  { icon: Linkedin, href: 'https://linkedin.com/company/nezzel', label: 'LinkedIn' },
-];
+  { icon: Twitter, href: SEO_CONFIG.social.x, label: 'X' },
+  { icon: Facebook, href: SEO_CONFIG.social.facebook, label: 'Facebook' },
+  { icon: Instagram, href: SEO_CONFIG.social.instagram, label: 'Instagram' },
+  { icon: Linkedin, href: SEO_CONFIG.social.linkedin, label: 'LinkedIn' },
+].filter((link) => /^https:\/\//.test(link.href));
 
 export function Footer() {
   const { language } = useLanguage();
@@ -135,14 +73,14 @@ export function Footer() {
     <footer className="w-full border-t bg-card">
       <div className="mx-auto max-w-7xl px-4 py-12 md:px-8">
         {/* Footer Links */}
-        <div className="mb-10 grid grid-cols-2 gap-8 md:grid-cols-5">
+        <div className="mb-10 grid grid-cols-2 gap-8 md:grid-cols-4">
           {Object.entries(footerLinks).map(([key, section]) => (
             <div key={key}>
               <h3 className="mb-3 text-sm font-semibold">
                 {isRTL ? section.titleAr : section.title}
               </h3>
               <ul className="space-y-2">
-                {section.links.map((link, index) => (
+                {[...section.links, ...(key === 'company' ? [{ label: 'Disclaimer', labelAr: 'إخلاء المسؤولية', href: '/disclaimer' }] : [])].map((link, index) => (
                   <li key={`${key}-${link.href}-${index}`}>
                     <Link
                       href={link.href}
@@ -239,11 +177,11 @@ export function Footer() {
 
           {/* Contact */}
           <a
-            href="mailto:info@nezzel.com"
+            href="mailto:info@mersadna.com"
             className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <Mail className="h-4 w-4" />
-            <span>info@nezzel.com</span>
+            <span>info@mersadna.com</span>
           </a>
         </div>
       </div>

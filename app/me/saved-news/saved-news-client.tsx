@@ -2,10 +2,9 @@
 
 import Link from 'next/link';
 import { Bookmark, Newspaper, Trash2 } from 'lucide-react';
-import { useNewsBookmarks, useNewsCategories } from '@/hooks/use-news';
+import { useNewsBookmarks } from '@/hooks/use-news';
 import { useLanguage } from '@/contexts/language-context';
-import { getCategoryColors, getCategoryInfo } from '@/lib/news-constants';
-import { cn } from '@/lib/utils';
+import { newsDetailPath } from '@/lib/news-routes';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
@@ -13,7 +12,6 @@ export default function SavedNewsPage() {
   const { language } = useLanguage();
   const isRTL = language === 'ar';
   const { bookmarks, removeBookmark, isLoaded } = useNewsBookmarks();
-  const { categories } = useNewsCategories();
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
@@ -82,12 +80,6 @@ export default function SavedNewsPage() {
       {isLoaded && bookmarks.length > 0 && (
         <div className="space-y-4">
           {bookmarks.map((bookmark) => {
-            const categoryInfo = getCategoryInfo(bookmark.category, categories);
-            const categoryName = categoryInfo
-              ? isRTL
-                ? categoryInfo.nameAr
-                : categoryInfo.nameEn
-              : bookmark.category;
             const title = isRTL ? bookmark.titleAr : bookmark.title;
             const excerpt = isRTL ? bookmark.excerptAr : bookmark.excerpt;
 
@@ -98,7 +90,7 @@ export default function SavedNewsPage() {
               >
                 {/* Thumbnail */}
                 <Link
-                  href={`/news/${bookmark.id}`}
+                  href={newsDetailPath(bookmark.id, bookmark.slug, bookmark.title)}
                   className="relative w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800"
                 >
                   <Image
@@ -114,16 +106,8 @@ export default function SavedNewsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <span
-                        className={cn(
-                          'inline-block px-2 py-0.5 text-xs font-medium rounded-full mb-2',
-                          getCategoryColors(bookmark.category, categories)
-                        )}
-                      >
-                        {categoryName}
-                      </span>
                       <Link
-                        href={`/news/${bookmark.id}`}
+                        href={newsDetailPath(bookmark.id, bookmark.slug, bookmark.title)}
                         className="block group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
                       >
                         <h3 className="font-semibold text-slate-900 dark:text-slate-100 line-clamp-2 mb-1">

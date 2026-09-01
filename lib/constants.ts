@@ -24,10 +24,13 @@ export const KARAT_COLORS = {
 } as const;
 
 const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
+const directBackendUrl = 'http://mersadna.test/api';
 
+// All browser and server requests go directly to the backend. Override
+// these URLs per environment rather than routing requests through the Next app.
 export const API_BASE_URL = typeof window === 'undefined'
-  ? (process.env.INTERNAL_API_URL || publicApiUrl || '/api')
-  : (publicApiUrl?.startsWith('http') ? publicApiUrl : '/api');
+  ? (process.env.INTERNAL_API_URL || publicApiUrl || directBackendUrl)
+  : (publicApiUrl || directBackendUrl);
 
 export const REFRESH_INTERVAL = 60000; // 1 minute in milliseconds
 

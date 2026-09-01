@@ -1,193 +1,57 @@
 import type { Metadata } from 'next';
 
-// ============================================================
-// SEO Configuration - Centralized SEO data for all pages
-// ============================================================
-// INSTRUCTIONS: Fill in the empty strings below with your data.
-// All page titles, descriptions, and keywords can be customized.
-// ============================================================
+export const SITE_URL = (process.env.SITE_URL || 'https://mersadna.com').replace(/\/$/, '');
 
 export const SEO_CONFIG = {
-  // --- Site-wide settings ---
   site: {
     name: 'Mersadna',
     nameAr: 'مرصادنا',
-    domain: 'https://nezzel.com',
-    twitter: '@nezzelgold',
+    domain: SITE_URL,
+    description: 'مرصادنا منصة عربية لمتابعة أسعار الذهب والعملات والمعادن في مصر.',
   },
-
-  // --- USER: Fill these verification codes ---
   verification: {
-    google: '',   // Google Search Console verification code
-    yandex: '',   // Yandex Webmaster verification code
-    bing: '',     // Bing Webmaster verification code
+    google: process.env.GOOGLE_SITE_VERIFICATION || '',
+    bing: process.env.BING_SITE_VERIFICATION || '',
   },
-
-  // --- USER: Fill your social media links ---
   social: {
-    twitter: '',     // e.g. https://twitter.com/nezzelgold
-    facebook: '',    // e.g. https://facebook.com/nezzelgold
-    instagram: '',   // e.g. https://instagram.com/nezzelgold
-    youtube: '',     // e.g. https://youtube.com/@nezzelgold
-    tiktok: '',      // e.g. https://tiktok.com/@nezzelgold
+    x: process.env.NEXT_PUBLIC_X_URL || '',
+    facebook: process.env.NEXT_PUBLIC_FACEBOOK_URL || '',
+    instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || '',
+    youtube: process.env.NEXT_PUBLIC_YOUTUBE_URL || '',
+    linkedin: process.env.NEXT_PUBLIC_LINKEDIN_URL || '',
   },
-
-  // --- Page metadata ---
-  // USER: Review and customize these descriptions and keywords
   pages: {
-    // Gold section
-    goldCalculator: {
-      title: 'حاسبة الذهب',
-      description: 'احسب قيمة الذهب بالجنيه المصري لجميع العيارات مع المصنعية والضريبة. حاسبة ذهب ذكية ومجانية.',
-      keywords: ['حاسبة الذهب', 'حساب سعر الذهب', 'المصنعية', 'قيمة الذهب', 'gold calculator Egypt'],
-    },
-    goldZakat: {
-      title: 'حاسبة زكاة الذهب',
-      description: 'احسب زكاة الذهب الواجبة عليك بسهولة وفقاً للشريعة الإسلامية. حاسبة النصاب والزكاة لجميع العيارات.',
-      keywords: ['زكاة الذهب', 'حاسبة الزكاة', 'نصاب الذهب', 'زكاة المال', 'gold zakat calculator'],
-    },
-
-    // Silver section
-    silver: {
-      title: 'أسعار الفضة',
-      description: 'تابع أسعار الفضة الحية في مصر بالجنيه المصري مع الرسوم البيانية وتحليلات الأسعار.',
-      keywords: ['أسعار الفضة', 'سعر الفضة اليوم', 'فضة في مصر', 'silver price Egypt'],
-    },
-    silverCalculator: {
-      title: 'حاسبة الفضة',
-      description: 'احسب قيمة الفضة بالجنيه المصري مع المصنعية. حاسبة فضة ذكية ومجانية.',
-      keywords: ['حاسبة الفضة', 'حساب سعر الفضة', 'silver calculator'],
-    },
-
-    // Currency section
-    currenciesCalculator: {
-      title: 'حاسبة العملات',
-      description: 'حول بين العملات المختلفة بأسعار البنوك والسوق الموازي في مصر. محول عملات فوري ودقيق.',
-      keywords: ['حاسبة العملات', 'تحويل العملات', 'محول العملات', 'currency converter Egypt'],
-    },
-    currencyAnalytics: {
-      title: 'تحليلات العملات',
-      description: 'تحليلات شاملة لأسعار العملات الأجنبية في مصر مع مقارنة البنوك والسوق الموازي.',
-      keywords: ['تحليلات العملات', 'تحليل سعر الدولار', 'مقارنة أسعار البنوك', 'currency analytics Egypt'],
-    },
-
-    // Crypto section
-    cryptoCalculator: {
-      title: 'حاسبة العملات الرقمية',
-      description: 'احسب قيمة العملات الرقمية مثل البيتكوين والإيثيريوم بالجنيه المصري.',
-      keywords: ['حاسبة البيتكوين', 'حاسبة العملات الرقمية', 'crypto calculator', 'bitcoin calculator'],
-    },
-
-    // Charts & History
-    chart: {
-      title: 'الرسوم البيانية',
-      description: 'رسوم بيانية تفاعلية لأسعار الذهب والعملات في مصر مع تحليلات الاتجاهات.',
-      keywords: ['رسوم بيانية', 'charts', 'تحليل أسعار الذهب', 'gold charts Egypt'],
-    },
-    history: {
-      title: 'السجل السعري',
-      description: 'تابع تاريخ أسعار الذهب والعملات في مصر مع المقارنة بين الفترات الزمنية.',
-      keywords: ['تاريخ أسعار الذهب', 'السجل السعري', 'gold price history Egypt'],
-    },
-
-    // News
-    news: {
-      title: 'آخر الأخبار',
-      description: 'تابع آخر أخبار الذهب والعملات والاقتصاد في مصر والعالم.',
-      keywords: ['أخبار الذهب', 'أخبار العملات', 'أخبار الاقتصاد', 'gold news Egypt'],
-    },
-
-    // Static pages
-    about: {
-      title: 'من نحن',
-      description: 'تعرف على منصة Mersadna - وجهتك الموثوقة لمتابعة أسعار الذهب والعملات في مصر.',
-      keywords: ['Mersadna', 'مرصادنا', 'من نحن', 'about Mersadna'],
-    },
-    contact: {
-      title: 'اتصل بنا',
-      description: 'تواصل مع فريق Mersadna. نسعد بالإجابة على استفساراتك ومقترحاتك.',
-      keywords: ['اتصل بنا', 'تواصل معنا', 'contact Mersadna'],
-    },
-    pricing: {
-      title: 'الأسعار والباقات',
-      description: 'اختر الباقة المناسبة لك من خطط Mersadna للوصول إلى جميع المزايا.',
-      keywords: ['أسعار الاشتراك', 'باقات', 'pricing', 'Mersadna plans'],
-    },
-    privacy: {
-      title: 'سياسة الخصوصية',
-      description: 'سياسة الخصوصية وحماية البيانات الشخصية في منصة Mersadna.',
-      keywords: ['سياسة الخصوصية', 'حماية البيانات', 'privacy policy'],
-    },
-    terms: {
-      title: 'شروط الاستخدام',
-      description: 'شروط وأحكام استخدام منصة Mersadna لمتابعة أسعار الذهب والعملات.',
-      keywords: ['شروط الاستخدام', 'الأحكام', 'terms of service'],
-    },
-
-    // User dashboard (noindex)
-    meAlerts: {
-      title: 'التنبيهات',
-      description: 'إدارة تنبيهات الأسعار الخاصة بك.',
-    },
-    mePortfolio: {
-      title: 'المحفظة',
-      description: 'تتبع محفظتك الاستثمارية.',
-    },
-    meWatchlist: {
-      title: 'قائمة المتابعة',
-      description: 'إدارة قائمة المتابعة الخاصة بك.',
-    },
-    meSettings: {
-      title: 'الإعدادات',
-      description: 'إعدادات حسابك.',
-    },
-    meSavedNews: {
-      title: 'الأخبار المحفوظة',
-      description: 'الأخبار التي قمت بحفظها.',
-    },
-
-    // Auth pages (noindex)
-    authLogin: {
-      title: 'تسجيل الدخول',
-      description: 'سجل دخولك إلى حسابك في Mersadna.',
-    },
-    authRegister: {
-      title: 'إنشاء حساب',
-      description: 'أنشئ حسابك المجاني في Mersadna.',
-    },
-    authForgotPassword: {
-      title: 'نسيت كلمة المرور',
-      description: 'استعادة كلمة المرور الخاصة بحسابك.',
-    },
-    authResetPassword: {
-      title: 'إعادة تعيين كلمة المرور',
-      description: 'إعادة تعيين كلمة المرور الخاصة بحسابك.',
-    },
-    authVerifyOtp: {
-      title: 'التحقق من الرمز',
-      description: 'التحقق من رمز التأكيد المرسل إليك.',
-    },
-
-    // Dynamic pages - templates
-    karatTemplate: {
-      // %s will be replaced with karat name e.g. "عيار 24"
-      title: 'سعر الذهب %s في مصر',
-      description: 'تابع سعر الذهب %s الحي في مصر بالجنيه المصري مع الرسوم البيانية وتحليلات السوق.',
-      keywords: ['سعر ذهب %s', 'ذهب %s اليوم', 'gold %s price Egypt'],
-    },
-  },
-
-  // OG image defaults
-  images: {
-    og: '/og-image.png',
-    ogWidth: 1200,
-    ogHeight: 630,
+    home: { title: 'مرصادنا | أسعار الذهب والعملات في مصر', description: 'تابع أسعار الذهب والعملات والفضة في مصر، مع تحديثات السوق وأدوات حسابية واضحة.' },
+    gold: { title: 'أسعار الذهب اليوم في مصر', description: 'أسعار الذهب اليوم في مصر لعيارات 24 و21 و18 بالجنيه المصري، مع آخر تحديث والرسم البياني وحاسبة الذهب.' },
+    goldCalculator: { title: 'حاسبة الذهب في مصر', description: 'احسب القيمة التقديرية للذهب بالجنيه المصري حسب العيار والوزن والمصنعية.' },
+    goldZakat: { title: 'حاسبة زكاة الذهب', description: 'احسب زكاة الذهب بصورة تقديرية حسب الوزن والعيار وقيمة النصاب.' },
+    silver: { title: 'أسعار الفضة اليوم في مصر', description: 'تابع أسعار الفضة في مصر وآخر تحديثات السوق مع أدوات الحساب.' },
+    silverCalculator: { title: 'حاسبة الفضة', description: 'احسب القيمة التقديرية للفضة بالجنيه المصري حسب الوزن والنقاء.' },
+    currencies: { title: 'أسعار العملات اليوم في مصر', description: 'تابع أسعار الدولار واليورو والعملات الأجنبية في البنوك المصرية والسوق الموازية.' },
+    currenciesCalculator: { title: 'حاسبة تحويل العملات', description: 'حوّل بين العملات بأسعار مرجعية محدثة في مصر.' },
+    currencyAnalytics: { title: 'تحليلات أسعار العملات في مصر', description: 'قارن حركة أسعار العملات وبيانات البنوك المصرية في مكان واحد.' },
+    crypto: { title: 'أسعار العملات الرقمية', description: 'تابع أسعار العملات الرقمية وبيانات السوق الرئيسية.' },
+    cryptoCalculator: { title: 'حاسبة العملات الرقمية', description: 'احسب القيمة التقديرية للعملات الرقمية بالدولار والجنيه المصري.' },
+    chart: { title: 'الرسم البياني لأسعار الذهب', description: 'استكشف الرسم البياني لحركة أسعار الذهب في مصر عبر الفترات الزمنية المختلفة.' },
+    history: { title: 'تاريخ أسعار الذهب في مصر', description: 'راجع السجل السعري للذهب في مصر وقارن تغير الأسعار بمرور الوقت.' },
+    news: { title: 'أخبار الذهب والاقتصاد', description: 'أحدث أخبار الذهب والعملات والاقتصاد التي يكتبها فريق مرصادنا.' },
+    about: { title: 'عن مرصادنا', description: 'تعرف على منصة مرصادنا لمتابعة الأسواق المصرية.' },
+    contact: { title: 'اتصل بمرصادنا', description: 'تواصل مع فريق مرصادنا للاستفسارات والمقترحات.' },
+    privacy: { title: 'سياسة الخصوصية', description: 'سياسة خصوصية منصة مرصادنا.' },
+    terms: { title: 'شروط الاستخدام', description: 'شروط استخدام منصة مرصادنا.' },
+    meAlerts: { title: 'التنبيهات', description: 'إدارة تنبيهات الأسعار الخاصة بك.' },
+    mePortfolio: { title: 'المحفظة', description: 'تتبع محفظتك الاستثمارية.' },
+    meWatchlist: { title: 'قائمة المتابعة', description: 'إدارة قائمة المتابعة الخاصة بك.' },
+    meSettings: { title: 'الإعدادات', description: 'إعدادات حسابك.' },
+    meSavedNews: { title: 'الأخبار المحفوظة', description: 'الأخبار التي قمت بحفظها.' },
+    authLogin: { title: 'تسجيل الدخول', description: 'سجل دخولك إلى حسابك في مرصادنا.' },
+    authRegister: { title: 'إنشاء حساب', description: 'أنشئ حسابك في مرصادنا.' },
+    authForgotPassword: { title: 'استعادة كلمة المرور', description: 'استعادة كلمة مرور حسابك.' },
+    authResetPassword: { title: 'إعادة تعيين كلمة المرور', description: 'إعادة تعيين كلمة مرور حسابك.' },
+    authVerifyOtp: { title: 'التحقق من الرمز', description: 'تحقق من رمز التأكيد.' },
   },
 } as const;
 
-// ============================================================
-// Helper: Build metadata for a page from SEO_CONFIG
-// ============================================================
 type PageKey = keyof typeof SEO_CONFIG.pages;
 
 interface BuildMetadataOptions {
@@ -197,40 +61,35 @@ interface BuildMetadataOptions {
   overrides?: Partial<Metadata>;
 }
 
-export function buildMetadata(
-  pageKey: PageKey,
-  options: BuildMetadataOptions = {}
-): Metadata {
+export function absoluteUrl(path = '/') {
+  return `${SITE_URL}${path === '/' ? '' : path.startsWith('/') ? path : `/${path}`}`;
+}
+
+export function buildMetadata(pageKey: PageKey, options: BuildMetadataOptions = {}): Metadata {
   const page = SEO_CONFIG.pages[pageKey];
   const { noindex = false, canonicalPath, ogType = 'website', overrides = {} } = options;
-  const domain = SEO_CONFIG.site.domain;
+  const canonical = canonicalPath ? absoluteUrl(canonicalPath) : undefined;
 
-  const metadata: Metadata = {
+  return {
     title: page.title,
     description: page.description,
-    ...('keywords' in page && page.keywords ? { keywords: [...page.keywords] } : {}),
-    ...(noindex
-      ? { robots: { index: false, follow: false } }
-      : {}),
-    ...(canonicalPath
-      ? { alternates: { canonical: `${domain}${canonicalPath}` } }
-      : {}),
+    robots: noindex ? { index: false, follow: false } : undefined,
+    alternates: canonical ? { canonical } : undefined,
     openGraph: {
-      title: `${page.title} | ${SEO_CONFIG.site.name}`,
+      title: `${page.title} | ${SEO_CONFIG.site.nameAr}`,
       description: page.description,
       type: ogType,
       locale: 'ar_EG',
-      siteName: SEO_CONFIG.site.name,
-      ...(canonicalPath ? { url: `${domain}${canonicalPath}` } : {}),
+      siteName: SEO_CONFIG.site.nameAr,
+      url: canonical,
+      images: [{ url: absoluteUrl('/opengraph-image'), width: 1200, height: 630, alt: SEO_CONFIG.site.nameAr }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${page.title} | ${SEO_CONFIG.site.name}`,
+      title: `${page.title} | ${SEO_CONFIG.site.nameAr}`,
       description: page.description,
-      creator: SEO_CONFIG.site.twitter,
+      images: [absoluteUrl('/opengraph-image')],
     },
     ...overrides,
   };
-
-  return metadata;
 }

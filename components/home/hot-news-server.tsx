@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export async function HotNewsSectionServer() {
   try {
-    const response = await fetchNewsList(undefined, 1);
+    const response = await fetchNewsList(1);
     const news = response.data.news.slice(0, 4);
 
     return <HotNewsSectionClient news={news} referenceTime={new Date().toISOString()} />;

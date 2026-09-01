@@ -69,7 +69,7 @@ export function getCategoryColors(
 /**
  * LocalStorage key for bookmarked news
  */
-export const BOOKMARKS_STORAGE_KEY = 'nezzel_news_bookmarks';
+export const BOOKMARKS_STORAGE_KEY = 'mersadna_news_bookmarks';
 
 /**
  * News refresh interval (5 minutes for news, less frequent than prices)

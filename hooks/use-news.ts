@@ -1,22 +1,18 @@
 // React Query hooks for News API
 
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import { fetchNewsList, fetchNewsDetail, fetchFeaturedNews, fetchNewsCategories } from '@/lib/api';
-import { NewsCategory, BookmarkedNews, NewsItem, NewsCategoryInfo } from '@/types';
-import { NEWS_REFRESH_INTERVAL, NEWS_STALE_TIME, BOOKMARKS_STORAGE_KEY, CATEGORY_COLORS } from '@/lib/news-constants';
+import { fetchNewsList, fetchNewsDetail, fetchFeaturedNews } from '@/lib/api';
+import { BookmarkedNews, NewsItem } from '@/types';
+import { NEWS_REFRESH_INTERVAL, NEWS_STALE_TIME, BOOKMARKS_STORAGE_KEY } from '@/lib/news-constants';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
 /**
  * Fetch paginated news list with filters
  */
-export function useNewsList(
-  category?: NewsCategory,
-  search?: string,
-  page: number = 1
-) {
+export function useNewsList(search?: string, page: number = 1) {
   return useQuery({
-    queryKey: ['news', 'list', category, search, page],
-    queryFn: () => fetchNewsList(category, page, search),
+    queryKey: ['news', 'list', search, page],
+    queryFn: () => fetchNewsList(page, search),
     staleTime: NEWS_STALE_TIME,
     gcTime: NEWS_REFRESH_INTERVAL,
   });
@@ -25,13 +21,10 @@ export function useNewsList(
 /**
  * Infinite scroll news list
  */
-export function useInfiniteNewsList(
-  category?: NewsCategory,
-  search?: string
-) {
+export function useInfiniteNewsList(search?: string) {
   return useInfiniteQuery({
-    queryKey: ['news', 'infinite', category, search],
-    queryFn: ({ pageParam = 1 }) => fetchNewsList(category, pageParam, search),
+    queryKey: ['news', 'infinite', search],
+    queryFn: ({ pageParam = 1 }) => fetchNewsList(pageParam, search),
     getNextPageParam: (lastPage) => {
       if (lastPage.data.pagination.hasNextPage) {
         return lastPage.data.pagination.currentPage + 1;
@@ -65,40 +58,6 @@ export function useFeaturedNews() {
     staleTime: NEWS_STALE_TIME,
     refetchInterval: NEWS_REFRESH_INTERVAL,
   });
-}
-
-/**
- * Fetch news categories from API
- * GET /api/category/child-categories?parent_node_name=news
- */
-export function useNewsCategories() {
-  const query = useQuery({
-    queryKey: ['categories', 'news'],
-    queryFn: fetchNewsCategories,
-    staleTime: 600000, // 10 minutes - categories rarely change
-    gcTime: 1800000,   // 30 minutes
-  });
-
-  // Transform API categories to NewsCategoryInfo for UI
-  const categories: NewsCategoryInfo[] = useMemo(() => {
-    if (!query.data) return [];
-    return query.data.map((cat, index) => {
-      const colors = CATEGORY_COLORS[index % CATEGORY_COLORS.length];
-      return {
-        id: cat.slug,
-        nameEn: cat.name,
-        nameAr: cat.name, // API returns name in Accept-Language
-        slug: cat.slug,
-        color: colors.color,
-        darkColor: colors.darkColor,
-      };
-    });
-  }, [query.data]);
-
-  return {
-    ...query,
-    categories,
-  };
 }
 
 /**

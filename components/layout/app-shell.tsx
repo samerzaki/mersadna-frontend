@@ -5,7 +5,6 @@ import { BottomNav } from "./bottom-nav";
 import { Footer } from "./footer";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/language-context";
-import { useSidebar } from "@/contexts/sidebar-context";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -16,7 +15,6 @@ type AppShellProps = {
 export function AppShell({ children, statsBanner, className }: AppShellProps) {
   const { language } = useLanguage();
   const isRTL = language === "ar";
-  const { isCollapsed } = useSidebar();
 
   return (
     <>
@@ -29,9 +27,7 @@ export function AppShell({ children, statsBanner, className }: AppShellProps) {
           className={cn(
             "min-h-screen flex flex-col transition-all duration-300",
             // Add margin on desktop to account for fixed sidebar (RTL-aware)
-            isRTL
-              ? (isCollapsed ? "md:mr-20" : "md:mr-64")
-              : (isCollapsed ? "md:ml-20" : "md:ml-64"),
+            isRTL ? "md:mr-64" : "md:ml-64",
             // Add margin-bottom on mobile to prevent content from being hidden behind bottom nav
             "mb-20 md:mb-0",
             className

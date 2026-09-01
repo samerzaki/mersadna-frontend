@@ -19,9 +19,9 @@ export function ShareButtons({ url, title, description, variant = 'icons', class
   const isRTL = language === 'ar';
   const [copied, setCopied] = useState(false);
 
-  const encodedUrl = encodeURIComponent(url);
+  const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
+  const encodedUrl = encodeURIComponent(shareUrl);
   const encodedTitle = encodeURIComponent(title);
-  const encodedDescription = encodeURIComponent(description || '');
 
   const shareLinks = [
     {
@@ -56,7 +56,18 @@ export function ShareButtons({ url, title, description, variant = 'icons', class
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(url);
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+      } else {
+        const input = document.createElement('textarea');
+        input.value = shareUrl;
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -70,7 +81,7 @@ export function ShareButtons({ url, title, description, variant = 'icons', class
         await navigator.share({
           title,
           text: description,
-          url,
+          url: shareUrl,
         });
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {

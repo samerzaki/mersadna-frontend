@@ -11,11 +11,8 @@ import {
   NewsListResponse,
   NewsDetailResponse,
   NewsFeaturedResponse,
-  NewsCategory,
   ApiNewsListResponse,
   ApiNewsDetailResponse,
-  ApiRelatedNewsResponse,
-  ApiCategoryItem,
   CryptoListApiResponse,
   CryptoTopApiResponse,
   SilverOverviewResponse,
@@ -23,7 +20,6 @@ import {
   BlackMarketResponse,
 } from '@/types';
 import { API_BASE_URL } from './constants';
-import { NEWS_PER_PAGE } from './news-constants';
 import {
   adaptApiNewsToNewsItem,
   adaptApiPagination,
@@ -328,73 +324,24 @@ export async function fetchBlackMarketRates(
 }
 
 // =============================================================================
-// CATEGORY API FUNCTIONS
-// =============================================================================
-
-/**
- * Fetch child categories for a given parent node
- * GET /api/category/child-categories?parent_node_name=news
- *
- * @param parentNodeName - The parent node name (e.g., 'news')
- */
-export async function fetchChildCategories(
-  parentNodeName: string
-): Promise<ApiCategoryItem[]> {
-  const params = new URLSearchParams({ parent_node_name: parentNodeName });
-
-  const response = await fetch(`${API_BASE_URL}/category/child-categories?${params.toString()}`, {
-    headers: {
-      'Accept': 'application/json',
-      'Accept-Language': 'ar',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch categories');
-  }
-
-  const payload: unknown = await response.json();
-  if (Array.isArray(payload)) return payload as ApiCategoryItem[];
-  if (payload && typeof payload === 'object' && Array.isArray((payload as { data?: unknown }).data)) {
-    return (payload as { data: ApiCategoryItem[] }).data;
-  }
-  return [];
-}
-
-/**
- * Fetch news categories
- * Shorthand for fetchChildCategories('news')
- */
-export async function fetchNewsCategories(): Promise<ApiCategoryItem[]> {
-  return fetchChildCategories('news');
-}
-
-// =============================================================================
 // NEWS API FUNCTIONS
 // =============================================================================
 
 /**
  * Fetch paginated news list from API
- * GET /api/news/articles
+ * GET /api/news
  *
- * @param category - Filter by category (optional - frontend filtering by category slug)
  * @param page - Page number (default: 1)
  * @param search - Search query (optional)
- * @param limit - Items per page (default: 12)
- * @param sourceName - Unused, kept for API compatibility
  * @param sortBy - Sort order: 'latest' | 'oldest' (default: 'latest')
  */
 export async function fetchNewsList(
-  category?: NewsCategory,
   page: number = 1,
   search?: string,
-  limit: number = NEWS_PER_PAGE,
-  sourceName?: string,
   sortBy: 'latest' | 'oldest' = 'latest'
 ): Promise<NewsListResponse> {
   const params = new URLSearchParams({
     page: page.toString(),
-    per_page: limit.toString(),
     sort_by: sortBy,
   });
 
@@ -402,7 +349,7 @@ export async function fetchNewsList(
     params.append('search', search);
   }
 
-  const response = await fetch(`${API_BASE_URL}/news/articles?${params.toString()}`, {
+  const response = await fetch(`${API_BASE_URL}/news?${params.toString()}`, {
     headers: {
       'Accept': 'application/json',
       'Accept-Language': 'ar',
@@ -413,28 +360,11 @@ export async function fetchNewsList(
     throw new Error('Failed to fetch news list');
   }
 
-  const apiResponse: ApiNewsListResponse & { meta?: { pagination?: { current_page?: number; per_page?: number; total?: number; last_page?: number } } } = await response.json();
+  const apiResponse: ApiNewsListResponse = await response.json();
 
-  // Transform API response to frontend format
-  let newsItems = apiResponse.data.map(adaptApiNewsToNewsItem);
+  const newsItems = apiResponse.data.map(adaptApiNewsToNewsItem);
 
-  // Apply category filter on frontend if specified
-  if (category) {
-    newsItems = newsItems.filter(item => item.category === category);
-  }
-
-  // Adapt pagination
-  const legacyPagination = apiResponse.meta?.pagination;
-  const pagination = apiResponse.pagination
-    ? adaptApiPagination(apiResponse.pagination)
-    : {
-        currentPage: legacyPagination?.current_page ?? page,
-        totalPages: legacyPagination?.last_page ?? 1,
-        totalItems: legacyPagination?.total ?? newsItems.length,
-        perPage: legacyPagination?.per_page ?? limit,
-        hasNextPage: (legacyPagination?.current_page ?? page) < (legacyPagination?.last_page ?? 1),
-        hasPreviousPage: (legacyPagination?.current_page ?? page) > 1,
-      };
+  const pagination = adaptApiPagination(apiResponse.pagination);
 
   return {
     status: apiResponse.status,
@@ -443,7 +373,6 @@ export async function fetchNewsList(
       news: newsItems,
       pagination,
       filters: {
-        category,
         search,
       },
     },
@@ -455,12 +384,21 @@ export async function fetchNewsList(
 
 /**
  * Fetch single news article by ID
- * GET /api/news/articles/:news_id
+ * GET /api/news/:id-slug
  *
  * @param newsId - News article numeric ID
  */
 export async function fetchNewsDetail(newsId: string): Promise<NewsDetailResponse> {
-  const response = await fetch(`${API_BASE_URL}/news/articles/${newsId}`, {
+  // `useParams()` may provide an encoded route segment. Decode it first so the
+  // Arabic slug is encoded exactly once for the backend request.
+  let articleRoute = newsId;
+  try {
+    articleRoute = decodeURIComponent(newsId);
+  } catch {
+    // Keep the original value if a malformed legacy URL is encountered.
+  }
+
+  const response = await fetch(`${API_BASE_URL}/news/${encodeURIComponent(articleRoute)}`, {
     headers: {
       'Accept': 'application/json',
       'Accept-Language': 'ar',
@@ -479,31 +417,12 @@ export async function fetchNewsDetail(newsId: string): Promise<NewsDetailRespons
   // Transform API response to frontend format
   const news = adaptApiNewsToNewsItem(apiResponse.data);
 
-  // Fetch related news
-  let relatedNews: typeof news[] = [];
-  try {
-    const relatedResponse = await fetch(`${API_BASE_URL}/news/${newsId}/get-related-newss`, {
-      headers: {
-        'Accept': 'application/json',
-        'Accept-Language': 'ar',
-      },
-    });
-    if (relatedResponse.ok) {
-      const relatedData: ApiRelatedNewsResponse = await relatedResponse.json();
-      if (relatedData.data && Array.isArray(relatedData.data)) {
-        relatedNews = relatedData.data.map(adaptApiNewsToNewsItem);
-      }
-    }
-  } catch {
-    // Silently fail - related news is optional
-  }
-
   return {
     status: apiResponse.status,
     success: apiResponse.success,
     data: {
       news,
-      relatedNews,
+      relatedNews: [],
     },
     meta: {
       message: 'News detail fetched successfully',
@@ -513,7 +432,7 @@ export async function fetchNewsDetail(newsId: string): Promise<NewsDetailRespons
 
 /**
  * Fetch featured/breaking news
- * GET /api/news/articles?sort_by=latest
+ * GET /api/news?sort_by=latest
  */
 export async function fetchFeaturedNews(): Promise<NewsFeaturedResponse> {
   const params = new URLSearchParams({
@@ -521,7 +440,7 @@ export async function fetchFeaturedNews(): Promise<NewsFeaturedResponse> {
     sort_by: 'latest',
   });
 
-  const response = await fetch(`${API_BASE_URL}/news/articles?${params.toString()}`, {
+  const response = await fetch(`${API_BASE_URL}/news?${params.toString()}`, {
     headers: {
       'Accept': 'application/json',
       'Accept-Language': 'ar',

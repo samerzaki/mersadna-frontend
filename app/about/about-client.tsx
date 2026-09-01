@@ -30,8 +30,8 @@ export default function AboutPage() {
           </h2>
           <p className="leading-relaxed text-muted-foreground">
             {isRTL
-              ? 'مرصادنا هي منصة شاملة لمتابعة أسعار الذهب والعملات والعملات الرقمية في مصر. نوفر لك بيانات دقيقة ومحدثة لحظياً لمساعدتك في اتخاذ قرارات استثمارية مدروسة. نسعى لتقديم تجربة مستخدم متميزة مع أدوات حسابية ذكية وتحليلات شاملة للسوق.'
-              : 'Mersadna is a comprehensive platform for tracking gold, currency, and cryptocurrency prices in Egypt. We provide accurate, real-time data to help you make informed investment decisions. We strive to deliver an exceptional user experience with smart calculation tools and comprehensive market analytics.'}
+              ? 'مرصادنا منصة عربية لمتابعة أسعار الذهب والعملات والفضة والعملات الرقمية في مصر. ننظم البيانات المتاحة ونقدم أدوات حسابية ورسومًا تساعدك على قراءة السوق بصورة أوضح.'
+              : 'Mersadna is an Arabic platform for following gold, currency, silver, and cryptocurrency prices in Egypt, with clear market data and practical calculation tools.'}
           </p>
         </section>
 
@@ -49,8 +49,8 @@ export default function AboutPage() {
             </div>
             <p className="text-muted-foreground">
               {isRTL
-                ? 'توفير معلومات دقيقة وشفافة عن أسعار الذهب والعملات لجميع المستخدمين في مصر.'
-                : 'Provide accurate and transparent information about gold and currency prices to all users in Egypt.'}
+                ? 'تقديم بيانات سوق منظمة وسهلة القراءة، مع توضيح وقت التحديث وحدود الاستخدام.'
+                : 'Present market data clearly, including update times and usage limitations.'}
             </p>
           </div>
 
@@ -66,8 +66,8 @@ export default function AboutPage() {
             </div>
             <p className="text-muted-foreground">
               {isRTL
-                ? 'أن نكون المنصة الأولى في مصر والشرق الأوسط لمتابعة أسعار الذهب والعملات.'
-                : 'To be the leading platform in Egypt and the Middle East for tracking gold and currency prices.'}
+                ? 'تسهيل الوصول إلى معلومات السوق والأدوات العملية للمستخدم العربي.'
+                : 'Make market information and practical tools easier for Arabic-speaking users to access.'}
             </p>
           </div>
 
@@ -83,8 +83,8 @@ export default function AboutPage() {
             </div>
             <p className="text-muted-foreground">
               {isRTL
-                ? 'الشفافية، الدقة، الموثوقية، والابتكار في خدمة مستخدمينا.'
-                : 'Transparency, accuracy, reliability, and innovation in serving our users.'}
+                ? 'الوضوح، البساطة، واحترام اختلاف الأسعار الفعلية بين الجهات والأسواق.'
+                : 'Clarity, simplicity, and respect for differences between reference and final market prices.'}
             </p>
           </div>
 
@@ -100,8 +100,8 @@ export default function AboutPage() {
             </div>
             <p className="text-muted-foreground">
               {isRTL
-                ? 'فريق متخصص من المطورين والمحللين الماليين يعمل على تقديم أفضل تجربة للمستخدمين.'
-                : 'A specialized team of developers and financial analysts working to deliver the best user experience.'}
+                ? 'نعمل على تطوير تجربة المتابعة والأدوات باستمرار بناءً على احتياجات المستخدمين.'
+                : 'We continuously improve the tracking experience and tools based on user needs.'}
             </p>
           </div>
         </div>

@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { NotificationChannels, LinkedAccounts } from '@/types/user';
 import { login as loginApi, register as registerApi, whoAmI } from '@/lib/api-auth';
-import { removeStoredToken, setStoredToken } from '@/lib/auth-utils';
+import { getStoredToken, removeStoredToken, setStoredToken } from '@/lib/auth-utils';
 import type { AuthUser } from '@/types/auth';
 
 export interface User {
@@ -80,6 +80,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Restore session on mount
   useEffect(() => {
     const initializeAuth = async () => {
+      if (!getStoredToken()) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const response = await whoAmI();
         if (response.success && response.data) setUser(mapAuthUser(response.data));
@@ -163,6 +168,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refreshUser = useCallback(async () => {
+    if (!getStoredToken()) return;
+
     try {
       const response = await whoAmI();
       if (response.success && response.data) {

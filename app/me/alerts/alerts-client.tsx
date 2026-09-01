@@ -35,8 +35,8 @@ const AVAILABLE_PRODUCTS = [
   { code: "AED", name: "درهم إماراتي", type: "currency" as const, currentPrice: 13.84 },
 ];
 
-const STORAGE_KEY = "nezzel_price_alerts";
-const ONBOARDING_DISMISSED_KEY = "nezzel_alerts_onboarding_dismissed";
+const STORAGE_KEY = "mersadna_price_alerts";
+const ONBOARDING_DISMISSED_KEY = "mersadna_alerts_onboarding_dismissed";
 
 // Color constants for consistent design
 const PRIMARY_COLOR = "amber";

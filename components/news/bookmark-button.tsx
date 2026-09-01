@@ -4,8 +4,10 @@ import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { NewsItem, BookmarkedNews } from '@/types';
 import { useNewsBookmarks } from '@/hooks/use-news';
 import { useLanguage } from '@/contexts/language-context';
+import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 interface BookmarkButtonProps {
   news: NewsItem | BookmarkedNews;
@@ -15,6 +17,8 @@ interface BookmarkButtonProps {
 
 export function BookmarkButton({ news, variant = 'icon', className }: BookmarkButtonProps) {
   const { isBookmarked, toggleBookmark } = useNewsBookmarks();
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
   const { language } = useLanguage();
   const isRTL = language === 'ar';
 
@@ -23,6 +27,12 @@ export function BookmarkButton({ news, variant = 'icon', className }: BookmarkBu
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!isAuthenticated) {
+      router.push('/auth/login');
+      return;
+    }
+
     toggleBookmark(news);
   };
 

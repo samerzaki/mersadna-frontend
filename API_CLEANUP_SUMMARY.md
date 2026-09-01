@@ -1,7 +1,7 @@
-# API Cleanup Summary
+﻿# API Cleanup Summary
 
 ## Overview
-Cleaned up all old/deprecated API endpoints and kept only those from the Nezzel Postman collection.
+Cleaned up all old/deprecated API endpoints and kept only those from the Mersadna Postman collection.
 
 ## Active API Endpoints (From Postman Collection)
 
@@ -225,3 +225,4 @@ When using deprecated hooks, you'll see:
 ```
 
 These warnings help identify which components need migration.
+

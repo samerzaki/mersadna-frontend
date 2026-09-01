@@ -55,7 +55,9 @@ export interface NewsItem {
   excerptAr: string;
   content: string;
   contentAr: string;
-  category: NewsCategory;
+  keyPoints?: string[];
+  /** Not returned by the current news API; retained for legacy saved articles. */
+  category?: NewsCategory;
   tags: string[];
   thumbnail: string;
   thumbnailAlt?: string;
@@ -93,7 +95,6 @@ export interface NewsListResponse {
     news: NewsItem[];
     pagination: NewsPagination;
     filters: {
-      category?: NewsCategory;
       search?: string;
     };
   };
@@ -141,7 +142,7 @@ export interface BookmarkedNews {
   title: string;
   titleAr: string;
   thumbnail: string;
-  category: NewsCategory;
+  category?: NewsCategory;
   excerpt: string;
   excerptAr: string;
   bookmarkedAt: string;
@@ -165,16 +166,17 @@ export interface ApiNewsCategory {
  */
 export interface ApiNewsItem {
   id: number;
+  slug?: string;
   title: string;
-  description: string;
+  description?: string;
   image_url: string;
-  is_rewritten: boolean;
-  published_at: string;
+  is_rewritten?: boolean;
+  published_at?: string;
   created_at: string;
-  date: string;
-  date_human: string;
-  date_formatted: string;
-  category: ApiNewsCategory;
+  date?: string;
+  date_human?: string;
+  date_formatted?: string;
+  category?: ApiNewsCategory;
   // Detail-only fields
   content?: string;
   key_points?: string[];

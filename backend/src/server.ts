@@ -15,14 +15,14 @@ import { decimal, latest } from './market.js';
 const app = Fastify({ logger: { redact: ['req.headers.cookie', 'req.headers.authorization'] }, bodyLimit: 1024 * 1024, trustProxy: true });
 await app.register(cookie, { secret: config.SESSION_SECRET, hook: 'onRequest' });
 await app.register(helmet, { contentSecurityPolicy: config.NODE_ENV === 'production' });
-await app.register(cors, { origin: config.APP_ORIGIN, credentials: true });
+await app.register(cors, { origin: config.corsAllowedOrigins, credentials: true });
 await app.register(rateLimit, { global: true, max: 300, timeWindow: '1 minute' });
 
 app.addHook('onRequest', async (request, reply) => {
   if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method) || request.url.startsWith('/api/auth/')) return;
   const origin = request.headers.origin;
   const csrf = request.headers['x-csrf-token'];
-  if ((origin && origin !== config.APP_ORIGIN) || !csrf || csrf !== request.cookies.gold_csrf) return fail(reply, 403, 'Invalid CSRF token', 'CSRF_FAILED');
+  if ((origin && !config.corsAllowedOrigins.includes(origin)) || !csrf || csrf !== request.cookies.gold_csrf) return fail(reply, 403, 'Invalid CSRF token', 'CSRF_FAILED');
 });
 app.addHook('onSend', async (_request, reply, payload) => {
   if (!reply.getHeader('content-type')) reply.type('application/json; charset=utf-8');
@@ -86,9 +86,50 @@ app.get('/api/currency/highest-sell-price', async (_request, reply) => currencyE
 app.get('/api/currency/black-market', async (_request, reply) => { const item = await latest('currency-black-market-usd'); return item ? ok(reply, { buy_price: decimal(item.buy), sell_price: decimal(item.sell), updated_at: item.recordedAt }) : fail(reply, 404, 'Price unavailable', 'PRICE_UNAVAILABLE'); });
 
 app.get('/api/category/child-categories', async (_request, reply) => ok(reply, await prisma.newsCategory.findMany()));
-app.get('/api/news/articles', async (request, reply) => { const q = z.object({ page: z.coerce.number().int().positive().default(1), per_page: z.coerce.number().int().min(1).max(50).default(20), category: z.string().optional() }).parse(request.query); const where = { published: true, ...(q.category ? { category: { slug: q.category } } : {}) }; const [total, items] = await Promise.all([prisma.newsArticle.count({ where }), prisma.newsArticle.findMany({ where, include: { category: true }, orderBy: { publishedAt: 'desc' }, skip: (q.page - 1) * q.per_page, take: q.per_page })]); return ok(reply, items, { pagination: { current_page: q.page, per_page: q.per_page, total, last_page: Math.ceil(total / q.per_page) } }); });
-app.get('/api/news/articles/:id', async (request, reply) => { const item = await prisma.newsArticle.findFirst({ where: { published: true, OR: [{ slug: (request.params as any).id }, { id: Number((request.params as any).id) || -1 }] }, include: { category: true } }); return item ? ok(reply, item) : fail(reply, 404, 'Article not found', 'NOT_FOUND'); });
-app.get('/api/news/:id/get-related-newss', async (request, reply) => { const current = await prisma.newsArticle.findFirst({ where: { OR: [{ slug: (request.params as any).id }, { id: Number((request.params as any).id) || -1 }] } }); if (!current) return ok(reply, []); return ok(reply, await prisma.newsArticle.findMany({ where: { published: true, categoryId: current.categoryId, id: { not: current.id } }, take: 4, orderBy: { publishedAt: 'desc' } })); });
+
+const arabicMonths = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+const newsDate = (value: Date) => value.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
+const newsDateFormatted = (value: Date) => `${value.getUTCDate()} ${arabicMonths[value.getUTCMonth()]} ${value.getUTCFullYear()}`;
+const newsDateHuman = (value: Date) => {
+  const seconds = Math.max(0, Math.floor((Date.now() - value.getTime()) / 1000));
+  if (seconds < 60) return 'منذ لحظات';
+  const hours = Math.floor(seconds / 3600);
+  if (hours < 1) return `منذ ${Math.floor(seconds / 60)} دقيقة`;
+  if (hours === 1) return 'منذ ساعة واحدة';
+  if (hours === 2) return 'منذ ساعتين';
+  if (hours < 24) return `منذ ${hours} ساعات`;
+  const days = Math.floor(hours / 24);
+  return days === 1 ? 'منذ يوم واحد' : days === 2 ? 'منذ يومين' : `منذ ${days} أيام`;
+};
+const newsArticleResponse = (article: any, includeContent = false) => {
+  const publishedAt = article.publishedAt ?? article.createdAt;
+  return {
+    id: article.id,
+    title: article.title ?? article.originalTitle,
+    description: article.description ?? '',
+    image_url: article.imageUrl ?? '',
+    is_rewritten: Boolean(article.title && article.title !== article.originalTitle),
+    published_at: publishedAt.toISOString(),
+    created_at: article.createdAt.toISOString(),
+    date: newsDate(publishedAt),
+    date_human: newsDateHuman(publishedAt),
+    date_formatted: newsDateFormatted(publishedAt),
+    category: article.category ? { id: article.category.id, name: article.category.title, slug: article.category.slug } : null,
+    ...(includeContent ? { content: article.body ?? '', key_points: article.keyPoints ?? [] } : {}),
+  };
+};
+app.get('/api/news/articles', async (request, reply) => {
+  const q = z.object({ page: z.coerce.number().int().positive().default(1), search: z.string().trim().min(1).optional(), sort_by: z.enum(['latest', 'oldest']).default('latest') }).parse(request.query);
+  const where: any = { published: true, ...(q.search ? { OR: [{ title: { contains: q.search } }, { originalTitle: { contains: q.search } }] } : {}) };
+  const perPage = 20;
+  const [total, items] = await Promise.all([
+    prisma.newsArticle.count({ where }),
+    prisma.newsArticle.findMany({ where, include: { category: true }, orderBy: { publishedAt: q.sort_by === 'latest' ? 'desc' : 'asc' }, skip: (q.page - 1) * perPage, take: perPage }),
+  ]);
+  return reply.send({ status: 200, success: true, data: items.map(item => newsArticleResponse(item)), pagination: { count: items.length, total, perPage, currentPage: q.page, totalPages: Math.ceil(total / perPage) } });
+});
+app.get('/api/news/articles/:id', async (request, reply) => { const routeId = String((request.params as any).id); const id = Number(/^\d+(?=-|$)/.exec(routeId)?.[0]) || -1; const item = await prisma.newsArticle.findFirst({ where: { published: true, OR: [{ slug: routeId }, { id }] }, include: { category: true } }); return item ? ok(reply, newsArticleResponse(item, true)) : fail(reply, 404, 'Article not found', 'NOT_FOUND'); });
+app.get('/api/news/:id/get-related-newss', async (request, reply) => { const routeId = String((request.params as any).id); const id = Number(/^\d+(?=-|$)/.exec(routeId)?.[0]) || -1; const current = await prisma.newsArticle.findFirst({ where: { OR: [{ slug: routeId }, { id }] } }); if (!current) return ok(reply, []); return ok(reply, await prisma.newsArticle.findMany({ where: { published: true, categoryId: current.categoryId, id: { not: current.id } }, take: 4, orderBy: { publishedAt: 'desc' } })); });
 
 app.get('/api/asset-portfolio', { preHandler: authenticate }, async (request, reply) => ok(reply, await portfolio(request.userId!)));
 app.post('/api/asset-portfolio', { preHandler: authenticate }, async (request, reply) => { const body = z.object({ kind: z.nativeEnum(MarketKind), productKey: z.string().min(1).max(100), amount: z.coerce.number().positive(), buyPrice: z.coerce.number().positive(), currency: z.string().default('EGP'), purchasedAt: z.coerce.date(), notes: z.string().max(1000).optional() }).safeParse(request.body); if (!body.success) return fail(reply, 422, 'Invalid portfolio item', 'VALIDATION_ERROR'); return ok(reply, await prisma.portfolioItem.create({ data: { userId: request.userId!, ...body.data } })); });

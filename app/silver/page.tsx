@@ -5,6 +5,7 @@ import SilverPage from './silver-client';
 export const metadata: Metadata = buildMetadata('silver', {
   canonicalPath: '/silver',
 });
+export const revalidate = 60;
 
 export default function Page() {
   return <SilverPage />;

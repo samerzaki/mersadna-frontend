@@ -4,10 +4,9 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ArrowLeft, Zap } from 'lucide-react';
-import { useNewsDetail, useNewsCategories } from '@/hooks/use-news';
+import { useNewsDetail } from '@/hooks/use-news';
 import { useReadingPreferences } from '@/hooks/use-reading-preferences';
 import { useLanguage } from '@/contexts/language-context';
-import { getCategoryColors, getCategoryInfo } from '@/lib/news-constants';
 import {
   NewsMeta,
   BookmarkButton,
@@ -17,7 +16,7 @@ import {
 } from '@/components/news';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApiError } from '@/components/ui/api-error';
-import { cn } from '@/lib/utils';
+import { MarkdownContent } from '@/components/news/markdown-content';
 
 export default function NewsDetailPage() {
   const params = useParams();
@@ -26,7 +25,6 @@ export default function NewsDetailPage() {
   const isRTL = language === 'ar';
 
   const { data, isLoading, error, refetch } = useNewsDetail(slug);
-  const { categories } = useNewsCategories();
   const reading = useReadingPreferences();
 
   const BackArrow = isRTL ? ArrowRight : ArrowLeft;
@@ -74,15 +72,8 @@ export default function NewsDetailPage() {
 
   const news = data.data.news;
   const relatedNews = data.data.relatedNews;
-  const categoryInfo = getCategoryInfo(news.category, categories);
-
   const title = isRTL ? news.titleAr : news.title;
   const content = isRTL ? news.contentAr : news.content;
-  const categoryName = categoryInfo
-    ? isRTL
-      ? categoryInfo.nameAr
-      : categoryInfo.nameEn
-    : news.category;
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
@@ -113,9 +104,9 @@ export default function NewsDetailPage() {
             </button>
 
             {/* Title */}
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4 leading-tight">
               {title}
-            </h1>
+            </h2>
 
             {/* Excerpt / Description */}
             {news.excerpt && (
@@ -131,14 +122,15 @@ export default function NewsDetailPage() {
                 readingTimeMinutes={news.readingTimeMinutes}
                 showSource={false}
                 showViews={false}
+                showReadingTime={false}
               />
             </div>
 
             {/* Article Content */}
-            <article
+            <MarkdownContent
+              content={content}
               className="prose prose-slate dark:prose-invert max-w-none reading-mode-article"
               style={{ fontSize: `${reading.fontSize}px` }}
-              dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br>') }}
             />
 
             {/* Tags at bottom */}
@@ -195,9 +187,9 @@ export default function NewsDetailPage() {
           )}
 
           {/* Title */}
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4 leading-tight">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4 leading-tight">
             {title}
-          </h1>
+          </h2>
 
           {/* Meta info */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -207,6 +199,7 @@ export default function NewsDetailPage() {
               viewCount={news.viewCount}
               showSource={false}
               showViews={true}
+              showReadingTime={false}
             />
 
             {/* Actions */}
@@ -229,49 +222,33 @@ export default function NewsDetailPage() {
           />
         </div>
 
+        {(news.keyPoints?.length ?? 0) > 0 && (
+          <section className="mb-8 rounded-xl border border-primary-100 bg-primary-50/60 p-5 dark:border-primary-900/50 dark:bg-primary-950/20">
+            <h3 className="mb-3 text-lg font-semibold text-slate-900 dark:text-slate-100">
+              {isRTL ? 'أهم النقاط' : 'Key points'}
+            </h3>
+            <ul className="list-disc space-y-2 ps-5 text-slate-700 dark:text-slate-300">
+              {news.keyPoints?.map((point, index) => <li key={`${index}-${point}`}>{point}</li>)}
+            </ul>
+          </section>
+        )}
+
         {/* Article Content */}
-        <article
+        <MarkdownContent
+          content={content}
           className="prose prose-slate dark:prose-invert max-w-none mb-12"
           style={{ fontSize: `${reading.fontSize}px` }}
-          dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br>') }}
         />
 
-        {/* Category and Tags */}
-        <div className="flex flex-wrap gap-2 mb-8 pb-8 border-b border-slate-200 dark:border-slate-800">
-          <span
-            className={cn(
-              'px-3 py-1 text-sm font-medium rounded-full',
-              getCategoryColors(news.category, categories)
-            )}
-          >
-            {categoryName}
-          </span>
-          {news.tags && news.tags.length > 0 && (
-            <>
-              {news.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 text-sm bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </>
-          )}
-        </div>
-
-        {/* Share section */}
-        <div className="mb-12 p-6 bg-slate-50 dark:bg-slate-900 rounded-xl">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
-            {isRTL ? 'شارك هذا الخبر' : 'Share this article'}
-          </h3>
-          <ShareButtons
-            url={shareUrl}
-            title={title}
-            description={isRTL ? news.excerptAr : news.excerpt}
-            variant="buttons"
-          />
-        </div>
+        {news.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-8 pb-8 border-b border-slate-200 dark:border-slate-800">
+            {news.tags.map((tag) => (
+              <span key={tag} className="px-3 py-1 text-sm bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Related News */}
         {relatedNews && relatedNews.length > 0 && (

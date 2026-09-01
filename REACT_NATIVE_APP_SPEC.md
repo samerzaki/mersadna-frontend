@@ -1,4 +1,4 @@
-# React Native Mobile App Specification - Mersadna
+﻿# React Native Mobile App Specification - Mersadna
 
 > **Document Version:** 1.0.0
 > **Created:** January 28, 2026
@@ -347,7 +347,7 @@
 ## 📁 Project Structure
 
 ```
-nezzel-gold-mobile/
+mersadna-mobile/
 ├── src/
 │   ├── api/                          # API client and endpoints
 │   │   ├── client.ts                 # Axios instance
@@ -755,8 +755,8 @@ Height: 80pt
 
 ### API Configuration
 
-**Base URL**: `http://nezzel.test/api` (development)
-**Production URL**: `https://api.nezzel.com` (to be configured)
+**Base URL**: `http://api.mersadna.test/api` (development)
+**Production URL**: `https://api.mersadna.com` (to be configured)
 
 ### Authentication Headers
 
@@ -1198,7 +1198,7 @@ export async function promptForRating() {
   if (launches === 10) {
     Rate.rate({
       AppleAppID: '1234567890',
-      GooglePackageName: 'com.nezzel.gold',
+      GooglePackageName: 'com.mersadna.gold',
       preferInApp: true,
     });
   }
@@ -1472,7 +1472,7 @@ export function MainTabNavigator() {
 ```typescript
 // src/navigation/linking.ts
 export const linking = {
-  prefixes: ['nezzelgold://', 'https://nezzel.com'],
+  prefixes: ['mersadna://', 'https://mersadna.com'],
   config: {
     screens: {
       Main: {
@@ -2064,7 +2064,7 @@ describe('Gold Prices Flow', () => {
 
 ```yaml
 # maestro/gold-calculator.yaml
-appId: com.nezzel.gold
+appId: com.mersadna.gold
 ---
 - launchApp
 - tapOn: "حاسبة الذهب"
@@ -2094,10 +2094,10 @@ npx react-native run-ios
 # Release build
 cd ios
 pod install
-xcodebuild -workspace NezzelGold.xcworkspace \
-  -scheme NezzelGold \
+xcodebuild -workspace Mersadna.xcworkspace \
+  -scheme Mersadna \
   -configuration Release \
-  -archivePath build/NezzelGold.xcarchive \
+  -archivePath build/Mersadna.xcarchive \
   archive
 ```
 
@@ -2118,13 +2118,13 @@ cd android
 
 ```bash
 # .env.development
-API_BASE_URL=http://nezzel.test/api
+API_BASE_URL=http://api.mersadna.test/api
 ENVIRONMENT=development
 FIREBASE_APP_ID=xxx
 SENTRY_DSN=xxx
 
 # .env.production
-API_BASE_URL=https://api.nezzel.com
+API_BASE_URL=https://api.mersadna.com
 ENVIRONMENT=production
 FIREBASE_APP_ID=xxx
 SENTRY_DSN=xxx
@@ -2133,7 +2133,7 @@ SENTRY_DSN=xxx
 ### App Store Requirements
 
 #### iOS (App Store)
-- **Bundle ID**: `com.nezzel.gold`
+- **Bundle ID**: `com.mersadna.gold`
 - **Min iOS Version**: 13.0
 - **App Icons**: 1024x1024 (all sizes generated)
 - **Screenshots**: Required sizes for iPhone/iPad
@@ -2141,7 +2141,7 @@ SENTRY_DSN=xxx
 - **App Description**: Arabic & English
 
 #### Android (Play Store)
-- **Package Name**: `com.nezzel.gold`
+- **Package Name**: `com.mersadna.gold`
 - **Min SDK**: 26 (Android 8.0)
 - **Target SDK**: 34 (Android 14)
 - **App Icons**: Adaptive icons
@@ -2337,7 +2337,7 @@ git push origin feature/gold-calculator
 ## 📞 Support & Contact
 
 - **Project Lead**: [Name]
-- **Backend API**: http://nezzel.test/api
+- **Backend API**: http://api.mersadna.test/api
 - **Backend Documentation**: See `CLAUDE.md` in web project
 - **Design Files**: [Figma/Sketch link]
 - **Issue Tracker**: [GitHub/Jira link]
@@ -2356,3 +2356,4 @@ Private project - All rights reserved.
 
 **Last Updated**: January 28, 2026
 **Document Version**: 1.0.0
+

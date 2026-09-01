@@ -3,7 +3,6 @@
 import type {
   ApiNewsItem,
   NewsItem,
-  NewsCategory,
   NewsPagination,
   ApiNewsPagination,
 } from '@/types';
@@ -31,41 +30,33 @@ function estimateReadingTime(content: string): number {
 }
 
 /**
- * Map API category slug to frontend NewsCategory
- * Now passes through the slug directly since categories are dynamic
- */
-function mapCategorySlug(slug: string): NewsCategory {
-  return slug || 'uncategorized';
-}
-
-/**
  * Transform API news item to frontend NewsItem format
  */
 export function adaptApiNewsToNewsItem(apiNews: ApiNewsItem): NewsItem {
   const id = apiNews.id.toString();
   const content = apiNews.content || '';
   const excerpt = apiNews.description || extractExcerpt(content || apiNews.title);
-  const category = mapCategorySlug(apiNews.category?.slug || 'economy');
   const readingTime = content ? estimateReadingTime(content) : 3;
+  const publishedAt = apiNews.published_at || apiNews.date || apiNews.created_at || new Date().toISOString();
 
   return {
     id,
-    slug: id,
+    slug: apiNews.slug || id,
     title: apiNews.title,
     titleAr: apiNews.title,
     excerpt,
     excerptAr: excerpt,
     content,
     contentAr: content,
-    category,
-    tags: [category],
+    keyPoints: apiNews.key_points || [],
+    tags: [],
     thumbnail: apiNews.image_url,
     source: {
-      id: 'nezzel',
-      name: 'Nezzel',
-      nameAr: 'نِزِل',
+      id: 'mersadna',
+      name: 'Mersadna',
+      nameAr: 'مرصادنا',
     },
-    publishedAt: apiNews.published_at,
+    publishedAt,
     readingTimeMinutes: readingTime,
     isFeatured: false,
     isBreaking: false,

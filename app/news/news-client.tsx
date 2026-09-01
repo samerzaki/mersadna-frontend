@@ -1,13 +1,10 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Newspaper } from 'lucide-react';
-import { useNewsList, useFeaturedNews, useNewsCategories } from '@/hooks/use-news';
+import { useNewsList, useFeaturedNews } from '@/hooks/use-news';
 import { useLanguage } from '@/contexts/language-context';
-import { NewsCategory } from '@/types';
 import {
-  NewsFilters,
   NewsSearch,
   NewsList,
   FeaturedNews,
@@ -18,28 +15,8 @@ import { ApiError } from '@/components/ui/api-error';
 export default function NewsPage() {
   const { language } = useLanguage();
   const isRTL = language === 'ar';
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  // Fetch categories from API
-  const { categories, isLoading: categoriesLoading } = useNewsCategories();
-  const validSlugs = useMemo(() => categories.map((c) => c.slug), [categories]);
-
-  // Get initial category from URL
-  const urlCategory = searchParams.get('category');
-  const initialCategory = urlCategory && validSlugs.includes(urlCategory) ? urlCategory : undefined;
-
-  const [category, setCategory] = useState<NewsCategory | undefined>(initialCategory);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-
-  // Sync category state with URL on mount and URL changes
-  useEffect(() => {
-    const urlCat = searchParams.get('category');
-    const validCat = urlCat && validSlugs.includes(urlCat) ? urlCat : undefined;
-    setCategory(validCat);
-    setPage(1);
-  }, [searchParams, validSlugs]);
 
   // Fetch featured news (only on first page with no filters)
   const {
@@ -53,9 +30,9 @@ export default function NewsPage() {
     isLoading: newsLoading,
     error: newsError,
     refetch,
-  } = useNewsList(category, search, page);
+  } = useNewsList(search, page);
 
-  const showFeatured = !category && !search && page === 1;
+  const showFeatured = !search && page === 1;
   const allNews = newsData?.data.news || [];
   const pagination = newsData?.data.pagination;
 
@@ -70,18 +47,6 @@ export default function NewsPage() {
   const news = featuredIds
     ? allNews.filter((item) => !featuredIds.has(item.id))
     : allNews;
-
-  const handleCategoryChange = (newCategory?: NewsCategory) => {
-    setCategory(newCategory);
-    setPage(1); // Reset to page 1 when filter changes
-
-    // Update URL
-    if (newCategory) {
-      router.push(`/news?category=${newCategory}`, { scroll: false });
-    } else {
-      router.push('/news', { scroll: false });
-    }
-  };
 
   const handleSearchChange = (newSearch: string) => {
     setSearch(newSearch);
@@ -104,14 +69,8 @@ export default function NewsPage() {
         </div>
       </div>
 
-      {/* Search and Filters */}
-      <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
-        <NewsFilters
-          activeCategory={category}
-          onCategoryChange={handleCategoryChange}
-          categories={categories}
-          isLoading={categoriesLoading}
-        />
+      {/* Search */}
+      <div className="flex justify-end mb-6">
         <NewsSearch
           value={search}
           onChange={handleSearchChange}

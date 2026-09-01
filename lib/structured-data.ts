@@ -1,4 +1,4 @@
-import { SEO_CONFIG } from './seo-config';
+import { absoluteUrl, SEO_CONFIG } from './seo-config';
 
 const domain = SEO_CONFIG.site.domain;
 
@@ -39,14 +39,10 @@ export function generateArticleSchema(article: {
     publisher: {
       '@type': 'Organization',
       name: SEO_CONFIG.site.name,
-      ...(SEO_CONFIG.images.og
-        ? {
-            logo: {
-              '@type': 'ImageObject',
-              url: `${domain}/icon-512x512.png`,
-            },
-          }
-        : {}),
+      logo: {
+        '@type': 'ImageObject',
+        url: absoluteUrl('/app-icon.svg'),
+      },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',

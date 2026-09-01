@@ -1,8 +1,8 @@
-# Mersadna API Endpoints Reference
+﻿# Mersadna API Endpoints Reference
 
 ## Base URL
 ```
-http://nezzel.test/api
+http://api.mersadna.test/api
 ```
 
 ## Endpoints
@@ -197,18 +197,18 @@ export const REFRESH_INTERVAL = 60000; // 1 minute
 # Get overview
 curl -H "Accept: application/json" \
      -H "Accept-Language: ar" \
-     http://nezzel.test/api/gold/get-overview
+     http://api.mersadna.test/api/gold/get-overview
 
 # Get all prices with filters
 curl -H "Accept: application/json" \
      -H "Accept-Language: ar" \
-     "http://nezzel.test/api/gold/get-all-prices?currency=EGP&period=7d"
+     "http://api.mersadna.test/api/gold/get-all-prices?currency=EGP&period=7d"
 ```
 
 ### Using browser:
 ```
-http://nezzel.test/api/gold/get-overview
-http://nezzel.test/api/gold/get-all-prices?currency=EGP&period=30d
+http://api.mersadna.test/api/gold/get-overview
+http://api.mersadna.test/api/gold/get-all-prices?currency=EGP&period=30d
 ```
 
 ---
@@ -231,3 +231,4 @@ Based on common patterns, you might want to add:
 - Price alerts
 - Dealer information
 - Zakat calculations
+

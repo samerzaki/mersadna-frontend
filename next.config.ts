@@ -33,10 +33,6 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'nezzel.com',
-      },
-      {
-        protocol: 'https',
         hostname: 'ta3weem.com',
       },
     ],

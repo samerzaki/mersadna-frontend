@@ -44,24 +44,17 @@ export async function SilverWidgetServer() {
 export function SilverWidgetSkeleton() {
   return (
     <section className="flex flex-col w-full">
-      <div className="mb-4">
-        <Skeleton className="h-8 w-36" />
-      </div>
-      <div className="grid grid-cols-2 gap-3 flex-1 content-start">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm p-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-3 w-3 rounded-full" />
-              </div>
-              <div className="flex items-baseline justify-between">
-                <Skeleton className="h-8 w-20" />
-                <Skeleton className="h-4 w-12" />
-              </div>
+      <div className="mb-4"><Skeleton className="h-8 w-36" /></div>
+      <div className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm dark:border-border dark:bg-card">
+        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-4 py-2 dark:border-border dark:bg-secondary"><Skeleton className="h-3 w-20" /><Skeleton className="h-3 w-10" /></div>
+        <div className="divide-y divide-slate-100 dark:divide-border">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center justify-between py-3">
+              <div className="ms-4 space-y-2"><Skeleton className="h-4 w-24" /><Skeleton className="h-3 w-16" /></div>
+              <div className="me-4 space-y-2"><Skeleton className="ms-auto h-5 w-20" /><Skeleton className="ms-auto h-3 w-10" /></div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -5,8 +5,7 @@ import Image from 'next/image';
 import { Zap } from 'lucide-react';
 import { NewsItem } from '@/types';
 import { useLanguage } from '@/contexts/language-context';
-import { useNewsCategories } from '@/hooks/use-news';
-import { getCategoryColors, getCategoryInfo } from '@/lib/news-constants';
+import { newsDetailPath } from '@/lib/news-routes';
 import { cn } from '@/lib/utils';
 
 interface FeaturedNewsProps {
@@ -18,14 +17,11 @@ interface FeaturedNewsProps {
 function OverlayCard({ news, className, titleClass }: { news: NewsItem; className?: string; titleClass?: string }) {
   const { language } = useLanguage();
   const isRTL = language === 'ar';
-  const { categories } = useNewsCategories();
-  const categoryInfo = getCategoryInfo(news.category, categories);
   const title = isRTL ? news.titleAr : news.title;
-  const categoryName = categoryInfo ? (isRTL ? categoryInfo.nameAr : categoryInfo.nameEn) : news.category;
 
   return (
     <Link
-      href={`/news/${news.id}`}
+      href={newsDetailPath(news.id, news.slug, news.title)}
       className={cn(
         'group relative block rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800',
         className
@@ -47,9 +43,6 @@ function OverlayCard({ news, className, titleClass }: { news: NewsItem; classNam
             <Zap className="w-3 h-3" />
           </span>
         )}
-        <span className={cn('px-2 py-1 text-xs font-medium rounded-full', getCategoryColors(news.category, categories))}>
-          {categoryName}
-        </span>
       </div>
 
       {/* Title overlay */}

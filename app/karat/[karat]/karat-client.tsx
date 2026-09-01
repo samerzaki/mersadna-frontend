@@ -67,7 +67,7 @@ export default function KaratPage({ params }: PageProps) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">{karatInfo.name}</h1>
+        <h2 className="text-3xl font-bold mb-2">{karatInfo.name}</h2>
         <p className="text-muted-foreground">
           {t.pages.karat.purity} {(karatInfo.purity * 100).toFixed(1)}%
         </p>
