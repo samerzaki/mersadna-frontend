@@ -64,7 +64,7 @@ export default function ContactPage() {
         <h1 className="mb-4 text-3xl font-bold md:text-4xl">اتصل بنا</h1>
         <p className="text-lg text-muted-foreground">أرسل استفسارك أو اقتراحك، وسنراجع رسالتك في أقرب وقت.</p>
       </header>
-      <div className="mb-8 rounded-2xl border bg-card p-6"><div className="flex items-start gap-3"><Mail className="mt-1 h-5 w-5 text-primary" /><div><h2 className="font-semibold">البريد الإلكتروني</h2><a href="mailto:info@mersadna.com" className="mt-1 inline-block text-primary hover:underline">info@mersadna.com</a></div></div></div>
+      <div className="mb-8 rounded-2xl border bg-card p-6"><div className="flex items-start gap-3"><Mail className="mt-1 h-5 w-5 text-primary" /><div><h2 className="font-semibold">البريد الإلكتروني</h2><a href="mailto:info@odamak.com" className="mt-1 inline-block text-primary hover:underline">info@odamak.com</a></div></div></div>
       <form onSubmit={handleSubmit} className="rounded-2xl border bg-card p-6 md:p-8">
         <h2 className="mb-6 text-2xl font-semibold">أرسل لنا رسالة</h2>
         <div className="grid gap-4 md:grid-cols-2">

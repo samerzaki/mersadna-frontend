@@ -1,8 +1,8 @@
-﻿# React Native Mobile App Specification - Mersadna
+# React Native Mobile App Specification - Odamak
 
 > **Document Version:** 1.0.0
 > **Created:** January 28, 2026
-> **Project Name:** Mersadna Mobile (مرصادنا)
+> **Project Name:** Odamak Mobile (مرصادنا)
 > **Platform:** iOS & Android
 > **Based on:** Next.js Web Application
 
@@ -37,7 +37,7 @@
 
 ### Project Overview
 
-**Mersadna Mobile** is a React Native cross-platform mobile application that brings the comprehensive gold and currency tracking platform to iOS and Android devices. The app provides real-time market data, smart calculators, and analytics tools for gold investors, currency traders, and financial enthusiasts in Egypt.
+**Odamak Mobile** is a React Native cross-platform mobile application that brings the comprehensive gold and currency tracking platform to iOS and Android devices. The app provides real-time market data, smart calculators, and analytics tools for gold investors, currency traders, and financial enthusiasts in Egypt.
 
 ### Target Audience
 - Gold investors and traders in Egypt
@@ -347,7 +347,7 @@
 ## 📁 Project Structure
 
 ```
-mersadna-mobile/
+odamak-mobile/
 ├── src/
 │   ├── api/                          # API client and endpoints
 │   │   ├── client.ts                 # Axios instance
@@ -755,8 +755,8 @@ Height: 80pt
 
 ### API Configuration
 
-**Base URL**: `http://api.mersadna.test/api` (development)
-**Production URL**: `https://api.mersadna.com` (to be configured)
+**Base URL**: `http://api.odamak.test/api` (development)
+**Production URL**: `https://api.odamak.com` (to be configured)
 
 ### Authentication Headers
 
@@ -1198,7 +1198,7 @@ export async function promptForRating() {
   if (launches === 10) {
     Rate.rate({
       AppleAppID: '1234567890',
-      GooglePackageName: 'com.mersadna.gold',
+      GooglePackageName: 'com.odamak.gold',
       preferInApp: true,
     });
   }
@@ -1472,7 +1472,7 @@ export function MainTabNavigator() {
 ```typescript
 // src/navigation/linking.ts
 export const linking = {
-  prefixes: ['mersadna://', 'https://mersadna.com'],
+  prefixes: ['odamak://', 'https://odamak.com'],
   config: {
     screens: {
       Main: {
@@ -2064,7 +2064,7 @@ describe('Gold Prices Flow', () => {
 
 ```yaml
 # maestro/gold-calculator.yaml
-appId: com.mersadna.gold
+appId: com.odamak.gold
 ---
 - launchApp
 - tapOn: "حاسبة الذهب"
@@ -2094,10 +2094,10 @@ npx react-native run-ios
 # Release build
 cd ios
 pod install
-xcodebuild -workspace Mersadna.xcworkspace \
-  -scheme Mersadna \
+xcodebuild -workspace Odamak.xcworkspace \
+  -scheme Odamak \
   -configuration Release \
-  -archivePath build/Mersadna.xcarchive \
+  -archivePath build/Odamak.xcarchive \
   archive
 ```
 
@@ -2118,13 +2118,13 @@ cd android
 
 ```bash
 # .env.development
-API_BASE_URL=http://api.mersadna.test/api
+API_BASE_URL=http://api.odamak.test/api
 ENVIRONMENT=development
 FIREBASE_APP_ID=xxx
 SENTRY_DSN=xxx
 
 # .env.production
-API_BASE_URL=https://api.mersadna.com
+API_BASE_URL=https://api.odamak.com
 ENVIRONMENT=production
 FIREBASE_APP_ID=xxx
 SENTRY_DSN=xxx
@@ -2133,7 +2133,7 @@ SENTRY_DSN=xxx
 ### App Store Requirements
 
 #### iOS (App Store)
-- **Bundle ID**: `com.mersadna.gold`
+- **Bundle ID**: `com.odamak.gold`
 - **Min iOS Version**: 13.0
 - **App Icons**: 1024x1024 (all sizes generated)
 - **Screenshots**: Required sizes for iPhone/iPad
@@ -2141,7 +2141,7 @@ SENTRY_DSN=xxx
 - **App Description**: Arabic & English
 
 #### Android (Play Store)
-- **Package Name**: `com.mersadna.gold`
+- **Package Name**: `com.odamak.gold`
 - **Min SDK**: 26 (Android 8.0)
 - **Target SDK**: 34 (Android 14)
 - **App Icons**: Adaptive icons
@@ -2337,7 +2337,7 @@ git push origin feature/gold-calculator
 ## 📞 Support & Contact
 
 - **Project Lead**: [Name]
-- **Backend API**: http://api.mersadna.test/api
+- **Backend API**: http://api.odamak.test/api
 - **Backend Documentation**: See `CLAUDE.md` in web project
 - **Design Files**: [Figma/Sketch link]
 - **Issue Tracker**: [GitHub/Jira link]
@@ -2352,7 +2352,7 @@ Private project - All rights reserved.
 
 **End of React Native App Specification**
 
-> This document serves as a comprehensive guide for AI assistants and developers to build the Mersadna mobile app. It covers business requirements, technical architecture, UI/UX guidelines, and implementation details.
+> This document serves as a comprehensive guide for AI assistants and developers to build the Odamak mobile app. It covers business requirements, technical architecture, UI/UX guidelines, and implementation details.
 
 **Last Updated**: January 28, 2026
 **Document Version**: 1.0.0

@@ -14,7 +14,7 @@ for (const path of publicRoutes) {
   const canonical = body.match(/<link[^>]+rel="canonical"[^>]+href="([^"]+)"/i)?.[1];
   const h1Count = (body.match(/<h1[\s>]/gi) || []).length;
   const hasLegacyBrand = /nezzel/i.test(body);
-  const passed = response.status === 200 && canonical?.startsWith('https://mersadna.com') && h1Count === 1 && !hasLegacyBrand;
+  const passed = response.status === 200 && canonical?.startsWith('https://odamak.com') && h1Count === 1 && !hasLegacyBrand;
   console.log(`${passed ? 'PASS' : 'FAIL'} ${path} status=${response.status} h1=${h1Count} canonical=${canonical || 'missing'}`);
   failed ||= !passed;
 }
@@ -31,7 +31,7 @@ const [{ response: robotsResponse, body: robots }, { response: sitemapResponse, 
   request('/sitemap.xml'),
 ]);
 const crawlFilesPassed = robotsResponse.status === 200 && sitemapResponse.status === 200 &&
-  /https:\/\/mersadna\.com\/sitemap\.xml/.test(robots) &&
+  /https:\/\/odamak\.com\/sitemap\.xml/.test(robots) &&
   !/nezzel|\/pricing/i.test(sitemap);
 console.log(`${crawlFilesPassed ? 'PASS' : 'FAIL'} crawl files`);
 failed ||= !crawlFilesPassed;

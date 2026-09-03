@@ -26,7 +26,7 @@ export default function PrivacyPage() {
         <p className="leading-relaxed text-muted-foreground">
           {isRTL
             ? 'في مرصادنا، نحن ملتزمون بحماية خصوصيتك وأمان بياناتك. توضح هذه السياسة كيفية جمع واستخدام وحماية معلوماتك الشخصية عند استخدام منصتنا.'
-            : 'At Mersadna, we are committed to protecting your privacy and data security. This policy explains how we collect, use, and protect your personal information when using our platform.'}
+            : 'At Odamak, we are committed to protecting your privacy and data security. This policy explains how we collect, use, and protect your personal information when using our platform.'}
         </p>
       </div>
 

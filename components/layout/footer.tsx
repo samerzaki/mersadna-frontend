@@ -138,7 +138,7 @@ export function Footer() {
               ) : (
                 <>
                   Prices shown are for reference only and updated periodically. Actual prices
-                  may vary. Mersadna is not responsible for trading decisions. Please
+                  may vary. Odamak is not responsible for trading decisions. Please
                   consult a financial advisor before making investment decisions.
                 </>
               )}
@@ -152,7 +152,7 @@ export function Footer() {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Coins className="h-4 w-4" />
             <span>
-              © {new Date().getFullYear()} {isRTL ? 'مرصادنا' : 'Mersadna'}
+              © {new Date().getFullYear()} {isRTL ? 'مرصادنا' : 'Odamak'}
             </span>
           </div>
 
@@ -177,11 +177,11 @@ export function Footer() {
 
           {/* Contact */}
           <a
-            href="mailto:info@mersadna.com"
+            href="mailto:info@odamak.com"
             className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <Mail className="h-4 w-4" />
-            <span>info@mersadna.com</span>
+            <span>info@odamak.com</span>
           </a>
         </div>
       </div>

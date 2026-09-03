@@ -8,7 +8,7 @@ export const metadata: Metadata = buildMetadata('cryptoCalculator', {
 });
 
 const jsonLd = generateSoftwareAppSchema({
-  name: 'حاسبة العملات الرقمية - Mersadna',
+  name: 'حاسبة العملات الرقمية - Odamak',
   description: 'احسب قيمة العملات الرقمية مثل البيتكوين والإيثيريوم بالجنيه المصري',
   url: '/crypto/calculator',
 });

@@ -356,8 +356,8 @@ export async function getTelegramLinkToken(): Promise<{
     success: true,
     data: {
       token,
-      botUsername: 'mersadna_gold_bot',
-      deepLink: `https://t.me/mersadna_gold_bot?start=${token}`,
+      botUsername: 'odamak_gold_bot',
+      deepLink: `https://t.me/odamak_gold_bot?start=${token}`,
       expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
     },
   };

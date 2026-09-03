@@ -8,7 +8,7 @@ export const metadata: Metadata = buildMetadata('silverCalculator', {
 });
 
 const jsonLd = generateSoftwareAppSchema({
-  name: 'حاسبة الفضة - Mersadna',
+  name: 'حاسبة الفضة - Odamak',
   description: 'احسب قيمة الفضة بالجنيه المصري مع المصنعية',
   url: '/silver/calculator',
 });

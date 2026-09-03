@@ -1,4 +1,4 @@
-﻿# Gold & Currency Frontend Implementation Summary
+# Gold & Currency Frontend Implementation Summary
 
 ## ✅ Implementation Complete
 
@@ -322,7 +322,7 @@ npx tsc --noEmit
 
 Full API documentation: [Gold Module API Documentation](../README.md)
 
-Base URL: `http://api.mersadna.test/api`
+Base URL: `http://api.odamak.test/api`
 
 All endpoints:
 - Require `Accept: application/json` header

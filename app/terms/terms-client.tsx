@@ -26,7 +26,7 @@ export default function TermsPage() {
         <p className="leading-relaxed text-muted-foreground">
           {isRTL
             ? 'مرحباً بك في مرصادنا. باستخدامك لهذه المنصة، فإنك توافق على الالتزام بالشروط والأحكام التالية. يرجى قراءتها بعناية.'
-            : 'Welcome to Mersadna. By using this platform, you agree to comply with the following terms and conditions. Please read them carefully.'}
+            : 'Welcome to Odamak. By using this platform, you agree to comply with the following terms and conditions. Please read them carefully.'}
         </p>
       </div>
 
@@ -45,7 +45,7 @@ export default function TermsPage() {
           <p className="text-muted-foreground">
             {isRTL
               ? 'باستخدامك لمنصة مرصادنا، فإنك توافق على هذه الشروط والأحكام وسياسة الخصوصية الخاصة بنا. إذا كنت لا توافق على أي من هذه الشروط، يرجى عدم استخدام المنصة.'
-              : 'By using the Mersadna platform, you agree to these terms and conditions and our privacy policy. If you do not agree with any of these terms, please do not use the platform.'}
+              : 'By using the Odamak platform, you agree to these terms and conditions and our privacy policy. If you do not agree with any of these terms, please do not use the platform.'}
           </p>
         </section>
 
@@ -62,7 +62,7 @@ export default function TermsPage() {
           <p className="mb-3 text-muted-foreground">
             {isRTL
               ? 'مرصادنا منصة معلوماتية توفر:'
-              : 'Mersadna is an information platform that provides:'}
+              : 'Odamak is an information platform that provides:'}
           </p>
           <ul className="space-y-2 text-muted-foreground">
             <li className="flex gap-2">
@@ -111,7 +111,7 @@ export default function TermsPage() {
             <p className="font-semibold">
               {isRTL
                 ? 'مرصادنا ليس مسؤولاً عن أي قرارات استثمارية أو تداول تتخذها بناءً على المعلومات المقدمة.'
-                : 'Mersadna is not responsible for any investment or trading decisions you make based on the information provided.'}
+                : 'Odamak is not responsible for any investment or trading decisions you make based on the information provided.'}
             </p>
             <p>
               {isRTL
@@ -243,7 +243,7 @@ export default function TermsPage() {
           <p className="text-muted-foreground">
             {isRTL
               ? 'جميع المحتويات والتصاميم والشعارات على المنصة هي ملكية خاصة لمرصادنا ومحمية بموجب قوانين حقوق الملكية الفكرية.'
-              : 'All content, designs, and logos on the platform are proprietary to Mersadna and protected under intellectual property laws.'}
+              : 'All content, designs, and logos on the platform are proprietary to Odamak and protected under intellectual property laws.'}
           </p>
         </section>
 

@@ -8,7 +8,7 @@ export const metadata: Metadata = buildMetadata('goldCalculator', {
 });
 
 const jsonLd = generateSoftwareAppSchema({
-  name: 'حاسبة الذهب - Mersadna',
+  name: 'حاسبة الذهب - Odamak',
   description: 'احسب قيمة الذهب بالجنيه المصري لجميع العيارات مع المصنعية والضريبة',
   url: '/gold/calculator',
 });

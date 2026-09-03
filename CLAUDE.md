@@ -1,7 +1,7 @@
-﻿# CLAUDE.md - Project Documentation
+# CLAUDE.md - Project Documentation
 
 > **Last Updated:** January 27, 2026
-> **Project Name:** Mersadna (مرصادنا)
+> **Project Name:** Odamak (مرصادنا)
 > **Version:** 0.1.0
 
 ---
@@ -31,7 +31,7 @@
 
 ## 📖 Project Overview
 
-**Mersadna** is a comprehensive web application for tracking real-time gold and currency prices in Egypt. The platform provides:
+**Odamak** is a comprehensive web application for tracking real-time gold and currency prices in Egypt. The platform provides:
 
 - **Live Gold Prices**: Real-time tracking of gold prices across all karats (24k, 21k, 18k) plus gold pound and ounce
 - **Currency Exchange Rates**: Live currency exchange rates from Egyptian banks and parallel markets
@@ -275,7 +275,7 @@ gold/
 
 ### Base URL
 ```
-http://api.mersadna.test/api
+http://api.odamak.test/api
 ```
 
 ### Available Endpoints
@@ -362,7 +362,7 @@ if (error) {
 - **Node.js**: v20.x or higher
 - **npm**: v10.x or higher
 - **Windows/Linux/macOS**: Any OS
-- **Backend API**: Mersadna API running at `http://api.mersadna.test/api`
+- **Backend API**: Odamak API running at `http://api.odamak.test/api`
 
 ### Installation
 
@@ -383,7 +383,7 @@ if (error) {
 
    Edit `.env.local`:
    ```env
-   NEXT_PUBLIC_API_URL=http://api.mersadna.test/api
+   NEXT_PUBLIC_API_URL=http://api.odamak.test/api
    NODE_ENV=development
    ```
 
@@ -563,7 +563,7 @@ import type { GoldOverviewResponse } from '@/types';
 
 ```env
 # API Configuration
-NEXT_PUBLIC_API_URL=http://api.mersadna.test/api
+NEXT_PUBLIC_API_URL=http://api.odamak.test/api
 
 # Environment
 NODE_ENV=development
@@ -822,7 +822,7 @@ npm start
 ### Environment Setup
 Ensure production environment variables are set:
 ```env
-NEXT_PUBLIC_API_URL=https://api.mersadna.com
+NEXT_PUBLIC_API_URL=https://api.odamak.com
 NODE_ENV=production
 ```
 
@@ -845,7 +845,7 @@ Next.js App Router with server components doesn't support static export by defau
 **Error**: `Failed to fetch gold overview`
 
 **Solution**:
-- Ensure backend API is running at `http://api.mersadna.test/api`
+- Ensure backend API is running at `http://api.odamak.test/api`
 - Check `.env.local` has correct `NEXT_PUBLIC_API_URL`
 - Verify API endpoint is accessible (visit in browser)
 
@@ -928,8 +928,8 @@ git push origin feature/my-feature
 
 ## 📞 Contact & Support
 
-- **Website**: https://mersadna.com
-- **Twitter**: @mersadna
+- **Website**: https://odamak.com
+- **Twitter**: @odamak
 
 ---
 

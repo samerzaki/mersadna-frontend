@@ -1207,7 +1207,7 @@ export const translations: Record<Language, Translations> = {
   },
   en: {
     header: {
-      title: 'Mersadna',
+      title: 'Odamak',
       subtitle: 'Gold Price Tracker',
     },
     sidebar: {
@@ -1299,7 +1299,7 @@ export const translations: Record<Language, Translations> = {
       egp: 'EGP',
       loading: 'Loading...',
       error: 'Error occurred',
-      appName: 'Mersadna',
+      appName: 'Odamak',
       errorPasswordMismatch: 'Passwords do not match',
       errorPasswordLength: 'Password must be at least 6 characters',
     },
@@ -1308,7 +1308,7 @@ export const translations: Record<Language, Translations> = {
     },
     pages: {
       login: {
-        appTitle: 'Mersadna',
+        appTitle: 'Odamak',
         appSubtitle: 'Track gold and currency prices in real-time',
         title: 'Sign In',
         subtitle: 'Enter your credentials to access your account',
@@ -1329,7 +1329,7 @@ export const translations: Record<Language, Translations> = {
         errorDefault: 'An error occurred while signing in',
       },
       register: {
-        appTitle: 'Mersadna',
+        appTitle: 'Odamak',
         appSubtitle: 'Join to track gold and currency prices',
         title: 'Create New Account',
         subtitle: 'Create your account to access advanced features',

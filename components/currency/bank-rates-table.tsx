@@ -93,7 +93,7 @@ export function BankRatesTable({
   const [pinnedBanks, setPinnedBanks] = useState<string[]>(() => {
     if (typeof window === 'undefined') return [];
     try {
-      const stored = localStorage.getItem('mersadna_pinned_banks');
+      const stored = localStorage.getItem('odamak_pinned_banks');
       return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
@@ -104,7 +104,7 @@ export function BankRatesTable({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem('mersadna_pinned_banks', JSON.stringify(pinnedBanks));
+        localStorage.setItem('odamak_pinned_banks', JSON.stringify(pinnedBanks));
       } catch (err) {
         console.error('Failed to save pinned banks:', err);
       }

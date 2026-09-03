@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 
-export const SITE_URL = (process.env.SITE_URL || 'https://mersadna.com').replace(/\/$/, '');
+export const SITE_URL = (process.env.SITE_URL || 'https://odamak.com').replace(/\/$/, '');
 
 export const SEO_CONFIG = {
   site: {
-    name: 'Mersadna',
+    name: 'Odamak',
     nameAr: 'مرصادنا',
     domain: SITE_URL,
     description: 'مرصادنا منصة عربية لمتابعة أسعار الذهب والعملات والمعادن في مصر.',

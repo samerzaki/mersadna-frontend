@@ -1,20 +1,20 @@
-﻿# API Integration - Home Page
+# API Integration - Home Page
 
 ## Summary
-Successfully integrated the Mersadna API with the home page UI. The application now fetches real-time gold prices from the backend API.
+Successfully integrated the Odamak API with the home page UI. The application now fetches real-time gold prices from the backend API.
 
 ## Changes Made
 
 ### 1. API Base URL Configuration
 **Files Updated:**
-- `lib/constants.ts` - Changed default API_BASE_URL from `http://gold.test/api` to `http://api.mersadna.test/api`
-- `.env.local` - Set `NEXT_PUBLIC_API_URL=http://api.mersadna.test/api`
-- `env.local.example` - Updated example to use `http://api.mersadna.test/api`
+- `lib/constants.ts` - Changed default API_BASE_URL from `http://gold.test/api` to `http://api.odamak.test/api`
+- `.env.local` - Set `NEXT_PUBLIC_API_URL=http://api.odamak.test/api`
+- `env.local.example` - Updated example to use `http://api.odamak.test/api`
 - `lib/api.ts` - Updated fallback baseUrl for bank logos
 
 **Current Configuration:**
 ```env
-NEXT_PUBLIC_API_URL=http://api.mersadna.test/api
+NEXT_PUBLIC_API_URL=http://api.odamak.test/api
 ```
 
 ### 2. Type Definitions
@@ -172,7 +172,7 @@ To test the integration:
 1. **Ensure API is running:**
    ```bash
    # Visit in browser
-   http://api.mersadna.test/api/gold/get-overview
+   http://api.odamak.test/api/gold/get-overview
    ```
 
 2. **Start Next.js dev server:**
@@ -216,7 +216,7 @@ To integrate other API endpoints:
 Make sure `.env.local` exists with:
 
 ```env
-NEXT_PUBLIC_API_URL=http://api.mersadna.test/api
+NEXT_PUBLIC_API_URL=http://api.odamak.test/api
 NODE_ENV=development
 ```
 

@@ -1,4 +1,4 @@
-// React Query hooks for the Mersadna currency API
+// React Query hooks for the Odamak currency API
 
 import { useQuery } from '@tanstack/react-query';
 import {

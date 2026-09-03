@@ -1,7 +1,7 @@
-﻿# API Cleanup Summary
+# API Cleanup Summary
 
 ## Overview
-Cleaned up all old/deprecated API endpoints and kept only those from the Mersadna Postman collection.
+Cleaned up all old/deprecated API endpoints and kept only those from the Odamak Postman collection.
 
 ## Active API Endpoints (From Postman Collection)
 

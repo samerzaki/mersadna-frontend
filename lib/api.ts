@@ -1,4 +1,4 @@
-// API client functions - Mersadna API
+// API client functions - Odamak API
 
 import {
   GoldOverviewResponse,

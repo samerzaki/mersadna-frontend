@@ -10,7 +10,7 @@ services:
   web:
     build:
       context: .
-      args: { NEXT_PUBLIC_API_URL: https://mersadna.com, INTERNAL_API_URL: http://api:3001/api }
+      args: { NEXT_PUBLIC_API_URL: https://odamak.com, INTERNAL_API_URL: http://api:3001/api }
     environment: { NODE_ENV: production, INTERNAL_API_URL: http://api:3001/api }
     networks: [private]
   api:
@@ -19,7 +19,7 @@ services:
       NODE_ENV: production
       DATABASE_URL: mysql://gold:${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}@mysql:3306/gold
       REDIS_URL: redis://redis:6379
-      APP_ORIGIN: https://mersadna.com
+      APP_ORIGIN: https://odamak.com
       SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET}
     depends_on:
       migrate: { condition: service_completed_successfully }
@@ -39,7 +39,7 @@ services:
       NODE_ENV: production
       DATABASE_URL: mysql://gold:${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}@mysql:3306/gold
       REDIS_URL: redis://redis:6379
-      APP_ORIGIN: https://mersadna.com
+      APP_ORIGIN: https://odamak.com
       SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET}
       GOLD_BULLION_URL: ${GOLD_BULLION_URL:-}
       SILVER_BULLION_URL: ${SILVER_BULLION_URL:-}

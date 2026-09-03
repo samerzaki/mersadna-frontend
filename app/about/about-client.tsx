@@ -17,7 +17,7 @@ export default function AboutPage() {
         <p className="text-lg text-muted-foreground">
           {isRTL
             ? 'منصة مرصادنا - وجهتك الموثوقة لمتابعة أسعار الذهب والعملات في مصر'
-            : 'Mersadna - Your trusted platform for tracking gold and currency prices in Egypt'}
+            : 'Odamak - Your trusted platform for tracking gold and currency prices in Egypt'}
         </p>
       </div>
 
@@ -26,12 +26,12 @@ export default function AboutPage() {
         {/* About Section */}
         <section className="rounded-lg border bg-card p-6">
           <h2 className="mb-4 text-2xl font-semibold">
-            {isRTL ? 'عن مرصادنا' : 'About Mersadna'}
+            {isRTL ? 'عن مرصادنا' : 'About Odamak'}
           </h2>
           <p className="leading-relaxed text-muted-foreground">
             {isRTL
               ? 'مرصادنا منصة عربية لمتابعة أسعار الذهب والعملات والفضة والعملات الرقمية في مصر. ننظم البيانات المتاحة ونقدم أدوات حسابية ورسومًا تساعدك على قراءة السوق بصورة أوضح.'
-              : 'Mersadna is an Arabic platform for following gold, currency, silver, and cryptocurrency prices in Egypt, with clear market data and practical calculation tools.'}
+              : 'Odamak is an Arabic platform for following gold, currency, silver, and cryptocurrency prices in Egypt, with clear market data and practical calculation tools.'}
           </p>
         </section>
 

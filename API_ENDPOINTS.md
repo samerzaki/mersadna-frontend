@@ -1,8 +1,8 @@
-﻿# Mersadna API Endpoints Reference
+# Odamak API Endpoints Reference
 
 ## Base URL
 ```
-http://api.mersadna.test/api
+http://api.odamak.test/api
 ```
 
 ## Endpoints
@@ -197,18 +197,18 @@ export const REFRESH_INTERVAL = 60000; // 1 minute
 # Get overview
 curl -H "Accept: application/json" \
      -H "Accept-Language: ar" \
-     http://api.mersadna.test/api/gold/get-overview
+     http://api.odamak.test/api/gold/get-overview
 
 # Get all prices with filters
 curl -H "Accept: application/json" \
      -H "Accept-Language: ar" \
-     "http://api.mersadna.test/api/gold/get-all-prices?currency=EGP&period=7d"
+     "http://api.odamak.test/api/gold/get-all-prices?currency=EGP&period=7d"
 ```
 
 ### Using browser:
 ```
-http://api.mersadna.test/api/gold/get-overview
-http://api.mersadna.test/api/gold/get-all-prices?currency=EGP&period=30d
+http://api.odamak.test/api/gold/get-overview
+http://api.odamak.test/api/gold/get-all-prices?currency=EGP&period=30d
 ```
 
 ---

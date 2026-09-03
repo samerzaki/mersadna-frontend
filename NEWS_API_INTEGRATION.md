@@ -1,4 +1,4 @@
-﻿# News API Integration Guide
+# News API Integration Guide
 
 > **Last Updated:** January 29, 2026
 > **Status:** ✅ Integrated with Real API
@@ -7,7 +7,7 @@
 
 ## Overview
 
-The news section has been successfully integrated with the Mersadna backend API. News articles are now fetched from the `/api/news/scraped` endpoint instead of using mock data.
+The news section has been successfully integrated with the Odamak backend API. News articles are now fetched from the `/api/news/scraped` endpoint instead of using mock data.
 
 ---
 
@@ -282,17 +282,17 @@ ALTER TABLE news ADD COLUMN reading_time_minutes INT;
 # List news
 curl -H "Accept: application/json" \
      -H "Accept-Language: ar" \
-     "http://api.mersadna.test/api/news/scraped?page=1"
+     "http://api.odamak.test/api/news/scraped?page=1"
 
 # Get single news
 curl -H "Accept: application/json" \
      -H "Accept-Language: ar" \
-     "http://api.mersadna.test/api/news/scraped/1"
+     "http://api.odamak.test/api/news/scraped/1"
 
 # Search
 curl -H "Accept: application/json" \
      -H "Accept-Language: ar" \
-     "http://api.mersadna.test/api/news/scraped?search=ذهب"
+     "http://api.odamak.test/api/news/scraped?search=ذهب"
 ```
 
 ---

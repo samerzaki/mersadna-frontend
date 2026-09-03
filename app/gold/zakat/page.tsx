@@ -8,7 +8,7 @@ export const metadata: Metadata = buildMetadata('goldZakat', {
 });
 
 const jsonLd = generateSoftwareAppSchema({
-  name: 'حاسبة زكاة الذهب - Mersadna',
+  name: 'حاسبة زكاة الذهب - Odamak',
   description: 'احسب زكاة الذهب الواجبة عليك بسهولة وفقاً للشريعة الإسلامية',
   url: '/gold/zakat',
 });

@@ -20,7 +20,7 @@ export default function OpenGraphImage() {
           direction: 'rtl',
         }}
       >
-        <div style={{ fontSize: 54, fontWeight: 700, marginBottom: 24 }}>MERSADNA</div>
+        <div style={{ fontSize: 54, fontWeight: 700, marginBottom: 24 }}>ODAMAK</div>
         <div style={{ fontSize: 76, fontWeight: 800, lineHeight: 1.2 }}>Egypt market prices</div>
         <div style={{ fontSize: 32, marginTop: 30, color: '#f9dc9c' }}>Gold, currencies, calculators, and market updates</div>
       </div>

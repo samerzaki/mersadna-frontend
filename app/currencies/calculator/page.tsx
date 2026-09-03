@@ -8,7 +8,7 @@ export const metadata: Metadata = buildMetadata('currenciesCalculator', {
 });
 
 const jsonLd = generateSoftwareAppSchema({
-  name: 'حاسبة العملات - Mersadna',
+  name: 'حاسبة العملات - Odamak',
   description: 'حول بين العملات المختلفة بأسعار البنوك والسوق الموازي في مصر',
   url: '/currencies/calculator',
 });

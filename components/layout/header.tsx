@@ -44,9 +44,9 @@ export function Header() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={isCollapsed
-                ? "https://mersadna-cdn.b-cdn.net/assets/images/logos/square.png"
-                : "https://mersadna-cdn.b-cdn.net/assets/images/logos/logo.png"}
-              alt="Mersadna"
+                ? "https://odamak-cdn.b-cdn.net/assets/images/logos/square.png"
+                : "https://odamak-cdn.b-cdn.net/assets/images/logos/logo.png"}
+              alt="Odamak"
               className="block h-full w-full object-contain"
             />
           </Link>

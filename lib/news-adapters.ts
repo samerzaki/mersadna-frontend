@@ -52,8 +52,8 @@ export function adaptApiNewsToNewsItem(apiNews: ApiNewsItem): NewsItem {
     tags: [],
     thumbnail: apiNews.image_url,
     source: {
-      id: 'mersadna',
-      name: 'Mersadna',
+      id: 'odamak',
+      name: 'Odamak',
       nameAr: 'مرصادنا',
     },
     publishedAt,
