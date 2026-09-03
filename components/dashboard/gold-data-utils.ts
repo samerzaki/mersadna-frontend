@@ -16,6 +16,10 @@ export interface GoldDataItem {
   trend: 'up' | 'down' | 'neutral';
   currency: string;
   recordedAt: string;
+  chartPoints: number[];
+  chartColor: string;
+  lastCheckedAt?: string;
+  lastCheckedAtForHuman?: string;
 }
 
 /**
@@ -23,7 +27,9 @@ export interface GoldDataItem {
  */
 export function transformApiDataToGoldDataItem(
   key: string,
-  data: GoldOverviewItem | GoldOunceItem
+  data: GoldOverviewItem | GoldOunceItem,
+  lastCheckedAt?: string,
+  lastCheckedAtForHuman?: string
 ): GoldDataItem {
   const keyMap: Record<string, { id: string; nameKey: GoldDataItem['nameKey']; karat: string }> = {
     '21': { id: 'k21', nameKey: 'karat21', karat: 'k21' },
@@ -44,6 +50,8 @@ export function transformApiDataToGoldDataItem(
 
   const spread_egp = isOunce ? 0 : (data as GoldOverviewItem).spread_egp;
   const spread_percent = isOunce ? 0 : (data as GoldOverviewItem).spread_percent;
+  const chartPoints = isOunce ? [] : (data as GoldOverviewItem).chart_points;
+  const chartColor = isOunce ? 'gray' : (data as GoldOverviewItem).chart_color;
 
   return {
     id: mapping.id,
@@ -56,5 +64,9 @@ export function transformApiDataToGoldDataItem(
     trend,
     currency: data.currency,
     recordedAt: data.recorded_at,
+    chartPoints: Array.isArray(chartPoints) ? chartPoints : [],
+    chartColor,
+    lastCheckedAt,
+    lastCheckedAtForHuman,
   };
 }

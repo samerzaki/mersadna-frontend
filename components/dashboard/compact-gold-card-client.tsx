@@ -11,6 +11,48 @@ interface CompactGoldCardProps {
   item: GoldDataItem;
 }
 
+const CHART_COLORS: Record<string, string> = {
+  green: '#16a34a',
+  red: '#dc2626',
+  gray: '#94a3b8',
+};
+
+function GoldSparkline({ points, color }: { points: number[]; color: string }) {
+  const values = points.filter(Number.isFinite);
+  if (values.length < 2) return null;
+
+  const width = 112;
+  const height = 36;
+  const padding = 3;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  const stroke = CHART_COLORS[color.toLowerCase()] ?? CHART_COLORS.gray;
+  const linePoints = values.map((value, index) => {
+    const x = padding + (index / (values.length - 1)) * (width - padding * 2);
+    const y = padding + (height - padding * 2) - ((value - min) / range) * (height - padding * 2);
+    return `${x},${y}`;
+  }).join(' ');
+
+  return (
+    <svg
+      aria-label="Price trend chart"
+      className="h-9 w-28 shrink-0"
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+    >
+      <polyline
+        points={linePoints}
+        fill="none"
+        stroke={stroke}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
 /**
  * Client component for individual gold card
  * Handles interactive features (modal, hover effects)
@@ -33,7 +75,11 @@ export function CompactGoldCard({ item }: CompactGoldCardProps) {
               {getName(item.nameKey, t)}
             </h3>
           </div>
-          <LiveIndicator recordedAt={item.recordedAt} />
+          <LiveIndicator
+            recordedAt={item.lastCheckedAt}
+            tooltip={item.lastCheckedAtForHuman}
+            liveWithinMinutes={120}
+          />
         </div>
 
         {/* Sell Price (Primary) */}
@@ -43,6 +89,13 @@ export function CompactGoldCard({ item }: CompactGoldCardProps) {
             {formatPriceWithCurrency(item.sellPrice, item.currency, locale)}
           </p>
         </div>
+
+        {/* Historical prices supplied by get-overview.chart_points */}
+        {!isOunce && (
+          <div className="mb-3 flex justify-end" dir="ltr">
+            <GoldSparkline points={item.chartPoints} color={item.chartColor} />
+          </div>
+        )}
 
         {/* Buy Price + Trend (same row) - Hidden for Global Ounce */}
         {!isOunce && (

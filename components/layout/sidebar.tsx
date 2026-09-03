@@ -7,6 +7,7 @@ import { Crown, Settings, User, ChevronDown } from "lucide-react";
 import { navigation } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/language-context";
+import { useAuth } from "@/contexts/auth-context";
 import { useSidebar } from "@/contexts/sidebar-context";
 import {
   Tooltip,
@@ -46,6 +47,7 @@ export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { language } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const isRTL = language === "ar";
   const { isCollapsed } = useSidebar();
 
@@ -269,6 +271,7 @@ export function Sidebar({ className }: SidebarProps) {
       </div>
 
       {/* Footer: User Profile */}
+      {isAuthenticated && (
       <div className={cn(
         "shrink-0 border-t border-slate-100 dark:border-slate-800 py-4",
         isCollapsed ? "px-2" : "px-4"
@@ -310,6 +313,7 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
         )}
       </div>
+      )}
     </aside>
     </TooltipProvider>
   );

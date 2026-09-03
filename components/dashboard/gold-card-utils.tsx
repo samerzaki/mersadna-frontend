@@ -1,7 +1,8 @@
 'use client';
 
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { formatPercent, isPriceLive } from '@/lib/format';
+import { formatPercent } from '@/lib/format';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Re-export shared types and utilities so existing client imports still work
 export { type GoldDataItem, transformApiDataToGoldDataItem } from './gold-data-utils';
@@ -34,17 +35,43 @@ export const getName = (
 /**
  * Live indicator component - shows animated green dot if data is fresh
  */
-export function LiveIndicator({ recordedAt }: { recordedAt?: string | null }) {
-  if (!recordedAt || !isPriceLive(recordedAt)) {
+export function LiveIndicator({
+  recordedAt,
+  tooltip,
+  liveWithinMinutes = 5,
+}: {
+  recordedAt?: string | null;
+  tooltip?: string;
+  liveWithinMinutes?: number;
+}) {
+  if (!recordedAt || !isPriceLiveWithin(recordedAt, liveWithinMinutes)) {
     return null;
   }
 
-  return (
-    <span className="relative flex h-2 w-2">
-      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+  const indicator = (
+    <span className="relative flex h-2 w-2" aria-label="Live price">
+      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
     </span>
   );
+
+  if (!tooltip) return indicator;
+
+  return (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>{indicator}</TooltipTrigger>
+        <TooltipContent>{tooltip}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+function isPriceLiveWithin(recordedAt: string | Date, liveWithinMinutes: number) {
+  const timestamp = typeof recordedAt === 'string' ? new Date(recordedAt) : recordedAt;
+  const ageInMinutes = (Date.now() - timestamp.getTime()) / (1000 * 60);
+
+  return Number.isFinite(ageInMinutes) && ageInMinutes >= 0 && ageInMinutes < liveWithinMinutes;
 }
 
 /**

@@ -17,9 +17,10 @@ export async function CompactGoldPricesServer() {
     const goldData: GoldDataItem[] = [];
 
     if (data.data?.gold) {
+      const { last_checked_at, last_checked_at_for_human } = data.data.gold;
       Object.entries(data.data.gold).forEach(([key, value]) => {
         if (value && typeof value === 'object' && 'sell_price' in value) {
-          goldData.push(transformApiDataToGoldDataItem(key, value));
+          goldData.push(transformApiDataToGoldDataItem(key, value, last_checked_at, last_checked_at_for_human));
         }
       });
     }

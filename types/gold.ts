@@ -72,6 +72,10 @@ export interface GoldOverviewResponse {
       '24': GoldOverviewItem | null;
       '18': GoldOverviewItem | null;
       ounce: GoldOunceItem | null;
+      /** Timestamp when the configured gold-price sources were last checked. */
+      last_checked_at?: string;
+      /** Localized, API-provided relative representation of last_checked_at. */
+      last_checked_at_for_human?: string;
     };
   };
 }
