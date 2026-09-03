@@ -33,6 +33,32 @@ export type NavGroup = {
   items: NavItem[];
 };
 
+/** Flat top-nav items for the Odamak header / active-route highlighting. */
+export const primaryNav: NavItem[] = [
+  { titleEn: "Home", titleAr: "الرئيسية", href: "/", icon: Home },
+  { titleEn: "Gold", titleAr: "الذهب", href: "/gold", icon: Coins },
+  { titleEn: "Currencies", titleAr: "العملات", href: "/currencies", icon: DollarSign },
+  { titleEn: "Silver", titleAr: "الفضة", href: "/silver", icon: Gem },
+  { titleEn: "Crypto", titleAr: "الرقمية", href: "/crypto", icon: Bitcoin },
+  { titleEn: "Calculator", titleAr: "الحاسبة", href: "/gold/calculator", icon: Calculator },
+  { titleEn: "Zakat", titleAr: "الزكاة", href: "/gold/zakat", icon: HandHeart },
+  { titleEn: "News", titleAr: "الأخبار", href: "/news", icon: Newspaper },
+];
+
+/**
+ * Whether `href` should be highlighted as active for the current `pathname`,
+ * picking the *longest* matching primaryNav href so e.g. "/gold/calculator"
+ * doesn't also light up "/gold".
+ */
+export function isPrimaryNavActive(pathname: string, href: string): boolean {
+  const matches = primaryNav
+    .map((item) => item.href)
+    .filter((candidate) => pathname === candidate || (candidate !== "/" && pathname.startsWith(candidate + "/")));
+  if (matches.length === 0) return false;
+  const longest = matches.reduce((a, b) => (b.length > a.length ? b : a));
+  return longest === href;
+}
+
 export const navigation: NavGroup[] = [
   {
     id: "gold-market",

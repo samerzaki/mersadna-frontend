@@ -3,65 +3,55 @@
 import Link from 'next/link';
 import { Home, Search } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
+import { Button } from '@/components/ui/button';
 
 export default function NotFound() {
   const { language } = useLanguage();
   const isRTL = language === 'ar';
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 dark:bg-slate-900">
-      <div className="mx-auto max-w-lg text-center">
-        {/* 404 Number */}
-        <div className="mb-8">
-          <h1 className="text-8xl font-bold text-slate-300 dark:text-slate-700 md:text-9xl">
-            404
-          </h1>
-        </div>
+    <div className="flex min-h-screen items-center justify-center bg-bg px-4 py-12">
+      <div className="card-surface mx-auto max-w-lg p-8 text-center md:p-10">
+        <h1 className="num mb-6 text-[64px] font-bold leading-none text-gold md:text-[80px]">404</h1>
 
-        {/* Heading */}
-        <h2 className="mb-4 text-2xl font-semibold text-slate-800 dark:text-slate-100 md:text-3xl">
+        <h2 className="mb-4 font-heading text-2xl font-semibold text-text md:text-3xl">
           {isRTL ? 'الصفحة غير موجودة' : 'Page Not Found'}
         </h2>
 
-        {/* Description */}
-        <p className="mb-8 text-base leading-relaxed text-slate-600 dark:text-slate-400">
+        <p className="mb-8 text-base leading-relaxed text-muted">
           {isRTL
             ? 'عذراً، الصفحة التي تبحث عنها غير متوفرة. قد تكون قد تم نقلها أو حذفها.'
             : 'Sorry, the page you are looking for is not available. It may have been moved or deleted.'}
         </p>
 
-        {/* Action Buttons */}
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-800 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-          >
-            <Home className="h-4 w-4" />
-            {isRTL ? 'العودة للرئيسية' : 'Back to Home'}
-          </Link>
+          <Button asChild variant="default" size="lg">
+            <Link href="/">
+              <Home className="h-4 w-4" />
+              {isRTL ? 'العودة للرئيسية' : 'Back to Home'}
+            </Link>
+          </Button>
 
-          <Link
-            href="/gold"
-            className="inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-          >
-            <Search className="h-4 w-4" />
-            {isRTL ? 'استكشف الأسعار' : 'Explore Prices'}
-          </Link>
+          <Button asChild variant="outline" size="lg">
+            <Link href="/gold">
+              <Search className="h-4 w-4" />
+              {isRTL ? 'استكشف الأسعار' : 'Explore Prices'}
+            </Link>
+          </Button>
         </div>
 
-        {/* Help Text */}
-        <p className="mt-8 text-sm text-slate-500 dark:text-slate-500">
+        <p className="mt-8 text-sm text-dim">
           {isRTL ? (
             <>
               هل تحتاج إلى مساعدة؟{' '}
-              <Link href="/contact" className="text-slate-700 underline dark:text-slate-300">
+              <Link href="/contact" className="text-gold underline">
                 تواصل معنا
               </Link>
             </>
           ) : (
             <>
               Need help?{' '}
-              <Link href="/contact" className="text-slate-700 underline dark:text-slate-300">
+              <Link href="/contact" className="text-gold underline">
                 Contact us
               </Link>
             </>

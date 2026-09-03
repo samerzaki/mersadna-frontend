@@ -2,69 +2,77 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Bell, Minus, Sparkles, TrendingDown, TrendingUp } from 'lucide-react';
-import { useLanguage } from '@/contexts/language-context';
+import { Bell } from 'lucide-react';
+import { SectionCard } from '@/components/ui/section-card';
+import { LiveDot } from '@/components/ui/live-dot';
+import { Sparkline } from '@/components/ui/sparkline';
+import { ChangeText } from '@/components/ui/change-badge';
+import { MonoNumber } from '@/components/ui/mono-number';
 import { PriceAlertModal } from '@/components/dashboard/price-alert-modal';
-import { formatPriceWithCurrency } from '@/lib/format';
+import { useLanguage } from '@/contexts/language-context';
 import { SilverDataItem, getSilverName } from './silver-data-utils';
 
-function TrendIndicator({ trend, changePercent }: Pick<SilverDataItem, 'trend' | 'changePercent'>) {
-  if (trend === 'neutral' || changePercent === 0) return <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-400 dark:text-slate-500"><Minus className="h-3.5 w-3.5" />0%</span>;
-  const positive = trend === 'up';
-  const Icon = positive ? TrendingUp : TrendingDown;
-  return <span className={`inline-flex items-center gap-1 text-xs font-semibold tabular-nums ${positive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}><Icon className="h-3.5 w-3.5" />{Math.abs(changePercent).toFixed(2)}%</span>;
-}
-
 function SilverPriceRow({ item, onAlert }: { item: SilverDataItem; onAlert: (item: SilverDataItem) => void }) {
-  const { language } = useLanguage();
-  const isRTL = language === 'ar';
-  const locale = isRTL ? 'ar-EG' : 'en-US';
-  const name = getSilverName(item.nameKey, isRTL);
+  const { t, language } = useLanguage();
+  const name = getSilverName(item.nameKey, language === 'ar');
 
   return (
-    <div className="group/row grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-4 py-3 transition-colors hover:bg-slate-50 dark:hover:bg-secondary">
-      <div className="min-w-0">
-        <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{name}</p>
-        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{isRTL ? 'سعر الجرام' : 'Price per gram'}</p>
-      </div>
-      <div className="text-end">
-        <p className="text-base font-bold tracking-tight text-slate-950 dark:text-white tabular-nums sm:text-lg">{formatPriceWithCurrency(item.sellPrice, item.currency, locale)}</p>
-        <div className="mt-1 flex items-center justify-end gap-2">
-          <TrendIndicator trend={item.trend} changePercent={item.changePercent} />
-          <button type="button" onClick={() => onAlert(item)} className="rounded-md p-1 text-slate-400 opacity-100 transition-colors hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:opacity-0 sm:group-hover/row:opacity-100" aria-label={isRTL ? `إنشاء تنبيه لـ ${name}` : `Create alert for ${name}`}>
-            <Bell className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      </div>
+    <div className="group/row flex items-center gap-3 px-5 py-3.5 border-b border-line2 last:border-b-0 hover:bg-hover transition-colors">
+      <LiveDot tone="gold" size={6} />
+      <span className="text-[14px] text-text flex-1 min-w-0 truncate">{name}</span>
+      {item.chartPoints.length >= 2 ? (
+        <Sparkline data={item.chartPoints} width={48} height={16} tone="auto" />
+      ) : (
+        <span className="w-12" />
+      )}
+      <MonoNumber value={item.sellPrice} currency={item.currency} className="text-[15px] font-medium text-text whitespace-nowrap" />
+      <span className="w-[56px] text-end shrink-0">
+        <ChangeText value={item.changePercent} withArrow={false} />
+      </span>
+      <button
+        type="button"
+        onClick={() => onAlert(item)}
+        className="rounded-md p-1 text-dim opacity-0 group-hover/row:opacity-100 hover:text-gold transition-opacity"
+        aria-label={`${t.home2026.createAlertFor} ${name}`}
+      >
+        <Bell className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }
 
-interface SilverWidgetClientProps { silverItems: SilverDataItem[]; }
+interface SilverWidgetClientProps {
+  silverItems: SilverDataItem[];
+}
 
 export function SilverWidgetClient({ silverItems }: SilverWidgetClientProps) {
+  const { t, language } = useLanguage();
   const [alertItem, setAlertItem] = useState<SilverDataItem | null>(null);
-  const { language } = useLanguage();
-  const isRTL = language === 'ar';
 
   return (
-    <section className="flex w-full flex-col">
-      <div className="mb-4">
-        <Link href="/silver" className="group">
-          <h2 className="flex items-center gap-2 text-2xl font-bold transition-colors group-hover:text-primary">
-            <Sparkles className="h-6 w-6 text-slate-500" />
-            {isRTL ? 'أسعار الفضة' : 'Silver Prices'}
-          </h2>
+    <SectionCard
+      title={t.home2026.silver}
+      action={
+        <Link href="/silver" className="text-[13px] text-gold hover:opacity-75 transition-opacity">
+          {t.home2026.details}
         </Link>
+      }
+    >
+      <div>
+        {silverItems.map((item) => (
+          <SilverPriceRow key={item.id} item={item} onAlert={setAlertItem} />
+        ))}
       </div>
-      <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm dark:border-border dark:bg-card">
-        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-4 py-1.5 dark:border-border dark:bg-secondary">
-          <span className="text-xs font-medium text-slate-500 dark:text-muted-foreground">{isRTL ? '3 أنواع من الفضة' : '3 Silver Types'}</span>
-          <span className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-muted-foreground"><span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />{isRTL ? 'مباشر' : 'Live'}</span>
-        </div>
-        <div className="flex-1 divide-y divide-slate-100 dark:divide-border">{silverItems.map((item) => <SilverPriceRow key={item.id} item={item} onAlert={setAlertItem} />)}</div>
-      </div>
-      {alertItem && <PriceAlertModal isOpen onClose={() => setAlertItem(null)} goldType={getSilverName(alertItem.nameKey, isRTL)} currentPrice={alertItem.sellPrice} currency={alertItem.currency} />}
-    </section>
+
+      {alertItem && (
+        <PriceAlertModal
+          isOpen
+          onClose={() => setAlertItem(null)}
+          goldType={getSilverName(alertItem.nameKey, language === 'ar')}
+          currentPrice={alertItem.sellPrice}
+          currency={alertItem.currency}
+        />
+      )}
+    </SectionCard>
   );
 }

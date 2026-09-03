@@ -125,7 +125,7 @@ export function ShareButtons({ url, title, description, variant = 'icons', class
         >
           {copied ? (
             <>
-              <Check className="w-4 h-4 text-green-500" />
+              <Check className="w-4 h-4 text-up" />
               {isRTL ? 'تم النسخ!' : 'Copied!'}
             </>
           ) : (
@@ -146,7 +146,7 @@ export function ShareButtons({ url, title, description, variant = 'icons', class
       {'share' in navigator && (
         <button
           onClick={handleNativeShare}
-          className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          className="p-2 rounded-full bg-panel2 text-muted hover:bg-hover transition-colors"
           aria-label="Share"
         >
           <Share2 className="w-4 h-4" />
@@ -160,7 +160,7 @@ export function ShareButtons({ url, title, description, variant = 'icons', class
           target="_blank"
           rel="noopener noreferrer"
           className={cn(
-            'p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors',
+            'p-2 rounded-full bg-panel2 text-muted transition-colors',
             link.color
           )}
           aria-label={`Share on ${link.name}`}
@@ -174,8 +174,8 @@ export function ShareButtons({ url, title, description, variant = 'icons', class
         className={cn(
           'p-2 rounded-full transition-colors',
           copied
-            ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
-            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+            ? 'bg-up-soft text-up'
+            : 'bg-panel2 text-muted hover:bg-hover'
         )}
         aria-label={copied ? 'Link copied' : 'Copy link'}
       >

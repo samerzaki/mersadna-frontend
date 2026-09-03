@@ -4,14 +4,16 @@ import { use } from 'react';
 import { useKaratPrice } from '@/hooks/use-gold-prices';
 import { useChartData } from '@/hooks/use-price-history';
 import { PriceChart } from '@/components/charts/price-chart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { TrendIndicator } from '@/components/dashboard/trend-indicator';
-import { Loader2, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react';
-import { formatPrice, formatPriceChange, formatPercent, formatRelativeTime } from '@/lib/format';
+import { PageHeader } from '@/components/ui/page-header';
+import { SectionCard } from '@/components/ui/section-card';
+import { StatTile } from '@/components/ui/stat-tile';
+import { ChangeChip } from '@/components/ui/change-badge';
+import { Loader2, AlertCircle } from 'lucide-react';
+import { formatPrice, formatPriceChange, formatRelativeTime } from '@/lib/format';
 import { KaratCode } from '@/types';
 import { KARATS } from '@/lib/constants';
 import { useLanguage } from '@/contexts/language-context';
+import { cn } from '@/lib/utils';
 
 interface PageProps {
   params: Promise<{ karat: KaratCode }>;
@@ -29,7 +31,7 @@ export default function KaratPage({ params }: PageProps) {
   if (!karatInfo) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-destructive">{t.pages.karat.invalidKarat}</p>
+        <p className="text-down">{t.pages.karat.invalidKarat}</p>
       </div>
     );
   }
@@ -37,14 +39,14 @@ export default function KaratPage({ params }: PageProps) {
   if (priceLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-gold" />
       </div>
     );
   }
 
   if (priceError || !price) {
     return (
-      <div className="flex items-center justify-center gap-2 py-12 text-destructive">
+      <div className="flex items-center justify-center gap-2 py-12 text-down">
         <AlertCircle className="h-5 w-5" />
         <p>{t.pages.karat.errorLoading}</p>
       </div>
@@ -65,108 +67,56 @@ export default function KaratPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-3xl font-bold mb-2">{karatInfo.name}</h2>
-        <p className="text-muted-foreground">
-          {t.pages.karat.purity} {(karatInfo.purity * 100).toFixed(1)}%
-        </p>
-      </div>
+      <PageHeader
+        eyebrow={`${t.pages.karat.purity} ${(karatInfo.purity * 100).toFixed(1)}%`}
+        title={karatInfo.name}
+      />
 
       {/* Main price card */}
-      <Card className="border-2">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>{t.pages.karat.currentPrice}</CardTitle>
-            <Badge variant={isPositive ? 'default' : 'destructive'} className="gap-1">
-              <TrendIndicator change={price.change} showIcon={false} />
-              {formatPercent(price.changePercent)}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Buy price */}
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">{t.pages.karat.buyPrice}</p>
-              <div className="flex items-baseline gap-3">
-                <p className="text-5xl font-bold">{formatPrice(price.buyPrice)}</p>
-                <div className="flex items-center gap-1">
-                  {isPositive ? (
-                    <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  ) : (
-                    <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
-                  )}
-                  <span
-                    className={`text-lg font-semibold ${
-                      isPositive
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-red-600 dark:text-red-400'
-                    }`}
-                  >
-                    {formatPriceChange(price.change)}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Sell price */}
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">{t.pages.karat.sellPrice}</p>
-              <p className="text-5xl font-bold text-muted-foreground">
-                {formatPrice(price.sellPrice)}
-              </p>
+      <SectionCard
+        title={t.pages.karat.currentPrice}
+        action={<ChangeChip value={price.changePercent} />}
+        padded
+      >
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Buy price */}
+          <div>
+            <p className="text-sm text-muted mb-2">{t.pages.karat.buyPrice}</p>
+            <div className="flex items-baseline gap-3">
+              <p className="num text-5xl font-semibold text-text">{formatPrice(price.buyPrice)}</p>
+              <span className={cn('num text-lg font-semibold', isPositive ? 'text-up' : 'text-down')}>
+                {formatPriceChange(price.change)}
+              </span>
             </div>
           </div>
 
-          <p className="mt-4 text-sm text-muted-foreground">
-            {t.pages.karat.lastUpdate}: {formatRelativeTime(price.updatedAt)}
-          </p>
-        </CardContent>
-      </Card>
+          {/* Sell price */}
+          <div>
+            <p className="text-sm text-muted mb-2">{t.pages.karat.sellPrice}</p>
+            <p className="num text-5xl font-semibold text-muted">
+              {formatPrice(price.sellPrice)}
+            </p>
+          </div>
+        </div>
+
+        <p className="mt-4 text-sm text-muted">
+          {t.pages.karat.lastUpdate}: {formatRelativeTime(price.updatedAt)}
+        </p>
+      </SectionCard>
 
       {/* Statistics */}
       {stats && (
         <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {t.pages.karat.high30d}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{formatPrice(stats.high)}</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {t.pages.karat.low30d}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{formatPrice(stats.low)}</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {t.pages.karat.avg30d}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{formatPrice(stats.average)}</p>
-            </CardContent>
-          </Card>
+          <StatTile label={t.pages.karat.high30d} value={formatPrice(stats.high)} />
+          <StatTile label={t.pages.karat.low30d} value={formatPrice(stats.low)} />
+          <StatTile label={t.pages.karat.avg30d} value={formatPrice(stats.average)} />
         </div>
       )}
 
       {/* Chart */}
       {chartLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-gold" />
         </div>
       ) : chartData ? (
         <PriceChart

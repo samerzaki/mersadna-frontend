@@ -11,13 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// Workmanship estimation ranges (EGP per gram)
-const WORKMANSHIP_RANGES = {
-  karat24: { min: 150, max: 300, default: 225 },
-  karat21: { min: 120, max: 250, default: 185 },
-  karat18: { min: 100, max: 200, default: 150 },
-};
+import { PageHeader } from "@/components/ui/page-header";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import { SimpleCalculator, type MetalType } from "@/components/calculator/simple-calculator";
+import { WORKMANSHIP_RANGES } from "@/lib/constants";
 
 // Type definitions for all tabs
 type PLItem = {
@@ -43,9 +40,23 @@ type BuyItem = {
   customWorkmanship: string;
 };
 
-export default function GoldCalculatorPage() {
+interface GoldCalculatorPageProps {
+  defaultType?: MetalType;
+  title?: string;
+  lead?: string;
+}
+
+export default function GoldCalculatorPage({
+  defaultType = 'g21',
+  title,
+  lead,
+}: GoldCalculatorPageProps = {}) {
   const { t, language } = useLanguage();
+  const isRTL = language === 'ar';
   const dir = language === 'ar' ? 'rtl' : 'ltr';
+  const effectiveTitle = title ?? t.pages.calculator.defaultTitle;
+  const effectiveLead = lead ?? t.pages.calculator.defaultLead;
+  const [viewMode, setViewMode] = useState<'simple' | 'advanced'>('simple');
 
   // Fetch real gold prices from API
   const { data: goldData, isLoading: goldLoading, error: goldError } = useGoldOverview();
@@ -245,7 +256,7 @@ export default function GoldCalculatorPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-slate-400 mx-auto" />
-          <p className="text-sm text-slate-500">جاري تحميل أسعار الذهب...</p>
+          <p className="text-sm text-slate-500">{t.pages.calculator.loadingPrices}</p>
         </div>
       </div>
     );
@@ -259,9 +270,9 @@ export default function GoldCalculatorPage() {
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
             <div className="space-y-1">
-              <h3 className="font-medium text-red-900">خطأ في تحميل أسعار الذهب</h3>
+              <h3 className="font-medium text-red-900">{t.pages.calculator.errorTitle}</h3>
               <p className="text-sm text-red-700">
-                {goldError instanceof Error ? goldError.message : 'فشل في تحميل أسعار الذهب من الخادم'}
+                {goldError instanceof Error ? goldError.message : t.pages.calculator.errorMessage}
               </p>
             </div>
           </div>
@@ -271,15 +282,22 @@ export default function GoldCalculatorPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto" dir={dir}>
-      {/* Page Header */}
-      <h2 className="text-2xl font-bold flex items-center gap-2">
-        
-        <Calculator className="h-6 w-6" />
-        {t.pages.calculator.title}
-        
-      </h2>
+    <div className="space-y-8" dir={dir}>
+      <PageHeader eyebrow={isRTL ? 'الأدوات' : 'Tools'} title={effectiveTitle} lead={effectiveLead} />
 
+      <SegmentedControl
+        items={[
+          { value: 'simple', label: t.pages.calculator.viewSimple },
+          { value: 'advanced', label: t.pages.calculator.viewAdvanced },
+        ]}
+        value={viewMode}
+        onChange={(v) => setViewMode(v as 'simple' | 'advanced')}
+      />
+
+      {viewMode === 'simple' && <SimpleCalculator defaultType={defaultType} />}
+
+      {viewMode === 'advanced' && (
+      <div className="max-w-7xl mx-auto">
       {/* Split Layout: Desktop Grid / Mobile Stack */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative">
         {/* INPUTS: First in DOM (Top on Mobile / Right on Desktop RTL) */}
@@ -288,18 +306,18 @@ export default function GoldCalculatorPage() {
             <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="buy" className="gap-2">
                 <DollarSign className="h-4 w-4" />
-                <span className="hidden sm:inline">حاسبة المصنعية</span>
-                <span className="sm:hidden">المصنعية</span>
+                <span className="hidden sm:inline">{t.pages.calculator.workmanshipCalculator}</span>
+                <span className="sm:hidden">{t.pages.calculator.workmanshipShort}</span>
               </TabsTrigger>
               <TabsTrigger value="sell" className="gap-2">
                 <Coins className="h-4 w-4" />
                 <span className="hidden sm:inline">{t.pages.calculator.sellCalculator}</span>
-                <span className="sm:hidden">البيع</span>
+                <span className="sm:hidden">{t.pages.calculator.sellShort}</span>
               </TabsTrigger>
               <TabsTrigger value="pl" className="gap-2">
                 <TrendingUp className="h-4 w-4" />
                 <span className="hidden sm:inline">{t.pages.calculator.plCalculator}</span>
-                <span className="sm:hidden">الأرباح</span>
+                <span className="sm:hidden">{t.pages.calculator.profitShort}</span>
               </TabsTrigger>
             </TabsList>
 
@@ -806,6 +824,8 @@ export default function GoldCalculatorPage() {
         )}
       </div>
 
+      </div>
+      )}
     </div>
   );
 }

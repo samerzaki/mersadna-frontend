@@ -6,6 +6,9 @@ import { Loader2, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { GoldHistoryChart } from '@/components/history/gold-history-chart';
 import { LastUpdateIndicator } from '@/components/ui/last-update-indicator';
+import { PageHeader } from '@/components/ui/page-header';
+import { SegmentedControl } from '@/components/ui/segmented-control';
+import { KARAT_COLORS } from '@/lib/constants';
 
 type Period = '24h' | '7d' | '30d' | '1y';
 
@@ -24,46 +27,32 @@ export default function HistoryPage() {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">تاريخ أسعار الذهب</h1>
-          <p className="text-muted-foreground">
-            عرض تاريخي لأسعار الذهب بجميع العيارات
-          </p>
-        </div>
-
-        {/* Period Selector */}
-        <div className="flex gap-2">
-          {periods.map((p) => (
-            <button
-              key={p.value}
-              onClick={() => setPeriod(p.value)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                period === p.value
-                  ? 'bg-yellow-500 text-white'
-                  : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="container mx-auto px-4 space-y-6">
+      <PageHeader
+        title="تاريخ أسعار الذهب"
+        lead="عرض تاريخي لأسعار الذهب بجميع العيارات"
+        actions={
+          <SegmentedControl
+            items={periods}
+            value={period}
+            onChange={(v) => setPeriod(v as Period)}
+          />
+        }
+      />
 
       {isLoading && (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-gold" />
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+        <div className="bg-down-soft border border-line rounded-lg p-6">
           <div className="flex items-center gap-3">
-            <AlertCircle className="h-6 w-6 text-red-600" />
+            <AlertCircle className="h-6 w-6 text-down" />
             <div>
-              <h3 className="font-semibold text-red-900">خطأ في تحميل البيانات</h3>
-              <p className="text-sm text-red-700">
+              <h3 className="font-semibold text-text">خطأ في تحميل البيانات</h3>
+              <p className="text-sm text-down">
                 {error instanceof Error ? error.message : 'فشل في تحميل تاريخ أسعار الذهب'}
               </p>
             </div>
@@ -86,19 +75,19 @@ export default function HistoryPage() {
             <GoldHistoryChart
               title="عيار 24 قيراط"
               data={data.data.karat_24}
-              color="#FFD700"
+              color={KARAT_COLORS.k24}
               usdRates={data.data.usd_rates}
             />
             <GoldHistoryChart
               title="عيار 21 قيراط"
               data={data.data.karat_21}
-              color="#FFA500"
+              color={KARAT_COLORS.k21}
               usdRates={data.data.usd_rates}
             />
             <GoldHistoryChart
               title="عيار 18 قيراط"
               data={data.data.karat_18}
-              color="#FF8C00"
+              color={KARAT_COLORS.k18}
               usdRates={data.data.usd_rates}
             />
           </div>

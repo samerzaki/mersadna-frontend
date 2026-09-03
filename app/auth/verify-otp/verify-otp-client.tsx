@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/contexts/language-context";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AuthCard } from "@/components/auth/auth-card";
 import { OTPInput } from "@/components/auth/otp-input";
 import { verifyEmail, sendOtp, verifyTempMobileNumber, sendMobileOtp, changeEmail } from "@/lib/api-auth";
 import { useAuth, type RegisterData } from "@/contexts/auth-context";
@@ -116,127 +116,93 @@ function VerifyOTPContent() {
   // If OTP verified
   if (isVerified) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              {t.common.appName}
-            </h1>
+      <AuthCard appTitle={t.common.appName} showTabs={false}>
+        <div className="text-center">
+          <div className="mx-auto w-14 h-14 bg-up-soft rounded-full flex items-center justify-center mb-4">
+            <CheckCircle className="w-7 h-7 text-up" />
           </div>
-
-          <Card className="border-slate-200 dark:border-slate-800">
-            <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-4">
-                <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
-              </div>
-              <CardTitle className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {t.pages.verifyOtp.successTitle}
-              </CardTitle>
-              <CardDescription>
-                {t.pages.verifyOtp.successRedirect}
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <h2 className="font-heading text-[18px] font-semibold text-up mb-1.5">
+            {t.pages.verifyOtp.successTitle}
+          </h2>
+          <p className="text-[13px] text-muted">{t.pages.verifyOtp.successRedirect}</p>
         </div>
-      </div>
+      </AuthCard>
     );
   }
 
   // OTP entry form
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            {t.common.appName}
-          </h1>
-          <p className="text-slate-600 dark:text-slate-300">
-            {t.pages.login.appSubtitle}
-          </p>
-        </div>
+    <AuthCard appTitle={t.common.appName} appSubtitle={t.pages.login.appSubtitle} showTabs={false}>
+      <div className="text-center mb-6">
+        <h2 className="font-heading text-[18px] font-semibold text-text">{t.pages.verifyOtp.title}</h2>
+        <p className="text-[13px] text-muted mt-1">
+          {isMobilePurpose ? t.pages.verifyOtp.subtitlePhone : t.pages.verifyOtp.subtitle}
+        </p>
+        <p className="num text-[13px] font-medium text-text mt-2" dir="ltr">
+          {isMobilePurpose ? phone : maskEmail(email)}
+        </p>
+      </div>
 
-        <Card className="border-slate-200 dark:border-slate-800">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">{t.pages.verifyOtp.title}</CardTitle>
-            <CardDescription>
-              {isMobilePurpose
-                ? t.pages.verifyOtp.subtitlePhone
-                : t.pages.verifyOtp.subtitle}
-            </CardDescription>
-            <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mt-2" dir="ltr">
-              {isMobilePurpose ? phone : maskEmail(email)}
-            </p>
-          </CardHeader>
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <OTPInput
+            length={6}
+            value={otp}
+            onChange={setOtp}
+            onComplete={handleOTPComplete}
+            disabled={isLoading}
+            error={!!error}
+            autoFocus
+          />
 
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <OTPInput
-                length={6}
-                value={otp}
-                onChange={setOtp}
-                onComplete={handleOTPComplete}
-                disabled={isLoading}
-                error={!!error}
-                autoFocus
-              />
-
-              {error && (
-                <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-md border border-red-200 dark:border-red-800 text-center">
-                  {error}
-                </div>
-              )}
-
-              <div className="text-center">
-                <p className="text-xs text-muted-foreground mb-2">
-                  {t.pages.verifyOtp.noCode}
-                </p>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleResend}
-                  disabled={!canResend}
-                  className="text-sm"
-                >
-                  <RefreshCw className={`h-4 w-4 ${isRTL ? "ms-2" : "me-2"}`} />
-                  {canResend
-                    ? t.pages.verifyOtp.resendButton
-                    : `${t.pages.verifyOtp.resendIn} ${resendCountdown} ${t.pages.verifyOtp.seconds}`}
-                </Button>
-              </div>
-
-              {purpose === "registration" && (
-                <div className="text-center pt-4 border-t">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSkip}
-                    className="text-sm"
-                  >
-                    <BackArrow className={`h-4 w-4 ${isRTL ? "ms-2" : "me-2"}`} />
-                    {t.pages.verifyOtp.skipButton}
-                  </Button>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {t.pages.verifyOtp.skipWarning}
-                  </p>
-                </div>
-              )}
+          {error && (
+            <div className="p-3 text-[13px] text-down bg-down-soft rounded-[10px] text-center">
+              {error}
             </div>
-          </CardContent>
-        </Card>
+          )}
 
-        <div className="text-center">
-          <Link
-            href="/auth/login"
-            className="inline-flex items-center text-sm text-primary hover:underline"
-          >
-            <BackArrow className={`h-4 w-4 ${isRTL ? "ms-2" : "me-2"}`} />
-            {t.pages.verifyOtp.backToLogin}
-          </Link>
+          <div className="text-center">
+            <p className="text-[12px] text-dim mb-2">{t.pages.verifyOtp.noCode}</p>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleResend}
+              disabled={!canResend}
+              className="text-[13px]"
+            >
+              <RefreshCw className="h-4 w-4" />
+              {canResend
+                ? t.pages.verifyOtp.resendButton
+                : `${t.pages.verifyOtp.resendIn} ${resendCountdown} ${t.pages.verifyOtp.seconds}`}
+            </Button>
+          </div>
+
+          {purpose === "registration" && (
+            <div className="text-center pt-4 border-t border-line2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleSkip}
+                className="text-[13px]"
+              >
+                <BackArrow className="h-4 w-4" />
+                {t.pages.verifyOtp.skipButton}
+              </Button>
+              <p className="text-[12px] text-dim mt-2">{t.pages.verifyOtp.skipWarning}</p>
+            </div>
+          )}
         </div>
       </div>
-    </div>
+
+      <div className="mt-6 text-center">
+        <Link href="/auth/login" className="inline-flex items-center gap-2 text-[13px] text-gold hover:underline">
+          <BackArrow className="h-4 w-4" />
+          {t.pages.verifyOtp.backToLogin}
+        </Link>
+      </div>
+    </AuthCard>
   );
 }
 
@@ -244,7 +210,7 @@ export default function VerifyOTPPage() {
   const { t } = useLanguage();
 
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">{t.common.loading}</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-muted">{t.common.loading}</div>}>
       <VerifyOTPContent />
     </Suspense>
   );

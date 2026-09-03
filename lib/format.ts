@@ -126,6 +126,28 @@ export function formatNumber(num: number): string {
 }
 
 /**
+ * Format a signed number with a leading +/- sign and fixed decimals.
+ */
+export function formatSigned(value: number, digits: number = 2): string {
+  const sign = value >= 0 ? '+' : '−';
+  return `${sign}${Math.abs(value).toFixed(digits)}`;
+}
+
+/**
+ * Current time in Cairo (HH:mm:ss, Latin digits) for the live-market clock.
+ */
+export function cairoClock(date: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Africa/Cairo',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    numberingSystem: 'latn',
+  }).format(date);
+}
+
+/**
  * Check if a price update is "live" (within last 5 minutes)
  * @param recordedAt - ISO timestamp of when the price was recorded
  * @returns true if the price is less than 5 minutes old

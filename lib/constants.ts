@@ -33,6 +33,15 @@ export const API_BASE_URL = typeof window === 'undefined'
 
 export const REFRESH_INTERVAL = 60000; // 1 minute in milliseconds
 
+// Estimated workmanship (مصنعية) ranges in EGP per gram — indicative only, not sourced from the API.
+export const WORKMANSHIP_RANGES = {
+  karat24: { min: 150, max: 300, default: 225 },
+  karat21: { min: 120, max: 250, default: 185 },
+  karat18: { min: 100, max: 200, default: 150 },
+  silver999: { min: 15, max: 35, default: 25 },
+  silver925: { min: 12, max: 30, default: 20 },
+} as const;
+
 export const COUNTRIES: Country[] = [
   {
     code: 'SO',

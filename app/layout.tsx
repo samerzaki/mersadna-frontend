@@ -1,26 +1,42 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono, Cairo } from 'next/font/google';
-import { Suspense } from 'react';
+import { Noto_Kufi_Arabic, IBM_Plex_Sans_Arabic, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { AppShell } from '@/components/layout/app-shell';
 import { Header } from '@/components/layout/header';
-import { HeroStatsBannerServer, HeroStatsBannerSkeleton } from '@/components/home/hero-stats-banner-server';
 import { absoluteUrl, SEO_CONFIG, SITE_URL } from '@/lib/seo-config';
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
-const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
-const cairo = Cairo({
-  variable: '--font-cairo',
-  subsets: ['arabic', 'latin'],
-  weight: ['200', '300', '400', '500', '600', '700', '800', '900'],
+const ICONS_BASE_URL = 'https://cdn.odamak.com/images/icons';
+
+const kufi = Noto_Kufi_Arabic({
+  variable: '--font-kufi',
+  subsets: ['arabic'],
+  weight: ['400', '500', '600', '700'],
 });
+const plexArabic = IBM_Plex_Sans_Arabic({
+  variable: '--font-plex-arabic',
+  subsets: ['arabic', 'latin'],
+  weight: ['400', '500', '600'],
+});
+const plexMono = IBM_Plex_Mono({
+  variable: '--font-plex-mono',
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+});
+
+const THEME_INIT_SCRIPT = `
+try {
+  var t = localStorage.getItem('theme') || 'dark';
+  document.documentElement.classList.toggle('dark', t === 'dark');
+  document.documentElement.style.colorScheme = t;
+} catch (e) {}
+`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: SEO_CONFIG.pages.home.title,
-    template: '%s | مرصادنا',
+    template: '%s | قدامك',
   },
   description: SEO_CONFIG.site.description,
   applicationName: SEO_CONFIG.site.nameAr,
@@ -55,14 +71,30 @@ export const metadata: Metadata = {
     description: SEO_CONFIG.pages.home.description,
     images: ['/opengraph-image'],
   },
-  icons: { icon: [{ url: '/app-icon.svg', sizes: 'any', type: 'image/svg+xml' }] },
+  icons: {
+    icon: [
+      { url: `${ICONS_BASE_URL}/favicon.svg`, sizes: 'any', type: 'image/svg+xml' },
+      { url: `${ICONS_BASE_URL}/favicon-16x16.png`, sizes: '16x16', type: 'image/png' },
+      { url: `${ICONS_BASE_URL}/favicon-32x32.png`, sizes: '32x32', type: 'image/png' },
+      { url: `${ICONS_BASE_URL}/favicon-48x48.png`, sizes: '48x48', type: 'image/png' },
+    ],
+    shortcut: `${ICONS_BASE_URL}/favicon.ico`,
+    apple: [{ url: `${ICONS_BASE_URL}/apple-touch-icon.png`, sizes: '180x180', type: 'image/png' }],
+  },
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: SEO_CONFIG.site.nameAr },
   verification: {
     ...(SEO_CONFIG.verification.google ? { google: SEO_CONFIG.verification.google } : {}),
     ...(SEO_CONFIG.verification.bing ? { other: { 'msvalidate.01': SEO_CONFIG.verification.bing } } : {}),
   },
 };
 
-export const viewport: Viewport = { width: 'device-width', initialScale: 1, maximumScale: 5 };
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#0B33A7',
+  colorScheme: 'light dark',
+};
 
 const organizationSchema = {
   '@context': 'https://schema.org',
@@ -73,7 +105,7 @@ const organizationSchema = {
       name: SEO_CONFIG.site.nameAr,
       alternateName: SEO_CONFIG.site.name,
       url: SITE_URL,
-      logo: absoluteUrl('/app-icon.svg'),
+      logo: `${ICONS_BASE_URL}/pwa-512x512.png`,
     },
     {
       '@type': 'WebSite',
@@ -88,24 +120,21 @@ const organizationSchema = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ar" dir="rtl" suppressHydrationWarning className={cairo.variable}>
-      <body
-        suppressHydrationWarning
-        className={`${cairo.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html
+      lang="ar"
+      dir="rtl"
+      suppressHydrationWarning
+      className={`${kufi.variable} ${plexArabic.variable} ${plexMono.variable}`}
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body suppressHydrationWarning className="font-sans antialiased">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
         <Providers>
-          <div className="relative flex min-h-screen flex-col pt-16">
+          <div className="relative flex min-h-screen flex-col">
             <Header />
-            <AppShell
-              statsBanner={
-                <Suspense fallback={<HeroStatsBannerSkeleton />}>
-                  <HeroStatsBannerServer />
-                </Suspense>
-              }
-            >
-              {children}
-            </AppShell>
+            <AppShell>{children}</AppShell>
           </div>
         </Providers>
       </body>

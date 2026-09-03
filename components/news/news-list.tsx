@@ -50,13 +50,13 @@ export function NewsList({
   if (news.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
-          <FileX className="w-8 h-8 text-slate-400" />
+        <div className="w-16 h-16 rounded-full bg-panel2 flex items-center justify-center mb-4">
+          <FileX className="w-8 h-8 text-dim" />
         </div>
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+        <h3 className="font-heading text-[16px] font-semibold text-text mb-2">
           {emptyMessage || (isRTL ? 'لا توجد أخبار' : 'No news found')}
         </h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">
+        <p className="text-[13px] text-muted max-w-sm">
           {emptyDescription || (isRTL ? 'جرب تغيير معايير البحث أو الفلترة' : 'Try changing your search or filter criteria')}
         </p>
       </div>

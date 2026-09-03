@@ -9,6 +9,7 @@ export interface SilverDataItem {
   changePercent: number;
   trend: 'up' | 'down' | 'neutral';
   currency: string;
+  chartPoints: number[];
 }
 
 // Keep the homepage concise: show the three locally traded grades in one card.
@@ -28,6 +29,7 @@ export function transformSilverItem(
 
   const spread_egp = isOunce ? 0 : (data as SilverOverviewItem).spread_egp;
   const spread_percent = isOunce ? 0 : (data as SilverOverviewItem).spread_percent;
+  const chartPoints = isOunce ? [] : (data as SilverOverviewItem).chart_points;
 
   return {
     id: key,
@@ -38,6 +40,7 @@ export function transformSilverItem(
     changePercent: spread_percent,
     trend,
     currency: data.currency,
+    chartPoints: Array.isArray(chartPoints) ? chartPoints : [],
   };
 }
 

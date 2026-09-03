@@ -9,12 +9,13 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 /**
  * Fetch paginated news list with filters
  */
-export function useNewsList(search?: string, page: number = 1) {
+export function useNewsList(search?: string, page: number = 1, enabled: boolean = true) {
   return useQuery({
     queryKey: ['news', 'list', search, page],
     queryFn: () => fetchNewsList(page, search),
     staleTime: NEWS_STALE_TIME,
     gcTime: NEWS_REFRESH_INTERVAL,
+    enabled,
   });
 }
 

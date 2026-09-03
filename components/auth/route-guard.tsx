@@ -28,10 +28,10 @@ export function AuthGuard({ children }: RouteGuardProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
-          <p className="text-sm text-muted-foreground">{t.common.loading}</p>
+          <Loader2 className="h-8 w-8 animate-spin text-gold" />
+          <p className="text-sm text-muted">{t.common.loading}</p>
         </div>
       </div>
     );
@@ -63,10 +63,10 @@ export function GuestGuard({ children }: RouteGuardProps) {
   // Only show loading screen if we're authenticated and about to redirect
   if (isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
-          <p className="text-sm text-muted-foreground">{t.common.loading}</p>
+          <Loader2 className="h-8 w-8 animate-spin text-gold" />
+          <p className="text-sm text-muted">{t.common.loading}</p>
         </div>
       </div>
     );

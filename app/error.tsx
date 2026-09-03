@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { Home, RefreshCw, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
+import { Button } from '@/components/ui/button';
 
 export default function Error({
   error,
@@ -21,73 +22,55 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 dark:bg-slate-900">
-      <div className="mx-auto max-w-lg text-center">
-        {/* Error Icon */}
-        <div className="mb-8 flex justify-center">
-          <div className="rounded-full bg-red-100 p-6 dark:bg-red-950/30">
-            <AlertCircle className="h-12 w-12 text-red-600 dark:text-red-500" />
-          </div>
+    <div className="flex min-h-screen items-center justify-center bg-bg px-4 py-12">
+      <div className="card-surface mx-auto max-w-lg p-8 text-center md:p-10">
+        <div className="mb-6 flex justify-center">
+          <AlertCircle className="num h-16 w-16 text-gold" />
         </div>
 
-        {/* Heading */}
-        <h2 className="mb-4 text-2xl font-semibold text-slate-800 dark:text-slate-100 md:text-3xl">
+        <h2 className="mb-4 font-heading text-2xl font-semibold text-text md:text-3xl">
           {isRTL ? 'حدث خطأ ما' : 'Something Went Wrong'}
         </h2>
 
-        {/* Description */}
-        <p className="mb-8 text-base leading-relaxed text-slate-600 dark:text-slate-400">
+        <p className="mb-8 text-base leading-relaxed text-muted">
           {isRTL
             ? 'نعتذر، حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.'
             : 'We apologize, an unexpected error occurred. Please try again.'}
         </p>
 
-        {/* Error Details (Development Only) */}
         {process.env.NODE_ENV === 'development' && (
-          <div className="mb-8 rounded-md bg-slate-100 p-4 text-start dark:bg-slate-800">
-            <p className="text-xs font-mono text-slate-600 dark:text-slate-400">
-              {error.message}
-            </p>
-            {error.digest && (
-              <p className="mt-2 text-xs text-slate-500 dark:text-slate-500">
-                Error ID: {error.digest}
-              </p>
-            )}
+          <div className="mb-8 rounded-[11px] border border-line bg-panel2 p-4 text-start">
+            <p className="num text-xs text-muted">{error.message}</p>
+            {error.digest && <p className="mt-2 text-xs text-dim">Error ID: {error.digest}</p>}
           </div>
         )}
 
-        {/* Action Buttons */}
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <button
-            onClick={reset}
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-800 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-          >
+          <Button onClick={reset} variant="default" size="lg">
             <RefreshCw className="h-4 w-4" />
             {isRTL ? 'إعادة المحاولة' : 'Try Again'}
-          </button>
+          </Button>
 
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-          >
-            <Home className="h-4 w-4" />
-            {isRTL ? 'العودة للرئيسية' : 'Back to Home'}
-          </Link>
+          <Button asChild variant="outline" size="lg">
+            <Link href="/">
+              <Home className="h-4 w-4" />
+              {isRTL ? 'العودة للرئيسية' : 'Back to Home'}
+            </Link>
+          </Button>
         </div>
 
-        {/* Help Text */}
-        <p className="mt-8 text-sm text-slate-500 dark:text-slate-500">
+        <p className="mt-8 text-sm text-dim">
           {isRTL ? (
             <>
               إذا استمرت المشكلة،{' '}
-              <Link href="/contact" className="text-slate-700 underline dark:text-slate-300">
+              <Link href="/contact" className="text-gold underline">
                 تواصل معنا
               </Link>
             </>
           ) : (
             <>
               If the problem persists,{' '}
-              <Link href="/contact" className="text-slate-700 underline dark:text-slate-300">
+              <Link href="/contact" className="text-gold underline">
                 contact us
               </Link>
             </>

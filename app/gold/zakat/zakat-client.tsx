@@ -1,523 +1,263 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { HandHeart, Scale, CheckCircle2, Info, Trash2, Plus, AlertCircle } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { AlertCircle, CheckCircle2, Info } from "lucide-react";
+import { formatNumber } from "@/lib/format";
+import { useGoldOverview } from "@/hooks/use-gold-prices";
+import { useSilverOverview } from "@/hooks/use-silver-prices";
 import { useLanguage } from "@/contexts/language-context";
-import { cn } from "@/lib/utils";
-import { formatPrice, formatNumber } from "@/lib/format";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
+import { SectionCard } from "@/components/ui/section-card";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-// Mock live prices for calculation (EGP per gram)
-const MOCK_LIVE_PRICES = {
-  karat24: 3650,
-  karat21: 3200,
-  karat18: 2750,
-  karat14: 2100,
-};
-
 // Nisab threshold: 85 grams of 24k pure gold
 const NISAB_GRAMS = 85;
 const ZAKAT_RATE = 0.025; // 2.5%
 
-type KaratValue = 24 | 21 | 18 | 14;
-
-interface GoldItem {
-  id: number;
-  weight: string;
-  karat: KaratValue;
+interface FieldConfig {
+  key: 'gold21' | 'silver999' | 'cash' | 'debts';
+  label: string;
+  hint: string;
 }
 
 export default function GoldZakatPage() {
-  const { language, t } = useLanguage();
-  const isRTL = language === "ar";
+  const { language } = useLanguage();
+  const isRTL = language === 'ar';
+  const { data: goldData } = useGoldOverview();
+  const { data: silverData } = useSilverOverview();
 
-  const [items, setItems] = useState<GoldItem[]>([{ id: 1, weight: "", karat: 24 }]);
-  const [hasHawl, setHasHawl] = useState<boolean>(true);
+  const gold21Price = goldData?.data?.gold?.['21']?.buy_price ?? 0;
+  const gold24Price = goldData?.data?.gold?.['24']?.buy_price ?? 0;
+  const silver999Price = silverData?.data?.silver?.['999_egyptian']?.buy_price ?? 0;
 
-  // Calculate pure gold weight for each item and total
-  const itemsWithPureWeight = useMemo(() => {
-    return items.map((item) => {
-      const weightNum = parseFloat(item.weight) || 0;
-      const pureWeight = weightNum > 0 ? (weightNum * item.karat) / 24 : 0;
-      return { ...item, pureWeight };
-    });
-  }, [items]);
+  const FIELDS: FieldConfig[] = [
+    {
+      key: 'gold21',
+      label: isRTL ? 'ذهب لديك (جرام، عيار 21)' : 'Gold you own (grams, 21k)',
+      hint: isRTL ? 'الوزن الإجمالي للذهب المملوك بعيار 21' : 'Total weight of owned 21k gold',
+    },
+    {
+      key: 'silver999',
+      label: isRTL ? 'فضة لديك (جرام، عيار 999)' : 'Silver you own (grams, 999)',
+      hint: isRTL ? 'الوزن الإجمالي للفضة الخالصة المملوكة' : 'Total weight of owned pure silver',
+    },
+    {
+      key: 'cash',
+      label: isRTL ? 'نقود وودائع (جنيه)' : 'Cash and deposits (EGP)',
+      hint: isRTL ? 'النقد والمدخرات وأرصدة الحسابات البنكية' : 'Cash, savings, and bank account balances',
+    },
+    {
+      key: 'debts',
+      label: isRTL ? 'ديون عليك (جنيه)' : 'Debts owed by you (EGP)',
+      hint: isRTL ? 'الديون المستحقة عليك والواجب سدادها قريباً' : 'Debts due from you that must be repaid soon',
+    },
+  ];
 
-  const totalPureWeight = useMemo(() => {
-    return itemsWithPureWeight.reduce((sum, item) => sum + item.pureWeight, 0);
-  }, [itemsWithPureWeight]);
+  const [values, setValues] = useState<Record<FieldConfig['key'], string>>({
+    gold21: '',
+    silver999: '',
+    cash: '',
+    debts: '',
+  });
+  const [hasHawl, setHasHawl] = useState(true);
 
-  // Calculate total value in EGP
-  const totalValue = useMemo(() => {
-    return itemsWithPureWeight.reduce((sum, item) => {
-      const weightNum = parseFloat(item.weight) || 0;
-      if (weightNum <= 0) return sum;
-      const karatKey = `karat${item.karat}` as keyof typeof MOCK_LIVE_PRICES;
-      return sum + weightNum * MOCK_LIVE_PRICES[karatKey];
-    }, 0);
-  }, [itemsWithPureWeight]);
-
-  // Calculate total weight (for zakat in grams)
-  const totalWeight = useMemo(() => {
-    return itemsWithPureWeight.reduce((sum, item) => {
-      const weightNum = parseFloat(item.weight) || 0;
-      return sum + weightNum;
-    }, 0);
-  }, [itemsWithPureWeight]);
-
-  // Check if above Nisab
-  const isAboveNisab = totalPureWeight >= NISAB_GRAMS;
-
-  // Calculate Zakat
-  const zakatAmount = useMemo(() => {
-    if (!isAboveNisab || !hasHawl) return 0;
-    return totalValue * ZAKAT_RATE;
-  }, [isAboveNisab, hasHawl, totalValue]);
-
-  const zakatGrams = useMemo(() => {
-    if (!isAboveNisab || !hasHawl) return 0;
-    return totalWeight * ZAKAT_RATE;
-  }, [isAboveNisab, hasHawl, totalWeight]);
-
-  const remainingToNisab = Math.max(0, NISAB_GRAMS - totalPureWeight);
-  const nisabProgress = Math.min(100, (totalPureWeight / NISAB_GRAMS) * 100);
-
-  // Generate calculation breakdown text
-  const calculationBreakdown = useMemo(() => {
-    const validItems = itemsWithPureWeight.filter((item) => parseFloat(item.weight) > 0);
-    if (validItems.length === 0) return null;
-
-    const lines = validItems.map((item) => {
-      const weightNum = parseFloat(item.weight);
-      const pureWeight = item.pureWeight;
-      return `   - ${formatNumber(parseFloat(weightNum.toFixed(2)))} جرام (عيار ${item.karat}) 🡠 تعادل ${formatNumber(parseFloat(pureWeight.toFixed(2)))} جرام (عيار 24).`;
-    });
-
-    const separator = "   " + "─".repeat(60);
-    const totalLine = `   إجمالي الذهب الخالص لديك: ${formatNumber(parseFloat(totalPureWeight.toFixed(2)))} جرام (${isAboveNisab ? "أكثر من النصاب 85 جرام ✅" : "أقل من النصاب 85 جرام ❌"}).`;
-
-    return {
-      header: "تم تحويل ممتلكاتك إلى ذهب خالص (عيار 24) لتدقيق النصاب:",
-      lines,
-      separator,
-      total: totalLine,
-      totalValue: totalPureWeight,
-      isAboveNisab,
-    };
-  }, [itemsWithPureWeight, totalPureWeight, isAboveNisab]);
-
-  // Item management functions
-  const addItem = () => {
-    const newId = Math.max(...items.map((item) => item.id), 0) + 1;
-    setItems([...items, { id: newId, weight: "", karat: 24 }]);
+  const updateValue = (key: FieldConfig['key'], value: string) => {
+    setValues((prev) => ({ ...prev, [key]: value }));
   };
 
-  const removeItem = (id: number) => {
-    if (items.length > 1) {
-      setItems(items.filter((item) => item.id !== id));
-    }
-  };
+  const parsed = useMemo(() => ({
+    gold21: parseFloat(values.gold21) || 0,
+    silver999: parseFloat(values.silver999) || 0,
+    cash: parseFloat(values.cash) || 0,
+    debts: parseFloat(values.debts) || 0,
+  }), [values]);
 
-  const updateItem = (id: number, field: keyof GoldItem, value: string | KaratValue) => {
-    setItems(
-      items.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-    );
-  };
+  const goldValue = parsed.gold21 * gold21Price;
+  const silverValue = parsed.silver999 * silver999Price;
+  const netAssets = goldValue + silverValue + parsed.cash - parsed.debts;
+  const nisabValue = NISAB_GRAMS * gold24Price;
 
-  const hasValidItems = itemsWithPureWeight.some((item) => parseFloat(item.weight) > 0);
+  const hasAnyInput = parsed.gold21 > 0 || parsed.silver999 > 0 || parsed.cash > 0 || parsed.debts > 0;
+  const isAboveNisab = nisabValue > 0 && netAssets >= nisabValue;
+  const zakatDue = isAboveNisab && hasHawl ? netAssets * ZAKAT_RATE : 0;
 
   return (
-    <div className="space-y-6">
-      {/* Hero Section */}
-      <section>
-        <div className="mb-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              
-              <span>🤲</span>
-              {t.pages.zakat.title}
-              
-            </h2>
-
-            {/* Info Button with Dialog */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <button
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30 text-primary-700 dark:text-primary-400 transition-colors text-sm font-medium border border-primary-200 dark:border-primary-800"
-                  aria-label="كيف يعمل"
-                >
-                  <AlertCircle className="h-4 w-4" />
-                  <span>كيف يعمل</span>
-                </button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle className="text-xl">معلومات مهمة</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 mt-4">
-                  <div className="space-y-2">
-                    <p className="font-medium text-slate-700 dark:text-slate-300">النصاب:</p>
-                    <p>85 جرام من الذهب الخالص (عيار 24) أو ما يعادله من العيارات الأخرى.</p>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="font-medium text-slate-700 dark:text-slate-300">نسبة الزكاة:</p>
-                    <p>2.5% من إجمالي قيمة الذهب (وليس فقط الفائض عن النصاب).</p>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="font-medium text-slate-700 dark:text-slate-300">الحول:</p>
-                    <p>يجب أن يمر على الذهب عام هجري كامل (حوالي 354 يوم) منذ بلوغه النصاب.</p>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="font-medium text-slate-700 dark:text-slate-300">التحويل بين العيارات:</p>
-                    <p>يتم تحويل وزن الذهب إلى عيار 24 باستخدام الصيغة: (الوزن × العيار) ÷ 24</p>
-                  </div>
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow={isRTL ? "الأدوات" : "Tools"}
+        title={isRTL ? "حاسبة الزكاة" : "Zakat Calculator"}
+        lead={
+          isRTL
+            ? `نصاب الزكاة يعادل ${formatNumber(NISAB_GRAMS)} جراماً من الذهب عيار 24، ونسبة الزكاة الواجبة 2.5% من إجمالي المال إذا بلغ النصاب ومر عليه الحول.`
+            : `The Zakat nisab equals ${formatNumber(NISAB_GRAMS)} grams of 24k gold, and the due Zakat rate is 2.5% of total wealth if it reaches the nisab and a full lunar year (hawl) has passed.`
+        }
+        actions={
+          <Dialog>
+            <DialogTrigger asChild>
+              <button
+                className="flex items-center gap-2 px-4 py-2 rounded-[10px] bg-panel2 border border-line hover:border-gold text-text transition-colors text-[13px] font-medium"
+                aria-label={isRTL ? "كيف يعمل" : "How it works"}
+              >
+                <AlertCircle className="h-4 w-4" />
+                <span>{isRTL ? "كيف يعمل" : "How it works"}</span>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-xl">{isRTL ? "معلومات مهمة" : "Important Information"}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 text-sm text-muted mt-4">
+                <div className="space-y-2">
+                  <p className="font-medium text-text">{isRTL ? "النصاب:" : "Nisab:"}</p>
+                  <p>
+                    {isRTL
+                      ? "85 جرام من الذهب الخالص (عيار 24) أو ما يعادله من المال."
+                      : "85 grams of pure gold (24k) or its cash equivalent."}
+                  </p>
                 </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-      </section>
-
-      {/* Top Section: Split Screen Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Column 1 (Right): Results Section */}
-        <div className="h-fit lg:order-2">
-          {hasValidItems ? (
-            <div className="space-y-4">
-              {/* Below Nisab */}
-              {!isAboveNisab && (
-                <Card className="border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 h-fit">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
-                        <Info className="h-6 w-6 text-slate-500 dark:text-slate-400" />
-                      </div>
-                      <div className="flex-1 space-y-3">
-                        <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300">
-                          لا تجب فيه الزكاة
-                        </h3>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          وزن الذهب الخالص لديك ({formatNumber(parseFloat(totalPureWeight.toFixed(2)))} جرام) أقل من النصاب المطلوب ({formatNumber(NISAB_GRAMS)} جرام من الذهب الخالص).
-                        </p>
-                        
-                        {/* Calculation Breakdown */}
-                        {calculationBreakdown && (
-                          <div className="mt-4 p-4 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                            <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                              تفاصيل الحسبة:
-                            </h4>
-                            <div className="text-xs text-slate-600 dark:text-slate-400 space-y-1 leading-relaxed">
-                              <p>{calculationBreakdown.header}</p>
-                              {calculationBreakdown.lines.map((line, idx) => (
-                                <p key={idx}>{line}</p>
-                              ))}
-                              <p className="text-slate-400 dark:text-slate-500">{calculationBreakdown.separator}</p>
-                              <p className="font-semibold text-slate-700 dark:text-slate-300">
-                                {calculationBreakdown.total}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* Progress Bar */}
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                            <span>التقدم نحو النصاب</span>
-                            <span>{formatNumber(parseFloat(nisabProgress.toFixed(1)))}%</span>
-                          </div>
-                          <div className="w-full h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-primary-500 dark:bg-primary-600 transition-all duration-500"
-                              style={{ width: `${nisabProgress}%` }}
-                            />
-                          </div>
-                          <p className="text-xs text-slate-600 dark:text-slate-400">
-                            تحتاج إلى {formatNumber(parseFloat(remainingToNisab.toFixed(2)))} جرام إضافية من الذهب الخالص (عيار 24) للوصول إلى النصاب
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Above Nisab but no Hawl */}
-              {isAboveNisab && !hasHawl && (
-                <Card className="border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 h-fit">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
-                        <Info className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-300 mb-2">
-                          لم يمر عام هجري كامل
-                        </h3>
-                        <p className="text-sm text-yellow-800 dark:text-yellow-400">
-                          وزن الذهب لديك ({formatNumber(parseFloat(totalPureWeight.toFixed(2)))} جرام) يبلغ النصاب، لكن يجب أن يمر عليه عام هجري كامل حتى تجب الزكاة.
-                        </p>
-                        
-                        {/* Calculation Breakdown */}
-                        {calculationBreakdown && (
-                          <div className="mt-4 p-4 rounded-lg bg-white dark:bg-slate-900 border border-yellow-200 dark:border-yellow-800">
-                            <h4 className="text-sm font-semibold text-yellow-900 dark:text-yellow-300 mb-2">
-                              تفاصيل الحسبة:
-                            </h4>
-                            <div className="text-xs text-yellow-800 dark:text-yellow-400 space-y-1 leading-relaxed">
-                              <p>{calculationBreakdown.header}</p>
-                              {calculationBreakdown.lines.map((line, idx) => (
-                                <p key={idx}>{line}</p>
-                              ))}
-                              <p className="text-yellow-600 dark:text-yellow-500">{calculationBreakdown.separator}</p>
-                              <p className="font-semibold text-yellow-900 dark:text-yellow-300">
-                                {calculationBreakdown.total}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Above Nisab and Hawl - Zakat Due */}
-              {isAboveNisab && hasHawl && (
-                <Card className="border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20 h-fit">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
-                        <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
-                      </div>
-                      <div className="flex-1 space-y-4">
-                        <div>
-                          <h3 className="text-lg font-semibold text-green-900 dark:text-green-300 mb-2">
-                            تجب الزكاة
-                          </h3>
-                          <p className="text-sm text-green-800 dark:text-green-400 mb-4">
-                            وزن الذهب الخالص لديك ({formatNumber(parseFloat(totalPureWeight.toFixed(2)))} جرام) يبلغ النصاب ومر عليه عام هجري كامل.
-                          </p>
-                        </div>
-
-                        {/* Calculation Breakdown */}
-                        {calculationBreakdown && (
-                          <div className="p-4 rounded-lg bg-white dark:bg-slate-900 border border-green-200 dark:border-green-800">
-                            <h4 className="text-sm font-semibold text-green-900 dark:text-green-300 mb-2">
-                              تفاصيل الحسبة:
-                            </h4>
-                            <div className="text-xs text-green-800 dark:text-green-400 space-y-1 leading-relaxed">
-                              <p>{calculationBreakdown.header}</p>
-                              {calculationBreakdown.lines.map((line, idx) => (
-                                <p key={idx}>{line}</p>
-                              ))}
-                              <p className="text-green-600 dark:text-green-500">{calculationBreakdown.separator}</p>
-                              <p className="font-semibold text-green-900 dark:text-green-300">
-                                {calculationBreakdown.total}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Zakat Amount */}
-                        <div className="space-y-3 p-4 rounded-lg bg-white dark:bg-slate-900 border border-green-200 dark:border-green-800">
-                          <div className="text-center space-y-2">
-                            <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                              زكاتك هي:
-                            </p>
-                            <div className="space-y-1">
-                              <p className="text-2xl font-bold text-green-700 dark:text-green-400">
-                                {formatPrice(zakatAmount)}
-                              </p>
-                              <p className="text-sm text-slate-500 dark:text-slate-400">
-                                أو
-                              </p>
-                              <p className="text-xl font-semibold text-green-700 dark:text-green-400">
-                                {formatNumber(parseFloat(zakatGrams.toFixed(3)))} جرام ذهب
-                              </p>
-                            </div>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-                              القيمة الإجمالية: {formatPrice(totalValue)} × 2.5% = {formatPrice(zakatAmount)}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          ) : (
-            <Card className="border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 h-fit">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-center py-12">
-                  <div className="text-center space-y-2">
-                    <Info className="h-8 w-8 text-slate-400 dark:text-slate-500 mx-auto" />
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                      أدخل بيانات الذهب لعرض النتيجة
-                    </p>
-                  </div>
+                <div className="space-y-2">
+                  <p className="font-medium text-text">{isRTL ? "نسبة الزكاة:" : "Zakat rate:"}</p>
+                  <p>
+                    {isRTL
+                      ? "2.5% من إجمالي قيمة المال (الذهب + الفضة + النقود − الديون)."
+                      : "2.5% of total wealth value (gold + silver + cash − debts)."}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Column 2 (Left): Input Section */}
-        <Card className="h-fit lg:order-1">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Scale className="h-5 w-5" />
-              <span>ممتلكاتك من الذهب</span>
-            </CardTitle>
-            <CardDescription>
-              أدخل وزن وعيار كل قطعة ذهب تملكها
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Items List */}
-            <div className="space-y-3">
-              {items.map((item, index) => (
-                <div
-                  key={item.id}
-                  className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                      بند {index + 1}
-                    </span>
-                    {items.length > 1 && (
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                        aria-label="إزالة البند"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    {/* Weight Input */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                        الوزن (جرام)
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.1"
-                        value={item.weight}
-                        onChange={(e) => updateItem(item.id, "weight", e.target.value)}
-                        placeholder="0"
-                        className={cn(
-                          "w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700",
-                          "bg-white dark:bg-slate-900",
-                          "text-slate-900 dark:text-slate-100 text-sm",
-                          "focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500",
-                          "transition-all"
-                        )}
-                      />
-                    </div>
-
-                    {/* Karat Selection */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                        العيار
-                      </label>
-                      <select
-                        value={item.karat}
-                        onChange={(e) => updateItem(item.id, "karat", parseInt(e.target.value) as KaratValue)}
-                        className={cn(
-                          "w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700",
-                          "bg-white dark:bg-slate-900",
-                          "text-slate-900 dark:text-slate-100 text-sm",
-                          "focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500",
-                          "transition-all"
-                        )}
-                      >
-                        <option value={24}>عيار 24</option>
-                        <option value={21}>عيار 21</option>
-                        <option value={18}>عيار 18</option>
-                        <option value={14}>عيار 14</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Pure Weight Display for this item - Only show if karat is not 24 */}
-                  {item.weight && parseFloat(item.weight) > 0 && item.karat !== 24 && (
-                    <div className="mt-2 p-2 rounded bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-primary-900 dark:text-primary-300 font-medium">
-                          يعادل (عيار 24):
-                        </span>
-                        <span className="text-primary-700 dark:text-primary-400 font-bold">
-                          {formatNumber(
-                            parseFloat(((parseFloat(item.weight) || 0) * item.karat / 24).toFixed(2))
-                          )} جرام
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Add Item Button */}
-            <button
-              onClick={addItem}
-              className={cn(
-                "w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg",
-                "border-2 border-dashed border-slate-300 dark:border-slate-700",
-                "bg-slate-50 dark:bg-slate-800/50",
-                "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
-                "hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20",
-                "transition-all font-medium text-sm"
-              )}
-            >
-              <Plus className="h-4 w-4" />
-              <span>إضافة بند آخر</span>
-            </button>
-
-            {/* Total Pure Gold Weight Display */}
-            {hasValidItems && (
-              <div className="p-4 rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-primary-900 dark:text-primary-300">
-                    إجمالي الذهب الخالص (عيار 24)
-                  </span>
-                  <span className="text-lg font-bold text-primary-700 dark:text-primary-400">
-                    {formatNumber(parseFloat(totalPureWeight.toFixed(2)))} جرام
-                  </span>
+                <div className="space-y-2">
+                  <p className="font-medium text-text">{isRTL ? "الحول:" : "Hawl:"}</p>
+                  <p>
+                    {isRTL
+                      ? "يجب أن يمر على المال عام هجري كامل (حوالي 354 يوم) منذ بلوغه النصاب."
+                      : "A full lunar year (about 354 days) must pass on the wealth since it reached the nisab."}
+                  </p>
                 </div>
               </div>
-            )}
+            </DialogContent>
+          </Dialog>
+        }
+      />
 
-            {/* Hawl Checkbox */}
-            <div className="flex items-start gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Form */}
+        <SectionCard title={isRTL ? "بيانات ممتلكاتك" : "Your Assets"} padded>
+          <div className="space-y-4">
+            {FIELDS.map((field) => (
+              <div key={field.key}>
+                <label className="block text-[12px] text-muted mb-1.5">{field.label}</label>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={values[field.key]}
+                  onChange={(e) => updateValue(field.key, e.target.value)}
+                  placeholder="0"
+                />
+                <p className="mt-1 text-[11.5px] text-dim">{field.hint}</p>
+              </div>
+            ))}
+
+            <label className="flex items-start gap-3 p-3.5 rounded-[11px] bg-panel2 border border-line cursor-pointer">
               <input
                 type="checkbox"
-                id="hawl"
                 checked={hasHawl}
                 onChange={(e) => setHasHawl(e.target.checked)}
-                className="mt-1 h-5 w-5 rounded border-slate-300 text-green-600 focus:ring-green-500 focus:ring-offset-0"
+                className="mt-0.5 h-4 w-4 accent-gold"
               />
-              <label htmlFor="hawl" className="flex-1 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
-                <span className="font-medium">مرّ عليه عام هجري كامل</span>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  يجب أن يمر على الذهب عام هجري كامل (حوالي 354 يوم) حتى تجب الزكاة
-                </p>
-              </label>
+              <span className="flex-1 text-[13px] text-text">
+                <span className="font-medium">
+                  {isRTL ? "مرّ عليه عام هجري كامل (الحول)" : "A full lunar year has passed (hawl)"}
+                </span>
+                <span className="block text-[11.5px] text-dim mt-1">
+                  {isRTL
+                    ? "يجب أن يمر على المال عام هجري كامل حتى تجب الزكاة"
+                    : "A full lunar year must pass on the wealth for Zakat to be due"}
+                </span>
+              </span>
+            </label>
+          </div>
+        </SectionCard>
+
+        {/* Result */}
+        {hasAnyInput ? (
+          isAboveNisab && hasHawl ? (
+            <div className="bg-gold-soft shadow-gold rounded-2xl p-6 md:p-7 flex flex-col justify-center">
+              <div className="flex items-center gap-2 text-[13px] text-muted mb-2">
+                <CheckCircle2 className="h-4 w-4 text-gold" />
+                <span>{isRTL ? "الزكاة المستحقة عليك" : "Zakat due from you"}</span>
+              </div>
+              <div className="num text-[40px] md:text-[52px] font-medium text-gold leading-none">
+                {formatNumber(parseFloat(zakatDue.toFixed(2)))}
+              </div>
+              <div className="text-[14px] text-muted mt-2">{isRTL ? "جنيه مصري" : "Egyptian Pound"}</div>
+              <p className="mt-3 text-[12.5px] text-dim">
+                {isRTL
+                  ? `بلغ إجمالي مالك النصاب (${formatNumber(parseFloat(nisabValue.toFixed(0)))} ج.م) ومرّ عليه الحول.`
+                  : `Your total wealth reached the nisab (${formatNumber(parseFloat(nisabValue.toFixed(0)))} EGP) and the hawl has passed.`}
+              </p>
+
+              <div className="mt-6 space-y-2.5 border-t border-gold-line pt-4">
+                <div className="flex items-center justify-between text-[13px]">
+                  <span className="text-muted">{isRTL ? "قيمة الذهب" : "Gold Value"}</span>
+                  <span className="num text-text">{formatNumber(parseFloat(goldValue.toFixed(2)))}</span>
+                </div>
+                <div className="flex items-center justify-between text-[13px]">
+                  <span className="text-muted">{isRTL ? "قيمة الفضة" : "Silver Value"}</span>
+                  <span className="num text-text">{formatNumber(parseFloat(silverValue.toFixed(2)))}</span>
+                </div>
+                <div className="flex items-center justify-between text-[13px]">
+                  <span className="text-muted">
+                    {isRTL ? "صافي المال (بعد خصم الديون)" : "Net Wealth (after debts)"}
+                  </span>
+                  <span className="num text-text">{formatNumber(parseFloat(netAssets.toFixed(2)))}</span>
+                </div>
+                <div className="flex items-center justify-between text-[13px]">
+                  <span className="text-muted">{isRTL ? "نسبة الزكاة" : "Zakat Rate"}</span>
+                  <span className="num text-text">2.5%</span>
+                </div>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          ) : (
+            <SectionCard padded className="h-fit">
+              <div className="flex items-start gap-3">
+                <Info className="h-5 w-5 text-muted shrink-0 mt-0.5" />
+                <div className="space-y-2">
+                  <h3 className="text-[15px] font-semibold text-text">
+                    {isAboveNisab
+                      ? (isRTL ? 'لم يمر عام هجري كامل' : 'A full lunar year has not passed')
+                      : (isRTL ? 'لا تجب فيه الزكاة بعد' : 'Zakat is not yet due')}
+                  </h3>
+                  <p className="text-[13px] text-muted leading-relaxed">
+                    {isAboveNisab
+                      ? (isRTL
+                          ? `صافي مالك (${formatNumber(parseFloat(netAssets.toFixed(2)))} ج.م) بلغ النصاب، لكن يجب أن يمر عليه عام هجري كامل حتى تجب الزكاة.`
+                          : `Your net wealth (${formatNumber(parseFloat(netAssets.toFixed(2)))} EGP) has reached the nisab, but a full lunar year must pass before Zakat is due.`)
+                      : (isRTL
+                          ? `صافي مالك (${formatNumber(parseFloat(netAssets.toFixed(2)))} ج.م) أقل من قيمة النصاب (${nisabValue > 0 ? formatNumber(parseFloat(nisabValue.toFixed(0))) : '—'} ج.م).`
+                          : `Your net wealth (${formatNumber(parseFloat(netAssets.toFixed(2)))} EGP) is below the nisab value (${nisabValue > 0 ? formatNumber(parseFloat(nisabValue.toFixed(0))) : '—'} EGP).`)}
+                  </p>
+                </div>
+              </div>
+            </SectionCard>
+          )
+        ) : (
+          <SectionCard padded className="h-fit">
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center space-y-2">
+                <Info className="h-8 w-8 text-dim mx-auto" />
+                <p className="text-[13px] text-muted">
+                  {isRTL ? "أدخل بيانات ممتلكاتك لعرض النتيجة" : "Enter your assets to see the result"}
+                </p>
+              </div>
+            </div>
+          </SectionCard>
+        )}
       </div>
     </div>
   );

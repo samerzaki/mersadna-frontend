@@ -13,7 +13,7 @@ interface NewsSearchProps {
 }
 
 export function NewsSearch({ value, onChange, placeholder, className }: NewsSearchProps) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const isRTL = language === 'ar';
   const [localValue, setLocalValue] = useState(value);
 
@@ -41,19 +41,18 @@ export function NewsSearch({ value, onChange, placeholder, className }: NewsSear
   return (
     <div className={cn('relative', className)}>
       <Search className={cn(
-        'absolute top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400',
-        isRTL ? 'right-3' : 'left-3'
+        'absolute top-1/2 -translate-y-1/2 w-4 h-4 text-dim',
+        isRTL ? 'right-3.5' : 'left-3.5'
       )} />
       <input
         type="text"
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
-        placeholder={placeholder || (isRTL ? 'ابحث في الأخبار...' : 'Search news...')}
+        placeholder={placeholder || t.pages.news.searchPlaceholder}
         className={cn(
-          'w-full h-11 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900',
-          'text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500',
-          'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent',
-          'transition-all',
+          'w-full h-11 rounded-[11px] border border-line bg-bg text-text',
+          'text-[14px] placeholder:text-dim',
+          'focus:outline-none focus:border-gold transition-colors',
           isRTL ? 'pr-10 pl-10' : 'pl-10 pr-10'
         )}
         dir={isRTL ? 'rtl' : 'ltr'}
@@ -63,8 +62,7 @@ export function NewsSearch({ value, onChange, placeholder, className }: NewsSear
           onClick={handleClear}
           className={cn(
             'absolute top-1/2 -translate-y-1/2 p-1 rounded-full',
-            'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300',
-            'hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors',
+            'text-dim hover:text-text hover:bg-hover transition-colors',
             isRTL ? 'left-2' : 'right-2'
           )}
           aria-label="Clear search"

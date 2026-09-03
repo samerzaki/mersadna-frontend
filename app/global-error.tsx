@@ -3,6 +3,21 @@
 import { useEffect } from 'react';
 import { Home, RefreshCw, AlertTriangle } from 'lucide-react';
 
+// Inline fallback colors mirror the dark theme tokens in app/globals.css.
+// global-error.tsx replaces the root layout entirely when it renders, so we
+// cannot rely on the global stylesheet being present — inline styles keep
+// this page legible even if Tailwind never loads.
+const colors = {
+  bg: '#171717',
+  panel: '#212121',
+  line: '#3a3a3a',
+  text: '#f5f5f5',
+  muted: '#b8b8b8',
+  dim: '#8a8a8a',
+  gold: '#8fa1e8',
+  onGold: '#12142b',
+};
+
 export default function GlobalError({
   error,
   reset,
@@ -17,63 +32,109 @@ export default function GlobalError({
 
   return (
     <html>
-      <body>
-        <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
-          <div className="mx-auto max-w-lg text-center">
-            {/* Error Icon */}
-            <div className="mb-8 flex justify-center">
-              <div className="rounded-full bg-orange-100 p-6">
-                <AlertTriangle className="h-12 w-12 text-orange-600" />
-              </div>
+      <body style={{ margin: 0, background: colors.bg, color: colors.text, fontFamily: 'sans-serif' }}>
+        <div
+          style={{
+            display: 'flex',
+            minHeight: '100vh',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '48px 16px',
+          }}
+        >
+          <div
+            style={{
+              margin: '0 auto',
+              maxWidth: 480,
+              width: '100%',
+              textAlign: 'center',
+              background: colors.panel,
+              borderRadius: 20,
+              padding: 40,
+              boxShadow: '0 1px 2px rgba(0,0,0,0.4)',
+            }}
+          >
+            <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'center' }}>
+              <AlertTriangle style={{ height: 56, width: 56, color: colors.gold }} />
             </div>
 
-            {/* Heading */}
-            <h2 className="mb-4 text-2xl font-semibold text-slate-800 md:text-3xl">
+            <h2 style={{ marginBottom: 16, fontSize: 26, fontWeight: 600, color: colors.text }}>
               حدث خطأ خطير
             </h2>
 
-            {/* Description */}
-            <p className="mb-8 text-base leading-relaxed text-slate-600">
+            <p style={{ marginBottom: 32, fontSize: 16, lineHeight: 1.7, color: colors.muted }}>
               نعتذر، حدث خطأ خطير في التطبيق. يرجى تحديث الصفحة أو العودة للصفحة الرئيسية.
             </p>
 
-            {/* Error Details (Development Only) */}
             {process.env.NODE_ENV === 'development' && (
-              <div className="mb-8 rounded-md bg-slate-100 p-4 text-start">
-                <p className="text-xs font-mono text-slate-600">
+              <div
+                style={{
+                  marginBottom: 32,
+                  borderRadius: 11,
+                  border: `1px solid ${colors.line}`,
+                  background: colors.bg,
+                  padding: 16,
+                  textAlign: 'start',
+                }}
+              >
+                <p style={{ fontSize: 12, fontFamily: 'monospace', color: colors.muted, margin: 0 }}>
                   {error.message}
                 </p>
                 {error.digest && (
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p style={{ marginTop: 8, fontSize: 12, color: colors.dim, margin: '8px 0 0' }}>
                     Error ID: {error.digest}
                   </p>
                 )}
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, justifyContent: 'center' }}>
               <button
                 onClick={reset}
-                className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-800 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  borderRadius: 10,
+                  background: colors.gold,
+                  color: colors.onGold,
+                  padding: '12px 24px',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
               >
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw style={{ height: 16, width: 16 }} />
                 إعادة المحاولة
               </button>
 
               <a
                 href="/"
-                className="inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  borderRadius: 10,
+                  border: `1px solid ${colors.line}`,
+                  background: 'transparent',
+                  color: colors.text,
+                  padding: '12px 24px',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                }}
               >
-                <Home className="h-4 w-4" />
+                <Home style={{ height: 16, width: 16 }} />
                 العودة للرئيسية
               </a>
             </div>
 
-            {/* Help Text */}
-            <p className="mt-8 text-sm text-slate-500">
+            <p style={{ marginTop: 32, fontSize: 13, color: colors.dim }}>
               إذا استمرت المشكلة،{' '}
-              <a href="/contact" className="text-slate-700 underline">
+              <a href="/contact" style={{ color: colors.gold, textDecoration: 'underline' }}>
                 تواصل معنا
               </a>
             </p>

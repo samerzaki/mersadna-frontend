@@ -25,12 +25,13 @@ import {
   setDefaultMobilePhone,
 } from "@/lib/api-auth";
 import {
-  Settings, Mail, Lock, Bell, CheckCircle, Send, MessageSquare,
+  Mail, Lock, Bell, CheckCircle, Send, MessageSquare,
   Phone, User, X, Smartphone, Trash2, Star, ShieldCheck, ShieldAlert,
   Plus, RefreshCw, Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PhoneInputField, type PhoneInputValue } from "@/components/ui/phone-input";
+import { PageHeader } from "@/components/ui/page-header";
 import type { MobilePhone } from "@/types/auth";
 
 export default function SettingsPage() {
@@ -345,17 +346,7 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <Settings className="h-8 w-8 text-amber-600" />
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-              {t.pages.settings.title}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {t.pages.settings.subtitle}
-            </p>
-          </div>
-        </div>
+        <PageHeader title={t.pages.settings.title} lead={t.pages.settings.subtitle} className="py-0 md:py-0 pb-0 md:pb-0" />
 
         {/* Tabs */}
         <Tabs defaultValue="account" className="w-full md:flex md:gap-6" orientation="vertical">

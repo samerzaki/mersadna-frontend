@@ -64,10 +64,10 @@ export function BookmarkButton({ news, variant = 'icon', className }: BookmarkBu
     <button
       onClick={handleClick}
       className={cn(
-        'p-2 rounded-full transition-all',
+        'p-2 rounded-full transition-all backdrop-blur-sm',
         bookmarked
-          ? 'bg-primary-600 text-white hover:bg-primary-700'
-          : 'bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800',
+          ? 'bg-gold text-on-gold'
+          : 'bg-panel/90 text-muted hover:text-text hover:bg-panel',
         className
       )}
       aria-label={bookmarked ? 'Remove from saved' : 'Save article'}

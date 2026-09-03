@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { LanguageProvider, useLanguage } from '@/contexts/language-context';
 import { AuthProvider } from '@/contexts/auth-context';
-import { SidebarProvider } from '@/contexts/sidebar-context';
 import { HtmlDirection } from '@/components/layout/html-direction';
 import { DirectionProvider } from '@radix-ui/react-direction';
 
@@ -39,10 +38,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <LanguageProvider>
         <RadixDirectionWrapper>
           <AuthProvider>
-            <SidebarProvider>
-              <HtmlDirection />
-              {children}
-            </SidebarProvider>
+            <HtmlDirection />
+            {children}
           </AuthProvider>
         </RadixDirectionWrapper>
       </LanguageProvider>

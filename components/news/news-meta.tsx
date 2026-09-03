@@ -88,7 +88,7 @@ export function NewsMeta({
 
   // Inline variant
   return (
-    <div className={cn('flex items-center flex-wrap gap-x-4 gap-y-2 text-sm text-slate-500 dark:text-slate-400', className)}>
+    <div className={cn('flex items-center flex-wrap gap-x-4 gap-y-2 text-[13px] text-muted', className)}>
       {showSource && source && (
         <div className="flex items-center gap-1.5">
           {source.logo && (
@@ -104,13 +104,13 @@ export function NewsMeta({
       {showDate && (
         <div className="flex items-center gap-1.5" title={fullDate}>
           <Calendar className="w-4 h-4" />
-          <span>{timeAgo}</span>
+          <span className="num">{timeAgo}</span>
         </div>
       )}
       {showReadingTime && (
         <div className="flex items-center gap-1.5">
           <Clock className="w-4 h-4" />
-          <span>
+          <span className="num">
             {readingTimeMinutes} {isRTL ? 'د' : 'm'}
           </span>
         </div>
@@ -118,7 +118,7 @@ export function NewsMeta({
       {showViews && viewCount !== undefined && (
         <div className="flex items-center gap-1.5">
           <Eye className="w-4 h-4" />
-          <span>{viewCount.toLocaleString('en-US')}</span>
+          <span className="num">{viewCount.toLocaleString('en-US')}</span>
         </div>
       )}
     </div>

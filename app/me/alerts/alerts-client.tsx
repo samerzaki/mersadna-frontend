@@ -20,6 +20,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatTile } from "@/components/ui/stat-tile";
 
 // Mock data for available products
 const AVAILABLE_PRODUCTS = [
@@ -164,65 +166,19 @@ export default function AlertsPage() {
   return (
     <div className="space-y-4 pb-20">
       {/* Header */}
-      <div className="mb-3">
-        <div className="flex items-center gap-2.5 mb-1.5">
-          <div className="h-9 w-9 rounded-lg bg-amber-50 dark:bg-amber-950/10 flex items-center justify-center">
-            <Bell className="h-4.5 w-4.5 text-amber-600 dark:text-amber-500" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold">
-              {t.pages.alerts.title}
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              {t.pages.alerts.subtitle}
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageHeader title={t.pages.alerts.title} lead={t.pages.alerts.subtitle} />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-        <Card>
-          <CardContent className="p-2.5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">{t.pages.alerts.total}</p>
-                <p className="text-xl font-bold">{stats.total}</p>
-              </div>
-              <div className="h-8 w-8 rounded-lg bg-amber-50 dark:bg-amber-950/10 flex items-center justify-center">
-                <Bell className="h-3.5 w-3.5 text-amber-600 dark:text-amber-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-2.5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">{t.pages.alerts.active}</p>
-                <p className="text-xl font-bold text-emerald-600 dark:text-emerald-500">{stats.active}</p>
-              </div>
-              <div className="h-8 w-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/10 flex items-center justify-center">
-                <Eye className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-2.5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">{t.pages.alerts.triggered}</p>
-                <p className="text-xl font-bold text-rose-600 dark:text-rose-500">{stats.triggered}</p>
-              </div>
-              <div className="h-8 w-8 rounded-lg bg-rose-50 dark:bg-rose-950/10 flex items-center justify-center">
-                <AlertCircle className="h-3.5 w-3.5 text-rose-600 dark:text-rose-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <StatTile label={t.pages.alerts.total} value={stats.total} />
+        <StatTile
+          label={t.pages.alerts.active}
+          value={<span className="text-up">{stats.active}</span>}
+        />
+        <StatTile
+          label={t.pages.alerts.triggered}
+          value={<span className="text-down">{stats.triggered}</span>}
+        />
       </div>
 
       {/* Onboarding: How Alerts Work */}
@@ -419,7 +375,7 @@ export default function AlertsPage() {
                     <p className="text-xs text-muted-foreground mb-0.5">
                       {t.pages.alerts.targetPrice}
                     </p>
-                    <p className="text-base font-bold tabular-nums">
+                    <p className="num text-base font-bold">
                       {formatPrice(alert.targetPrice)}
                       <span className="text-xs font-normal text-muted-foreground mr-1">
                         {t.common.egp}
@@ -456,21 +412,21 @@ export default function AlertsPage() {
                   <div className="pt-2.5 border-t border-slate-200/50 dark:border-slate-700/50">
                     <div className="flex items-center justify-between mb-0.5">
                       <span className="text-xs text-muted-foreground">السعر الحالي:</span>
-                      <span className="text-xs font-semibold tabular-nums">
+                      <span className="num text-xs font-semibold">
                         {formatPrice(currentPrice)} {t.common.egp}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">المسافة:</span>
                       <span className={cn(
-                        "text-xs font-semibold tabular-nums",
+                        "num text-xs font-semibold",
                         isBelowCondition
                           ? currentPrice <= alert.targetPrice
-                            ? "text-rose-600 dark:text-rose-500"
-                            : "text-emerald-600 dark:text-emerald-500"
+                            ? "text-down"
+                            : "text-up"
                           : currentPrice >= alert.targetPrice
-                          ? "text-rose-600 dark:text-rose-500"
-                          : "text-emerald-600 dark:text-emerald-500"
+                          ? "text-down"
+                          : "text-up"
                       )}>
                         {isBelowCondition
                           ? `${formatPrice(currentPrice - alert.targetPrice)} ${t.common.egp}`

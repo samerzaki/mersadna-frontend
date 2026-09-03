@@ -5,10 +5,13 @@ import { AlertCircle } from 'lucide-react';
 import { useGoldHistory } from '@/hooks/use-gold-prices';
 import { UnifiedGoldChart } from './unified-gold-chart';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SectionCard } from '@/components/ui/section-card';
+import { useLanguage } from '@/contexts/language-context';
 
 type GoldPeriod = '24h' | '7d' | '30d' | '1y' | 'all';
 
 export function UnifiedGoldChartServer() {
+  const { t } = useLanguage();
   const [period, setPeriod] = useState<GoldPeriod>('30d');
   const { data: historyData, isLoading, isFetching, error } = useGoldHistory(period, 'EGP', true);
 
@@ -24,10 +27,10 @@ export function UnifiedGoldChartServer() {
           <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
           <div>
             <h3 className="font-semibold text-red-900 dark:text-red-300">
-              خطأ في تحميل البيانات
+              {t.charts.errorLoadingTitle}
             </h3>
             <p className="text-sm text-red-700 dark:text-red-400">
-              {error instanceof Error ? error.message : 'فشل في تحميل بيانات الرسم البياني'}
+              {error instanceof Error ? error.message : t.charts.errorLoadingChartMessage}
             </p>
           </div>
         </div>
@@ -40,14 +43,14 @@ export function UnifiedGoldChartServer() {
   }
 
   return (
-    <section>
+    <SectionCard padded>
       <UnifiedGoldChart
         data={historyData.data}
         period={period}
         onPeriodChange={setPeriod}
         isLoading={isFetching}
       />
-    </section>
+    </SectionCard>
   );
 }
 

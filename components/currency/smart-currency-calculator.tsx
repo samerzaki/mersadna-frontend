@@ -147,21 +147,21 @@ export function SmartCurrencyCalculator() {
           <button
             className={cn(
               "flex items-center gap-1.5 px-3 py-1 rounded-full",
-              "bg-white dark:bg-slate-800",
+              "bg-panel2",
               "shadow-sm hover:shadow-md",
-              "border border-slate-200 dark:border-slate-700",
-              "hover:border-primary-500 dark:hover:border-primary-400",
+              "border border-line",
+              "hover:border-gold-line",
               "transition-all",
-              "focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              "focus:outline-none focus:ring-2 focus:ring-gold/20"
             )}
           >
             <span className="text-lg" role="img" aria-label={currencyInfo.name}>
               {currencyInfo.flag}
             </span>
-            <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">
+            <span className="font-semibold text-sm text-text">
               {currencyInfo.code}
             </span>
-            <ChevronDown className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
+            <ChevronDown className="h-3.5 w-3.5 text-muted" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
@@ -176,7 +176,7 @@ export function SmartCurrencyCalculator() {
               </span>
               <div className="flex flex-col">
                 <span className="text-sm font-medium">{currency.code}</span>
-                <span className="text-xs text-muted-foreground">{currency.name}</span>
+                <span className="text-xs text-muted">{currency.name}</span>
               </div>
             </DropdownMenuItem>
           ))}
@@ -187,15 +187,15 @@ export function SmartCurrencyCalculator() {
 
   return (
     <div className="space-y-8">
-      {/* Horizontal Calculator Layout */}
-      <div className="bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 rounded-3xl p-6 md:p-8 shadow-xl border border-slate-200/50 dark:border-slate-700/50">
+      {/* Horizontal Calculator Layout (form) */}
+      <div className="card-surface p-6 md:p-8">
         <div className="flex flex-col lg:flex-row items-center gap-4 lg:gap-6">
           {/* FROM Section */}
           <div className="flex-1 w-full">
-            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 px-1">
+            <label className="block text-xs font-medium text-muted mb-2 px-1">
               {t.currency.from} / From
             </label>
-            <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700">
+            <div className="stat-tile p-5">
               <CurrencySelector
                 value={sourceCurrency}
                 onChange={setSourceCurrency}
@@ -208,15 +208,14 @@ export function SmartCurrencyCalculator() {
                 onChange={handleAmountChange}
                 placeholder="0.00"
                 className={cn(
-                  "w-full text-4xl md:text-5xl font-bold mt-3",
+                  "num w-full text-4xl md:text-5xl font-bold mt-3",
                   "bg-transparent border-0",
                   "focus:outline-none focus:ring-0",
-                  "text-slate-900 dark:text-slate-100",
-                  "placeholder:text-slate-300 dark:placeholder:text-slate-700",
-                  "tabular-nums"
+                  "text-text",
+                  "placeholder:text-dim"
                 )}
               />
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">
+              <p className="text-xs text-muted mt-2 font-medium">
                 {getCurrencyInfo(sourceCurrency).name}
               </p>
             </div>
@@ -227,39 +226,37 @@ export function SmartCurrencyCalculator() {
             <button
               onClick={handleSwap}
               className={cn(
-                "rounded-2xl bg-linear-to-br from-primary-500 to-primary-600",
-                "dark:from-primary-600 dark:to-primary-700",
-                "shadow-lg hover:shadow-xl",
+                "rounded-2xl bg-gold",
+                "shadow-gold hover:shadow-lg",
                 "p-4 transition-all duration-200",
                 "hover:scale-110 active:scale-95",
-                "border border-primary-400/20 dark:border-primary-500/20",
-                "focus:outline-none focus:ring-4 focus:ring-primary-500/30",
+                "focus:outline-none focus:ring-4 focus:ring-gold/30",
                 "rotate-0 lg:rotate-90"
               )}
               aria-label="Swap currencies"
             >
-              <ArrowUpDown className="h-6 w-6 text-white" />
+              <ArrowUpDown className="h-6 w-6 text-on-gold" />
             </button>
           </div>
 
           {/* TO Section */}
           <div className="flex-1 w-full">
-            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 px-1">
+            <label className="block text-xs font-medium text-muted mb-2 px-1">
               {t.currency.to} / To
             </label>
-            <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700">
+            <div className="stat-tile p-5">
               <CurrencySelector
                 value={targetCurrency}
                 onChange={setTargetCurrency}
                 excludeCurrency={sourceCurrency}
               />
-              <div className="w-full text-4xl md:text-5xl font-bold mt-3 text-slate-900 dark:text-slate-100 tabular-nums">
+              <div className="num w-full text-4xl md:text-5xl font-bold mt-3 text-text">
                 {scenarios[0]?.amount.toLocaleString('en-US', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 }) || '0.00'}
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">
+              <p className="text-xs text-muted mt-2 font-medium">
                 {getCurrencyInfo(targetCurrency).name}
               </p>
             </div>
@@ -267,16 +264,16 @@ export function SmartCurrencyCalculator() {
         </div>
       </div>
 
-      {/* Results Section - Enhanced Modern Cards */}
+      {/* Results Section - primary official result highlighted, others secondary */}
       <div className="space-y-5">
         <div className="flex items-center gap-3 px-2">
-          <div className="h-1 w-1 rounded-full bg-primary-500"></div>
-          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+          <div className="h-1 w-1 rounded-full bg-gold"></div>
+          <h3 className="text-sm font-semibold text-muted">
             {t.currency.exchangeMethods}
           </h3>
           {isLoading && (
-            <div className="flex items-center gap-2 text-xs text-primary-600 dark:text-primary-400">
-              <div className="w-3 h-3 border-2 border-primary-600 dark:border-primary-400 border-t-transparent rounded-full animate-spin"></div>
+            <div className="flex items-center gap-2 text-xs text-gold">
+              <div className="w-3 h-3 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
               <span>{t.currency.updating}</span>
             </div>
           )}
@@ -289,81 +286,58 @@ export function SmartCurrencyCalculator() {
           {scenarios.map((scenario, index) => {
             const isOfficial = index === 0;
             const isParallel = index === 1;
-            const isCreditCard = index === 2;
-
-            // Calculate savings/loss compared to official
-            const savingsVsOfficial =
-              ((scenario.amount - scenarios[0].amount) / scenarios[0].amount) * 100;
 
             return (
               <div
                 key={scenario.label}
                 className={cn(
-                  "group relative overflow-hidden",
-                  "bg-white dark:bg-slate-900",
-                  "border-2 transition-all duration-300",
-                  "rounded-2xl p-6",
-                  "hover:shadow-xl hover:scale-[1.02]",
-                  isOfficial && "border-primary-200 dark:border-primary-900/50 hover:border-primary-400 dark:hover:border-primary-700",
-                  isParallel && "border-amber-200 dark:border-amber-900/50 hover:border-amber-400 dark:hover:border-amber-700",
-                  isCreditCard && "border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700"
+                  "relative overflow-hidden rounded-2xl p-6 transition-shadow",
+                  isOfficial
+                    ? "bg-gold-soft shadow-gold"
+                    : "card-surface hover:shadow-gold"
                 )}
               >
-                {/* Gradient Background Accent */}
-                <div className={cn(
-                  "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-                  isOfficial && "bg-linear-to-br from-primary-50/50 to-transparent dark:from-primary-950/20",
-                  isParallel && "bg-linear-to-br from-amber-50/50 to-transparent dark:from-amber-950/20",
-                  isCreditCard && "bg-linear-to-br from-slate-50/50 to-transparent dark:from-slate-950/20"
-                )} />
-
-                {/* Content */}
                 <div className="relative">
                   {/* Header with Badge */}
                   <div className="flex items-start justify-between mb-5">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className={cn(
-                          "w-2 h-2 rounded-full",
-                          isOfficial && "bg-primary-500",
-                          isParallel && "bg-amber-500",
-                          isCreditCard && "bg-slate-500"
-                        )} />
-                        <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">
+                        <div className={cn('w-2 h-2 rounded-full', isOfficial ? 'bg-gold' : 'bg-dim')} />
+                        <h4 className="font-heading text-base font-bold text-text">
                           {scenario.label}
                         </h4>
                       </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                      <p className="text-xs text-muted leading-relaxed">
                         {scenario.description}
                       </p>
                     </div>
                     {isParallel && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                      <span className="chip">
                         {t.pages.currencies.popular}
                       </span>
                     )}
                     {isOfficial && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-primary-300 dark:border-primary-700">
+                      <span className="chip bg-gold text-on-gold">
                         {t.pages.currencies.official}
                       </span>
                     )}
                   </div>
 
                   {/* Amount Display */}
-                  <div className="space-y-3">
-                    <p className="text-4xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+                  <div className={cn('space-y-3', isOfficial && 'border-t border-gold-line pt-4')}>
+                    <p className={cn('num font-bold tracking-tight', isOfficial ? 'text-4xl text-gold' : 'text-3xl text-text')}>
                       {scenario.amount.toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
                     </p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                    <p className="text-sm text-muted font-medium">
                       {getCurrencyInfo(targetCurrency).name}
                     </p>
 
                     {/* Exchange Rate Badge */}
-                    <div className="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
-                      <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+                    <div className="inline-flex items-center px-3 py-1.5 rounded-lg bg-panel2">
+                      <p className="num text-xs text-muted font-medium">
                         1 {getCurrencyInfo(sourceCurrency).name} = {scenario.rate.toFixed(2)} {getCurrencyInfo(targetCurrency).name}
                       </p>
                     </div>

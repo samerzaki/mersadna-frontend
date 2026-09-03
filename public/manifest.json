@@ -1,5 +1,5 @@
 {
-  "name": "Odamak - مرصادنا",
+  "name": "Odamak - قدامك",
   "short_name": "Odamak",
   "description": "تابع أسعار الذهب الحية في مصر بالجنيه المصري لجميع العيارات مع حاسبة الزكاة وتحليلات السوق المجانية",
   "start_url": "/",
@@ -11,16 +11,28 @@
   "lang": "ar",
   "icons": [
     {
-      "src": "/app-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "https://cdn.odamak.com/images/icons/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/app-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "https://cdn.odamak.com/images/icons/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn.odamak.com/images/icons/pwa-maskable-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://cdn.odamak.com/images/icons/pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "categories": ["finance", "business"],

@@ -40,6 +40,15 @@ export interface Translations {
     karat18: string;
     pound: string;
     ounce: string;
+    tableTitle: string;
+    karatColumn: string;
+    changeColumn: string;
+    days30Column: string;
+    workmanshipTitle: string;
+    estimatedChip: string;
+    globalIndicators: string;
+    goldOunceLabel: string;
+    silverOunceLabel: string;
   };
   
   // Currency
@@ -77,6 +86,25 @@ export interface Translations {
     to: string;
     exchangeMethods: string;
     updating: string;
+    highestBuyPrice: string;
+    highestSellPrice: string;
+    lowestBuyPrice: string;
+    lowestSellPrice: string;
+    unofficialChip: string;
+    gapVsBanks: string;
+    converterTitle: string;
+    amountLabel: string;
+    sourceLabel: string;
+    bankSource: string;
+    parallelSource: string;
+    estimatedResult: string;
+    banksTitle: string;
+    bankColumn: string;
+    todayColumn: string;
+    loadingRates: string;
+    noDataAvailable: string;
+    unpinAria: string;
+    pinAria: string;
   };
   
   // Market Insights
@@ -121,6 +149,18 @@ export interface Translations {
   // Charts
   charts: {
     chartTitle: string;
+    defaultGoldChartTitle: string;
+    period24h: string;
+    period7d: string;
+    period30d: string;
+    period1y: string;
+    periodAll: string;
+    usdExchangeRate: string;
+    usdSellRate: string;
+    usdBuyRate: string;
+    loadingData: string;
+    errorLoadingTitle: string;
+    errorLoadingChartMessage: string;
   };
 
   // Pages
@@ -467,6 +507,35 @@ export interface Translations {
       cashback: string;
       optional: string;
       autoIfEmpty: string;
+      loadingPrices: string;
+      errorTitle: string;
+      errorMessage: string;
+      viewSimple: string;
+      viewAdvanced: string;
+      workmanshipCalculator: string;
+      workmanshipShort: string;
+      sellShort: string;
+      profitShort: string;
+      defaultTitle: string;
+      defaultLead: string;
+      simpleFormTitle: string;
+      weightGramLabel: string;
+      typeKaratLabel: string;
+      workmanshipOptionalLabel: string;
+      operationTypeLabel: string;
+      iAmBuying: string;
+      iAmSelling: string;
+      estimatedBuyTotal: string;
+      estimatedSellTotal: string;
+      egyptianPound: string;
+      pricePerGramLabel: string;
+      metalValue: string;
+      workmanshipTotalLabel: string;
+      goldKarat24Label: string;
+      goldKarat21Label: string;
+      goldKarat18Label: string;
+      silver999Label: string;
+      silver925Label: string;
     };
     zakat: {
       title: string;
@@ -597,6 +666,8 @@ export interface Translations {
       removeBookmark: string;
       relatedNews: string;
       backToNews: string;
+      mostFollowed: string;
+      quickPrices: string;
       savedNews: string;
       savedNewsSubtitle: string;
       noSavedNews: string;
@@ -612,12 +683,54 @@ export interface Translations {
       errorLoading: string;
     };
   };
+
+  // 2026 Home Page Redesign
+  home2026: {
+    liveCairo: string;
+    gold21Title: string;
+    vsYesterday: string;
+    lastUpdate: string;
+    consumerSell: string;
+    goldsmithBuy: string;
+    move30Days: string;
+    calculatePurchase: string;
+    notifyPriceChange: string;
+    allKaratsNow: string;
+    details: string;
+    bestBankRatePrefix: string;
+    bestBankRateSuffix: string;
+    highestBuyPrice: string;
+    highestSellPrice: string;
+    parallelMarket: string;
+    unofficial: string;
+    egyptianPound: string;
+    buy: string;
+    sell: string;
+    gapVsBanks: string;
+    banksShowingPrice: string;
+    silver: string;
+    liveUpdate: string;
+    createAlertFor: string;
+    crypto: string;
+    noData: string;
+    toolGoldCalcName: string;
+    toolGoldCalcDesc: string;
+    toolZakatName: string;
+    toolZakatDesc: string;
+    toolCurrencyConverterName: string;
+    toolCurrencyConverterDesc: string;
+    toolGoldDetailedName: string;
+    toolGoldDetailedDesc: string;
+    economyNews: string;
+    newsCenter: string;
+    newsLoadError: string;
+  };
 }
 
 export const translations: Record<Language, Translations> = {
   ar: {
     header: {
-      title: 'مرصادنا',
+      title: 'قدامك',
       subtitle: 'متابعة أسعار الذهب',
     },
     sidebar: {
@@ -648,6 +761,15 @@ export const translations: Record<Language, Translations> = {
       karat18: 'عيار 18',
       pound: 'جنيه ذهب',
       ounce: 'أونصة عالمية ($)',
+      tableTitle: 'أسعار الذهب حسب العيار',
+      karatColumn: 'العيار',
+      changeColumn: 'التغير',
+      days30Column: '30 يوم',
+      workmanshipTitle: 'المصنعية المتوقعة',
+      estimatedChip: 'تقديري',
+      globalIndicators: 'مؤشرات عالمية',
+      goldOunceLabel: 'أونصة الذهب',
+      silverOunceLabel: 'أونصة الفضة',
     },
     currency: {
       table: 'جدول',
@@ -683,6 +805,25 @@ export const translations: Record<Language, Translations> = {
       to: 'إلى',
       exchangeMethods: 'طرق الصرف المختلفة',
       updating: 'جاري التحديث...',
+      highestBuyPrice: 'أعلى سعر شراء',
+      highestSellPrice: 'أعلى سعر بيع',
+      lowestBuyPrice: 'أقل سعر شراء',
+      lowestSellPrice: 'أقل سعر بيع',
+      unofficialChip: 'غير رسمي',
+      gapVsBanks: 'الفارق عن البنوك',
+      converterTitle: 'محول العملات',
+      amountLabel: 'المبلغ',
+      sourceLabel: 'المصدر',
+      bankSource: 'بنكي',
+      parallelSource: 'موازي',
+      estimatedResult: 'الناتج التقديري',
+      banksTitle: 'البنوك',
+      bankColumn: 'البنك',
+      todayColumn: 'اليوم',
+      loadingRates: 'جاري تحميل الأسعار...',
+      noDataAvailable: 'لا توجد بيانات متاحة',
+      unpinAria: 'إلغاء التثبيت',
+      pinAria: 'تثبيت',
     },
     insights: {
       title: '📈 إحصائيات اليوم',
@@ -709,16 +850,28 @@ export const translations: Record<Language, Translations> = {
       egp: 'ج.م',
       loading: 'جاري التحميل...',
       error: 'حدث خطأ',
-      appName: 'مرصادنا',
+      appName: 'قدامك',
       errorPasswordMismatch: 'كلمات المرور غير متطابقة',
       errorPasswordLength: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
     },
     charts: {
       chartTitle: 'الرسم البياني',
+      defaultGoldChartTitle: 'تاريخ أسعار الذهب - جميع العيارات',
+      period24h: '24 ساعة',
+      period7d: '7 أيام',
+      period30d: '30 يوم',
+      period1y: 'سنة',
+      periodAll: 'الكل',
+      usdExchangeRate: 'سعر صرف الدولار',
+      usdSellRate: 'سعر بيع الدولار',
+      usdBuyRate: 'سعر شراء الدولار',
+      loadingData: 'جاري تحميل البيانات...',
+      errorLoadingTitle: 'خطأ في تحميل البيانات',
+      errorLoadingChartMessage: 'فشل في تحميل بيانات الرسم البياني',
     },
     pages: {
       login: {
-        appTitle: 'مرصادنا',
+        appTitle: 'قدامك',
         appSubtitle: 'تتبع أسعار الذهب والعملات في الوقت الحقيقي',
         title: 'تسجيل الدخول',
         subtitle: 'أدخل بياناتك للوصول إلى حسابك',
@@ -739,7 +892,7 @@ export const translations: Record<Language, Translations> = {
         errorDefault: 'حدث خطأ أثناء تسجيل الدخول',
       },
       register: {
-        appTitle: 'مرصادنا',
+        appTitle: 'قدامك',
         appSubtitle: 'انضم لمتابعة أسعار الذهب والعملات',
         title: 'إنشاء حساب جديد',
         subtitle: 'أنشئ حسابك للوصول إلى الميزات المتقدمة',
@@ -1059,6 +1212,35 @@ export const translations: Record<Language, Translations> = {
         cashback: 'كاش باك',
         optional: 'اختياري',
         autoIfEmpty: 'تلقائي إذا تركت فارغاً',
+        loadingPrices: 'جاري تحميل أسعار الذهب...',
+        errorTitle: 'خطأ في تحميل أسعار الذهب',
+        errorMessage: 'فشل في تحميل أسعار الذهب من الخادم',
+        viewSimple: 'بسيط',
+        viewAdvanced: 'متقدم',
+        workmanshipCalculator: 'حاسبة المصنعية',
+        workmanshipShort: 'المصنعية',
+        sellShort: 'البيع',
+        profitShort: 'الأرباح',
+        defaultTitle: 'حاسبة الذهب والفضة',
+        defaultLead: 'أدخل الوزن والعيار والمصنعية للحصول على قيمة تقديرية مبنية على السعر المرجعي المعروض.',
+        simpleFormTitle: 'بيانات الحساب',
+        weightGramLabel: 'الوزن بالجرام',
+        typeKaratLabel: 'النوع والعيار',
+        workmanshipOptionalLabel: 'المصنعية للجرام (اختياري)',
+        operationTypeLabel: 'نوع العملية',
+        iAmBuying: 'أنا بشتري',
+        iAmSelling: 'أنا ببيع',
+        estimatedBuyTotal: 'إجمالي الشراء التقديري',
+        estimatedSellTotal: 'إجمالي البيع التقديري',
+        egyptianPound: 'جنيه مصري',
+        pricePerGramLabel: 'سعر الجرام',
+        metalValue: 'قيمة المعدن',
+        workmanshipTotalLabel: 'إجمالي المصنعية',
+        goldKarat24Label: 'ذهب عيار 24',
+        goldKarat21Label: 'ذهب عيار 21',
+        goldKarat18Label: 'ذهب عيار 18',
+        silver999Label: 'فضة عيار 999',
+        silver925Label: 'فضة عيار 925',
       },
       zakat: {
         title: 'حاسبة زكاة الذهب',
@@ -1189,6 +1371,8 @@ export const translations: Record<Language, Translations> = {
         removeBookmark: 'إزالة من المحفوظات',
         relatedNews: 'أخبار ذات صلة',
         backToNews: 'العودة للأخبار',
+        mostFollowed: 'الأكثر متابعة',
+        quickPrices: 'أسعار سريعة',
         savedNews: 'الأخبار المحفوظة',
         savedNewsSubtitle: 'الأخبار التي حفظتها للقراءة لاحقاً',
         noSavedNews: 'لا توجد أخبار محفوظة',
@@ -1203,6 +1387,47 @@ export const translations: Record<Language, Translations> = {
         },
         errorLoading: 'حدث خطأ في تحميل الأخبار',
       },
+    },
+
+    home2026: {
+      liveCairo: 'مباشر — القاهرة',
+      gold21Title: 'جرام الذهب عيار 21',
+      vsYesterday: 'عن أمس',
+      lastUpdate: 'آخر تحديث',
+      consumerSell: 'بيع للمستهلك',
+      goldsmithBuy: 'شراء من الصائغ',
+      move30Days: 'حركة 30 يوم',
+      calculatePurchase: 'احسب قيمة مشترياتي',
+      notifyPriceChange: 'نبّهني عند تغير السعر',
+      allKaratsNow: 'كل الأعيرة الآن',
+      details: 'التفاصيل ←',
+      bestBankRatePrefix: 'أفضل سعر',
+      bestBankRateSuffix: 'في البنوك',
+      highestBuyPrice: 'أعلى سعر شراء',
+      highestSellPrice: 'أعلى سعر بيع',
+      parallelMarket: 'السوق الموازي',
+      unofficial: 'غير رسمي',
+      egyptianPound: 'جنيه مصري',
+      buy: 'شراء',
+      sell: 'بيع',
+      gapVsBanks: 'الفارق عن البنوك',
+      banksShowingPrice: 'بنكاً يعرض هذا السعر',
+      silver: 'الفضة',
+      liveUpdate: 'تحديث لحظي',
+      createAlertFor: 'إنشاء تنبيه لـ',
+      crypto: 'العملات الرقمية',
+      noData: 'لا توجد بيانات',
+      toolGoldCalcName: 'حاسبة الذهب والفضة',
+      toolGoldCalcDesc: 'احسب قيمة مشترياتك بدقة',
+      toolZakatName: 'حاسبة الزكاة',
+      toolZakatDesc: 'زكاة الذهب والفضة والنقود',
+      toolCurrencyConverterName: 'محول العملات',
+      toolCurrencyConverterDesc: 'تحويل فوري بين العملات',
+      toolGoldDetailedName: 'أسعار الذهب التفصيلية',
+      toolGoldDetailedDesc: 'كل الأعيرة والمؤشرات',
+      economyNews: 'أخبار الاقتصاد',
+      newsCenter: 'مركز الأخبار ←',
+      newsLoadError: 'فشل في تحميل الأخبار',
     },
   },
   en: {
@@ -1238,6 +1463,15 @@ export const translations: Record<Language, Translations> = {
       karat18: '18 Karat',
       pound: 'Gold Pound',
       ounce: 'Global Ounce ($)',
+      tableTitle: 'Gold Prices by Karat',
+      karatColumn: 'Karat',
+      changeColumn: 'Change',
+      days30Column: '30 Days',
+      workmanshipTitle: 'Estimated Workmanship',
+      estimatedChip: 'Estimated',
+      globalIndicators: 'Global Indicators',
+      goldOunceLabel: 'Gold Ounce',
+      silverOunceLabel: 'Silver Ounce',
     },
     currency: {
       table: 'Table',
@@ -1273,6 +1507,25 @@ export const translations: Record<Language, Translations> = {
       to: 'To',
       exchangeMethods: 'Exchange Methods',
       updating: 'Updating...',
+      highestBuyPrice: 'Highest Buy Price',
+      highestSellPrice: 'Highest Sell Price',
+      lowestBuyPrice: 'Lowest Buy Price',
+      lowestSellPrice: 'Lowest Sell Price',
+      unofficialChip: 'Unofficial',
+      gapVsBanks: 'Gap vs Banks',
+      converterTitle: 'Currency Converter',
+      amountLabel: 'Amount',
+      sourceLabel: 'Source',
+      bankSource: 'Bank',
+      parallelSource: 'Parallel',
+      estimatedResult: 'Estimated Result',
+      banksTitle: 'Banks',
+      bankColumn: 'Bank',
+      todayColumn: 'Today',
+      loadingRates: 'Loading rates...',
+      noDataAvailable: 'No data available',
+      unpinAria: 'Unpin',
+      pinAria: 'Pin',
     },
     insights: {
       title: '📈 Today\'s Statistics',
@@ -1305,6 +1558,18 @@ export const translations: Record<Language, Translations> = {
     },
     charts: {
       chartTitle: 'Chart',
+      defaultGoldChartTitle: 'Gold Price History - All Karats',
+      period24h: '24 Hours',
+      period7d: '7 Days',
+      period30d: '30 Days',
+      period1y: 'Year',
+      periodAll: 'All',
+      usdExchangeRate: 'USD Exchange Rate',
+      usdSellRate: 'USD Sell Rate',
+      usdBuyRate: 'USD Buy Rate',
+      loadingData: 'Loading data...',
+      errorLoadingTitle: 'Error loading data',
+      errorLoadingChartMessage: 'Failed to load chart data',
     },
     pages: {
       login: {
@@ -1649,6 +1914,35 @@ export const translations: Record<Language, Translations> = {
         cashback: 'Cashback',
         optional: 'Optional',
         autoIfEmpty: 'Auto if empty',
+        loadingPrices: 'Loading gold prices...',
+        errorTitle: 'Error loading gold prices',
+        errorMessage: 'Failed to load gold prices from the server',
+        viewSimple: 'Simple',
+        viewAdvanced: 'Advanced',
+        workmanshipCalculator: 'Workmanship Calculator',
+        workmanshipShort: 'Workmanship',
+        sellShort: 'Sell',
+        profitShort: 'Profit',
+        defaultTitle: 'Gold & Silver Calculator',
+        defaultLead: 'Enter the weight, karat, and workmanship to get an estimated value based on the reference price shown.',
+        simpleFormTitle: 'Calculation Data',
+        weightGramLabel: 'Weight in Grams',
+        typeKaratLabel: 'Type & Karat',
+        workmanshipOptionalLabel: 'Workmanship per Gram (optional)',
+        operationTypeLabel: 'Operation Type',
+        iAmBuying: 'I am buying',
+        iAmSelling: 'I am selling',
+        estimatedBuyTotal: 'Estimated Buy Total',
+        estimatedSellTotal: 'Estimated Sell Total',
+        egyptianPound: 'Egyptian Pound',
+        pricePerGramLabel: 'Price per Gram',
+        metalValue: 'Metal Value',
+        workmanshipTotalLabel: 'Total Workmanship',
+        goldKarat24Label: 'Gold 24 Karat',
+        goldKarat21Label: 'Gold 21 Karat',
+        goldKarat18Label: 'Gold 18 Karat',
+        silver999Label: 'Silver 999',
+        silver925Label: 'Silver 925',
       },
       zakat: {
         title: 'Gold Zakat Calculator',
@@ -1779,6 +2073,8 @@ export const translations: Record<Language, Translations> = {
         removeBookmark: 'Remove bookmark',
         relatedNews: 'Related News',
         backToNews: 'Back to News',
+        mostFollowed: 'Most Followed',
+        quickPrices: 'Quick Prices',
         savedNews: 'Saved News',
         savedNewsSubtitle: 'Articles you saved to read later',
         noSavedNews: 'No saved news',
@@ -1793,6 +2089,47 @@ export const translations: Record<Language, Translations> = {
         },
         errorLoading: 'Failed to load news',
       },
+    },
+
+    home2026: {
+      liveCairo: 'Live — Cairo',
+      gold21Title: '21K Gold Gram',
+      vsYesterday: 'vs yesterday',
+      lastUpdate: 'Last update',
+      consumerSell: 'Consumer sell',
+      goldsmithBuy: 'Goldsmith buy',
+      move30Days: '30-day move',
+      calculatePurchase: 'Calculate my purchase',
+      notifyPriceChange: 'Notify me on price change',
+      allKaratsNow: 'All karats now',
+      details: 'Details ←',
+      bestBankRatePrefix: 'Best',
+      bestBankRateSuffix: 'rate at banks',
+      highestBuyPrice: 'Highest buy price',
+      highestSellPrice: 'Highest sell price',
+      parallelMarket: 'Parallel market',
+      unofficial: 'Unofficial',
+      egyptianPound: 'Egyptian pound',
+      buy: 'Buy',
+      sell: 'Sell',
+      gapVsBanks: 'Gap vs banks',
+      banksShowingPrice: 'banks show this price',
+      silver: 'Silver',
+      liveUpdate: 'Live update',
+      createAlertFor: 'Create alert for',
+      crypto: 'Cryptocurrencies',
+      noData: 'No data available',
+      toolGoldCalcName: 'Gold & Silver Calculator',
+      toolGoldCalcDesc: 'Calculate the value of your purchases precisely',
+      toolZakatName: 'Zakat Calculator',
+      toolZakatDesc: 'Zakat on gold, silver and cash',
+      toolCurrencyConverterName: 'Currency Converter',
+      toolCurrencyConverterDesc: 'Instant conversion between currencies',
+      toolGoldDetailedName: 'Detailed Gold Prices',
+      toolGoldDetailedDesc: 'All karats and indicators',
+      economyNews: 'Economy news',
+      newsCenter: 'News center ←',
+      newsLoadError: 'Failed to load news',
     },
   },
 };

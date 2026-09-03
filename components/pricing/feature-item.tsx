@@ -14,9 +14,9 @@ export function FeatureItem({ text, included = true }: FeatureItemProps) {
     )}>
       <Check className={cn(
         'h-4 w-4 shrink-0',
-        included ? 'text-primary' : 'text-slate-300 dark:text-slate-700'
+        included ? 'text-gold' : 'text-dim'
       )} />
-      <span className="text-xs text-slate-600 dark:text-slate-400">
+      <span className="text-xs text-muted">
         {text}
       </span>
     </li>

@@ -1,7 +1,8 @@
 import { ModernGoldPricesServer, ModernGoldPricesSkeleton } from '@/components/dashboard/modern-gold-prices-server';
 import { UnifiedGoldChartServer } from '@/components/charts/unified-gold-chart-server';
 import { AutoRefreshWrapper } from '@/components/dashboard/auto-refresh-wrapper';
-import { GoldPageHeader } from './gold-page-header';
+import { GoldExtraCards } from '@/components/gold/gold-extra-cards';
+import { PageHeader } from '@/components/ui/page-header';
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo-config';
@@ -14,20 +15,17 @@ export default function GoldPricesPage() {
   return (
     <AutoRefreshWrapper>
       <div className="space-y-8">
-        <header className="rounded-2xl border border-border/70 bg-card p-5 md:p-7">
-          <p className="mb-2 text-sm font-semibold text-primary">تحديثات السوق المصرية</p>
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">أسعار الذهب اليوم في مصر</h1>
-          <p className="mt-3 max-w-3xl leading-7 text-muted-foreground">
-            راقب أسعار عيارات الذهب الرئيسية بالجنيه المصري، ثم انتقل إلى الرسم البياني أو الحاسبة لمعرفة القيمة التقديرية حسب الوزن والعيار.
-          </p>
-        </header>
-        {/* Header */}
-        <section>
-          <GoldPageHeader />
-          <Suspense fallback={<ModernGoldPricesSkeleton />}>
-            <ModernGoldPricesServer />
-          </Suspense>
-        </section>
+        <PageHeader
+          eyebrow="سوق الذهب"
+          title="أسعار الذهب التفصيلية"
+          lead="راقب أسعار عيارات الذهب الرئيسية بالجنيه المصري، ثم انتقل إلى الرسم البياني أو الحاسبة لمعرفة القيمة التقديرية حسب الوزن والعيار."
+        />
+
+        <Suspense fallback={<ModernGoldPricesSkeleton />}>
+          <ModernGoldPricesServer />
+        </Suspense>
+
+        <GoldExtraCards />
 
         {/* Price History Chart */}
         <UnifiedGoldChartServer />

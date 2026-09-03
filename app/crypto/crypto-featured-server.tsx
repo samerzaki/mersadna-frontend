@@ -40,7 +40,7 @@ export function CryptoPageSkeleton() {
           <Skeleton className="h-8 w-48 mb-4" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-5">
+              <div key={i} className="card-surface p-5">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">

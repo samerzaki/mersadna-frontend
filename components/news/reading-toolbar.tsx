@@ -34,10 +34,10 @@ function ToolbarButton({
       aria-label={label}
       className={cn(
         'p-2.5 rounded-lg transition-all duration-200',
-        'text-slate-600 dark:text-slate-300',
-        'hover:bg-slate-100 dark:hover:bg-slate-700',
+        'text-muted',
+        'hover:bg-hover',
         'disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent',
-        active && 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300'
+        active && 'bg-gold-soft text-gold'
       )}
     >
       {children}
@@ -67,7 +67,7 @@ export function ReadingToolbar({
         <Plus className="w-5 h-5" />
       </ToolbarButton>
 
-      <div className="text-xs font-medium text-slate-500 dark:text-slate-400 text-center select-none">
+      <div className="num text-xs font-medium text-muted text-center select-none">
         {fontSize}
       </div>
 
@@ -79,8 +79,8 @@ export function ReadingToolbar({
         <Minus className="w-5 h-5" />
       </ToolbarButton>
 
-      <div className="w-full h-px bg-slate-200 dark:bg-slate-700 md:block hidden" />
-      <div className="h-full w-px bg-slate-200 dark:bg-slate-700 md:hidden block" />
+      <div className="w-full h-px bg-line2 md:block hidden" />
+      <div className="h-full w-px bg-line2 md:hidden block" />
 
       <ToolbarButton
         onClick={onToggleReadingMode}
@@ -99,8 +99,8 @@ export function ReadingToolbar({
         className={cn(
           'hidden md:flex fixed top-1/2 -translate-y-1/2 z-[60]',
           'flex-col items-center gap-1 p-2',
-          'bg-white/85 dark:bg-slate-900/85 backdrop-blur-sm',
-          'rounded-xl shadow-lg border border-slate-200 dark:border-slate-700',
+          'bg-panel/90 backdrop-blur-sm',
+          'rounded-xl shadow-card border border-line',
           isRTL ? 'left-4' : 'right-4'
         )}
       >
@@ -112,8 +112,8 @@ export function ReadingToolbar({
         className={cn(
           'md:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-[60]',
           'flex flex-row items-center gap-1 p-1.5',
-          'bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm',
-          'rounded-full shadow-lg border border-slate-200 dark:border-slate-700'
+          'bg-panel/90 backdrop-blur-sm',
+          'rounded-full shadow-card border border-line'
         )}
       >
         {buttons}

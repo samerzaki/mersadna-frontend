@@ -2,15 +2,17 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { LogOut, Settings, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { LogOut, Menu, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
 import { ThemeToggle } from './theme-toggle';
 import { LanguageSwitcher } from './language-switcher';
 import { QuickSearch } from './quick-search';
+import { NavSheet } from './nav-sheet';
 import { useLanguage } from '@/contexts/language-context';
 import { useAuth } from '@/contexts/auth-context';
-import { useSidebar } from '@/contexts/sidebar-context';
+import { primaryNav, isPrimaryNavActive } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -24,187 +26,143 @@ import {
 export function Header() {
   const { language } = useLanguage();
   const { user, isAuthenticated, logout } = useAuth();
-  const { isCollapsed, toggleCollapse } = useSidebar();
+  const pathname = usePathname();
   const isRTL = language === 'ar';
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="flex h-16 items-center">
-        {/* Logo section - above sidebar on desktop */}
-        <div className={cn(
-          "relative flex h-full flex-1 items-center justify-between px-4 transition-all duration-300 md:flex-none",
-          isCollapsed ? "md:w-20" : "md:w-64",
-          "md:shrink-0",
-          isRTL ? "md:border-l" : "md:border-r",
-          "md:border-slate-200 dark:md:border-slate-800"
-        )}>
-          <Link href="/" className="relative flex h-full w-full min-w-0 items-center px-2.5 py-3">
-            {/* CDN-hosted brand asset; use its original file directly. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={isCollapsed
-                ? "https://odamak-cdn.b-cdn.net/assets/images/logos/square.png"
-                : "https://odamak-cdn.b-cdn.net/assets/images/logos/logo.png"}
-              alt="Odamak"
-              className="block h-full w-full object-contain"
-            />
-          </Link>
+    <header className="sticky top-0 z-50 h-[66px] bg-bg border-b border-line">
+      <div className="mx-auto flex h-full max-w-[1300px] items-center gap-3 md:gap-6 px-4 md:px-8">
+      <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Odamak home">
+        {/* The light logo is the legible counterpart for the dark site theme. */}
+        <img
+          src="https://cdn.odamak.com/images/brand/logo-square-primary.svg"
+          alt="Odamak"
+          className="h-9 w-9 dark:hidden"
+        />
+        <img
+          src="https://cdn.odamak.com/images/brand/logo-square-light.svg"
+          alt=""
+          aria-hidden="true"
+          className="hidden h-9 w-9 dark:block"
+        />
+        <img
+          src="https://cdn.odamak.com/images/brand/logo-primary.svg"
+          alt=""
+          aria-hidden="true"
+          className="h-7 w-auto dark:hidden"
+        />
+        <img
+          src="https://cdn.odamak.com/images/brand/logo-light.svg"
+          alt=""
+          aria-hidden="true"
+          className="hidden h-7 w-auto dark:block"
+        />
+      </Link>
 
-          {/* Desktop sidebar remains permanently expanded. */}
-          {false && (
-          <button
-            onClick={toggleCollapse}
-            className={cn(
-              "absolute top-1/2 z-10 hidden -translate-y-1/2 md:flex items-center justify-center",
-              isRTL ? "left-4" : "right-4",
-              "w-8 h-8 rounded-lg",
-              "text-slate-600 dark:text-slate-300",
-              "hover:bg-slate-100 dark:hover:bg-slate-800",
-              "transition-colors"
-            )}
-            title={isCollapsed ? (isRTL ? "توسيع" : "Expand") : (isRTL ? "طي" : "Collapse")}
-          >
-            {isCollapsed ? (
-              isRTL ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />
-            ) : (
-              isRTL ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />
-            )}
-          </button>
-          )}
-        </div>
-
-        {/* Icons section - aligned with main content */}
-        <div className="flex-1 flex items-center justify-between gap-4 px-4 md:px-8">
-          <div className="flex-1 flex items-center justify-between gap-4 mx-auto max-w-7xl">
-            {/* Search - Hidden on mobile, shown on desktop */}
-            <div className="hidden md:flex md:flex-1 md:max-w-md">
-              <QuickSearch />
-            </div>
-
-            {/* Icons - right aligned on mobile, aligned with content on desktop */}
-            <div className="flex-1 md:flex-none md:flex md:items-center md:justify-end">
-              <div className="flex items-center gap-2">
-              {/* Mobile: Search Button */}
-              <Button
-                variant="outline"
-                size="icon"
-                className="md:hidden"
-                onClick={() => setShowMobileSearch(!showMobileSearch)}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-
-              {/* Mobile: Utility Menu Button */}
-              <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild className="md:hidden">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    type="button"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    <Settings className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-56">
-                  <DropdownMenuLabel>Settings</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-
-                  <div className="px-2 py-1.5">
-                    <div className="w-full flex items-center justify-between">
-                      <span className="text-sm">Language</span>
-                      <LanguageSwitcher />
-                    </div>
-                  </div>
-
-                  <div className="px-2 py-1.5">
-                    <div className="w-full flex items-center justify-between">
-                      <span className="text-sm">Theme</span>
-                      <ThemeToggle />
-                    </div>
-                  </div>
-
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Desktop: Language and Theme toggles */}
-              <div className="hidden md:flex md:items-center md:gap-2">
-                <LanguageSwitcher />
-                <ThemeToggle />
-              </div>
-
-              {/* User Avatar / Auth Buttons - Always last */}
-              {isAuthenticated ? (
-                <DropdownMenu modal={false}>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                      type="button"
-                    >
-                      <Avatar
-                        src={user?.avatar}
-                        alt={user?.name}
-                        fallback={user?.name?.charAt(0).toUpperCase() || 'U'}
-                        size="default"
-                      />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-56">
-                    <DropdownMenuLabel>
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium capitalize">{user?.name}</p>
-                        <p className="text-xs text-muted-foreground">{user?.email}</p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/me/settings" className="cursor-pointer">
-                        الإعدادات
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onSelect={(e) => {
-                        e.preventDefault();
-                        logout();
-                      }}
-                      className="cursor-pointer text-red-600 dark:text-red-400"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>تسجيل الخروج</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <div className="flex items-center gap-2">
-                  {/* Mobile: Single Login button */}
-                  <Button size="sm" asChild className="md:hidden">
-                    <Link href="/auth/login">تسجيل الدخول</Link>
-                  </Button>
-                  {/* Desktop: Both Login and Register buttons */}
-                  <Button variant="outline" size="sm" asChild className="hidden md:inline-flex">
-                    <Link href="/auth/login">تسجيل الدخول</Link>
-                  </Button>
-                  <Button size="sm" asChild className="hidden md:inline-flex">
-                    <Link href="/auth/register">إنشاء حساب</Link>
-                  </Button>
-                </div>
+      <nav className="hidden lg:flex items-center gap-0.5">
+        {primaryNav.map((item) => {
+          const Icon = item.icon;
+          const active = isPrimaryNavActive(pathname, item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'flex items-center gap-1.5 px-[13px] py-[9px] rounded-[9px] text-sm transition-colors',
+                active ? 'bg-panel2 text-text' : 'text-muted hover:bg-hover'
               )}
-              </div>
-            </div>
-          </div>
-        </div>
+            >
+              <Icon className="w-[15px] h-[15px] shrink-0" />
+              <span>{isRTL ? item.titleAr : item.titleEn}</span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="flex-1" />
+
+      <button
+        type="button"
+        onClick={() => setShowMobileSearch((v) => !v)}
+        className="hidden md:flex items-center gap-2 h-[38px] px-3 rounded-[10px] bg-panel2 border border-line text-dim text-sm hover:border-gold hover:text-text transition-colors"
+      >
+        <Search className="w-[15px] h-[15px]" />
+        <span>{isRTL ? 'بحث سريع' : 'Quick search'}</span>
+        <span className="font-mono text-[11px] text-dim border border-line rounded-[5px] px-1">⌘K</span>
+      </button>
+
+      <Button variant="outline" size="icon" className="md:hidden" onClick={() => setShowMobileSearch((v) => !v)}>
+        <Search className="h-4 w-4" />
+      </Button>
+
+      <div className="hidden md:flex items-center gap-2">
+        <LanguageSwitcher />
+        <ThemeToggle />
       </div>
 
-      {/* Mobile Search - Collapsible */}
-      {showMobileSearch && (
-        <div className="md:hidden border-t border-border/40 px-4 py-3 animate-in slide-in-from-top-2 duration-200">
-          <div className="mx-auto max-w-7xl">
-            <QuickSearch />
-          </div>
+      {isAuthenticated ? (
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" type="button">
+              <Avatar src={user?.avatar} alt={user?.name} fallback={user?.name?.charAt(0).toUpperCase() || 'U'} size="default" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="w-56">
+            <DropdownMenuLabel>
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium capitalize">{user?.name}</p>
+                <p className="text-xs text-muted-foreground">{user?.email}</p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/me/settings" className="cursor-pointer">
+                الإعدادات
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                logout();
+              }}
+              className="cursor-pointer text-down"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>تسجيل الخروج</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="inverse" asChild className="hidden md:inline-flex">
+            <Link href="/auth/register">{isRTL ? 'إنشاء حساب' : 'Sign up'}</Link>
+          </Button>
+          <Button size="sm" variant="inverse" asChild className="md:hidden">
+            <Link href="/auth/login">{isRTL ? 'دخول' : 'Login'}</Link>
+          </Button>
         </div>
       )}
+
+      <button
+        type="button"
+        onClick={() => setNavOpen(true)}
+        className="lg:hidden flex items-center justify-center w-[38px] h-[38px] rounded-[10px] border border-line text-muted hover:border-gold hover:text-gold transition-colors"
+        aria-label={isRTL ? 'فتح القائمة' : 'Open menu'}
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      {showMobileSearch && (
+        <div className="absolute top-full inset-x-0 md:hidden border-t border-line bg-bg px-4 py-3">
+          <QuickSearch />
+        </div>
+      )}
+
+      <NavSheet open={navOpen} onClose={() => setNavOpen(false)} />
+      </div>
     </header>
   );
 }

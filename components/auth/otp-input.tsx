@@ -110,13 +110,13 @@ export function OTPInput({
           onPaste={handlePaste}
           disabled={disabled}
           className={cn(
-            "w-12 h-14 text-center text-2xl font-semibold rounded-lg border-2 transition-all",
-            "focus:outline-none focus:ring-2 focus:ring-offset-2",
+            "num w-12 h-14 text-center text-2xl font-semibold rounded-[11px] border bg-bg text-text transition-all",
+            "focus:outline-none",
             error
-              ? "border-red-500 dark:border-red-600 focus:border-red-500 focus:ring-red-500"
-              : "border-slate-300 dark:border-slate-600 focus:border-amber-500 focus:ring-amber-500",
-            disabled && "opacity-50 cursor-not-allowed bg-slate-100 dark:bg-slate-800",
-            value[index] && !error && "border-amber-500 dark:border-amber-600"
+              ? "border-down focus:border-down"
+              : "border-line focus:border-gold",
+            disabled && "opacity-50 cursor-not-allowed bg-panel2",
+            value[index] && !error && "border-gold"
           )}
         />
       ))}

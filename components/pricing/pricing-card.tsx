@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { FeatureItem } from './feature-item';
@@ -30,9 +30,9 @@ export function PricingCard({
   onCtaClick
 }: PricingCardProps) {
   return (
-    <Card className={cn(
-      'overflow-hidden',
-      isPremium && 'border-primary'
+    <div className={cn(
+      'card-surface overflow-hidden',
+      isPremium && 'bg-gold-soft shadow-gold'
     )}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
@@ -40,22 +40,22 @@ export function PricingCard({
             {title}
           </CardTitle>
           {isPremium && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-gold text-on-gold">
               PRO
             </span>
           )}
         </div>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-xs text-muted mt-1">
           {description}
         </p>
       </CardHeader>
 
       <CardContent className="space-y-4">
         <div className="flex items-baseline gap-1">
-          <span className="text-3xl font-bold tabular-nums">
+          <span className="num text-3xl font-bold tabular-nums">
             {price}
           </span>
-          <span className="text-sm text-slate-500 dark:text-slate-400">
+          <span className="text-sm text-muted">
             {period}
           </span>
         </div>
@@ -79,6 +79,6 @@ export function PricingCard({
           {ctaText}
         </Button>
       </CardContent>
-    </Card>
+    </div>
   );
 }

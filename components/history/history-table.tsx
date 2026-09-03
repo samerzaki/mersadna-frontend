@@ -8,11 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { PriceHistory } from '@/types';
-import { formatPrice, formatPercent, formatRelativeTime } from '@/lib/format';
-import { TrendIndicator } from '@/components/dashboard/trend-indicator';
+import { formatPrice, formatRelativeTime } from '@/lib/format';
+import { ChangeChip } from '@/components/ui/change-badge';
 import { KARATS } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 interface HistoryTableProps {
   data: PriceHistory[];
@@ -24,7 +24,7 @@ export function HistoryTable({ data }: HistoryTableProps) {
   };
 
   return (
-    <div className="rounded-md border">
+    <div className="card-surface overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow>
@@ -39,7 +39,7 @@ export function HistoryTable({ data }: HistoryTableProps) {
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground">
+              <TableCell colSpan={6} className="text-center text-muted">
                 لا توجد بيانات
               </TableCell>
             </TableRow>
@@ -51,30 +51,21 @@ export function HistoryTable({ data }: HistoryTableProps) {
                   <TableCell className="font-medium">
                     {getKaratName(item.karat)}
                   </TableCell>
-                  <TableCell className="font-semibold">
+                  <TableCell className="num font-semibold">
                     {formatPrice(item.buyPrice)}
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="num text-muted">
                     {formatPrice(item.sellPrice)}
                   </TableCell>
                   <TableCell>
-                    <span
-                      className={
-                        isPositive
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }
-                    >
+                    <span className={cn('num', isPositive ? 'text-up' : 'text-down')}>
                       {formatPrice(item.change)}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={isPositive ? 'default' : 'destructive'}>
-                      <TrendIndicator change={item.change} showIcon={false} />
-                      {formatPercent(item.changePercent)}
-                    </Badge>
+                    <ChangeChip value={item.changePercent} />
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
+                  <TableCell className="text-sm text-muted">
                     {formatRelativeTime(item.recordedAt)}
                   </TableCell>
                 </TableRow>

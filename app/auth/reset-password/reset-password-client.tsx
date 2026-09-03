@@ -6,8 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/contexts/language-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { AuthCard } from "@/components/auth/auth-card";
 import { resetPassword } from "@/lib/api-auth";
 import { CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
 
@@ -70,156 +70,100 @@ function ResetPasswordContent() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              {t.common.appName}
-            </h1>
+      <AuthCard appTitle={t.common.appName} showTabs={false}>
+        <div className="text-center">
+          <div className="mx-auto w-14 h-14 bg-up-soft rounded-full flex items-center justify-center mb-4">
+            <CheckCircle className="w-7 h-7 text-up" />
           </div>
-
-          <Card className="border-slate-200 dark:border-slate-800">
-            <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-4">
-                <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
-              </div>
-              <CardTitle className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {t.pages.resetPassword.successTitle}
-              </CardTitle>
-              <CardDescription>
-                {t.pages.resetPassword.successRedirect}
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <h2 className="font-heading text-[18px] font-semibold text-up mb-1.5">
+            {t.pages.resetPassword.successTitle}
+          </h2>
+          <p className="text-[13px] text-muted">{t.pages.resetPassword.successRedirect}</p>
         </div>
-      </div>
+      </AuthCard>
     );
   }
 
   if (!token || !email) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              {t.common.appName}
-            </h1>
-          </div>
-
-          <Card className="border-slate-200 dark:border-slate-800">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-bold text-red-600 dark:text-red-400">
-                {t.pages.resetPassword.invalidLinkTitle}
-              </CardTitle>
-              <CardDescription>
-                {t.pages.resetPassword.invalidLinkDescription}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Link href="/auth/forgot-password">
-                <Button className="w-full" variant="default">
-                  {t.pages.resetPassword.requestNewLink}
-                </Button>
-              </Link>
-              <div className="text-center">
-                <Link
-                  href="/auth/login"
-                  className="inline-flex items-center text-sm text-primary hover:underline"
-                >
-                  <BackArrow className={`h-4 w-4 ${isRTL ? "ms-2" : "me-2"}`} />
-                  {t.pages.resetPassword.backToLogin}
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+      <AuthCard appTitle={t.common.appName} showTabs={false}>
+        <div className="text-center mb-6">
+          <h2 className="font-heading text-[18px] font-semibold text-down">{t.pages.resetPassword.invalidLinkTitle}</h2>
+          <p className="text-[13px] text-muted mt-1">{t.pages.resetPassword.invalidLinkDescription}</p>
         </div>
-      </div>
+        <div className="space-y-4">
+          <Link href="/auth/forgot-password">
+            <Button className="w-full h-12" size="lg">
+              {t.pages.resetPassword.requestNewLink}
+            </Button>
+          </Link>
+          <div className="text-center">
+            <Link href="/auth/login" className="inline-flex items-center gap-2 text-[13px] text-gold hover:underline">
+              <BackArrow className="h-4 w-4" />
+              {t.pages.resetPassword.backToLogin}
+            </Link>
+          </div>
+        </div>
+      </AuthCard>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            {t.common.appName}
-          </h1>
+    <AuthCard appTitle={t.common.appName} showTabs={false}>
+      <div className="text-center mb-6">
+        <h2 className="font-heading text-[18px] font-semibold text-text">{t.pages.resetPassword.title}</h2>
+        <p className="text-[13px] text-muted mt-1">{t.pages.resetPassword.subtitle}</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="password">{t.pages.resetPassword.newPasswordLabel}</Label>
+          <Input
+            id="password"
+            type="password"
+            placeholder={t.pages.resetPassword.newPasswordPlaceholder}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            disabled={isLoading}
+            className="w-full"
+            autoFocus
+          />
         </div>
 
-        <Card className="border-slate-200 dark:border-slate-800">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">{t.pages.resetPassword.title}</CardTitle>
-            <CardDescription>
-              {t.pages.resetPassword.subtitle}
-            </CardDescription>
-          </CardHeader>
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword">{t.pages.resetPassword.confirmPasswordLabel}</Label>
+          <Input
+            id="confirmPassword"
+            type="password"
+            placeholder={t.pages.resetPassword.confirmPasswordPlaceholder}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            disabled={isLoading}
+            className="w-full"
+          />
+          <p className="text-[12px] text-dim">{t.pages.resetPassword.passwordHint}</p>
+        </div>
 
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="password">
-                  {t.pages.resetPassword.newPasswordLabel}
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder={t.pages.resetPassword.newPasswordPlaceholder}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                  className="w-full"
-                  autoFocus
-                />
-              </div>
+        {error && (
+          <div className="p-3 text-[13px] text-down bg-down-soft rounded-[10px]">
+            {error}
+          </div>
+        )}
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">
-                  {t.pages.resetPassword.confirmPasswordLabel}
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder={t.pages.resetPassword.confirmPasswordPlaceholder}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                  className="w-full"
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t.pages.resetPassword.passwordHint}
-                </p>
-              </div>
+        <Button type="submit" className="w-full h-12" size="lg" disabled={isLoading}>
+          {isLoading ? t.pages.resetPassword.submitting : t.pages.resetPassword.submitButton}
+        </Button>
+      </form>
 
-              {error && (
-                <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-md border border-red-200 dark:border-red-800">
-                  {error}
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? t.pages.resetPassword.submitting : t.pages.resetPassword.submitButton}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <Link
-                href="/auth/login"
-                className="inline-flex items-center text-sm text-primary hover:underline"
-              >
-                <BackArrow className={`h-4 w-4 ${isRTL ? "ms-2" : "me-2"}`} />
-                {t.pages.resetPassword.backToLogin}
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="mt-6 text-center">
+        <Link href="/auth/login" className="inline-flex items-center gap-2 text-[13px] text-gold hover:underline">
+          <BackArrow className="h-4 w-4" />
+          {t.pages.resetPassword.backToLogin}
+        </Link>
       </div>
-    </div>
+    </AuthCard>
   );
 }
 
@@ -232,7 +176,7 @@ export default function ResetPasswordPage() {
   const { t } = useLanguage();
 
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">{t.pages.resetPassword.loading}</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-muted">{t.pages.resetPassword.loading}</div>}>
       <ResetPasswordContent />
     </Suspense>
   );

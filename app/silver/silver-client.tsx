@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, TrendingUp, TrendingDown, Minus, AlertCircle, Calculator, Bell } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, AlertCircle, Calculator, Bell } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/language-context';
 import { useAllSilverPrices } from '@/hooks/use-silver-prices';
@@ -10,6 +10,9 @@ import { formatPriceWithCurrency, formatPercent } from '@/lib/format';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LastUpdateIndicator } from '@/components/ui/last-update-indicator';
 import { PriceAlertModal } from '@/components/dashboard/price-alert-modal';
+import { PageHeader } from '@/components/ui/page-header';
+import { Sparkline } from '@/components/ui/sparkline';
+import { cn } from '@/lib/utils';
 
 // Silver product names mapping (all products)
 const SILVER_NAMES: Record<string, { ar: string; en: string }> = {
@@ -38,52 +41,6 @@ interface SilverDataItem {
   recordedAt: string;
 }
 
-function Sparkline({ data, isPositive }: { data: number[]; isPositive: boolean }) {
-  const width = 120;
-  const height = 32;
-  const padding = 4;
-  const innerWidth = width - padding * 2;
-  const innerHeight = height - padding * 2;
-
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-
-  const points = data.map((value, index) => {
-    const x = padding + (index / (data.length - 1 || 1)) * innerWidth;
-    const y = padding + innerHeight - ((value - min) / range) * innerHeight;
-    return { x, y };
-  });
-
-  const pathD = points
-    .map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`))
-    .join(' ');
-
-  const areaPath = `${pathD} L ${points[points.length - 1].x} ${height - padding} L ${padding} ${height - padding} Z`;
-
-  const gradientId = `silver-gradient-${isPositive ? 'up' : 'down'}-${Math.random().toString(36).substr(2, 9)}`;
-
-  return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
-      <defs>
-        <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={isPositive ? '#10b981' : '#ef4444'} stopOpacity="0.2" />
-          <stop offset="100%" stopColor={isPositive ? '#10b981' : '#ef4444'} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={areaPath} fill={`url(#${gradientId})`} />
-      <polyline
-        points={points.map(p => `${p.x},${p.y}`).join(' ')}
-        fill="none"
-        stroke={isPositive ? '#10b981' : '#ef4444'}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 function SilverPriceCard({ item, t, locale }: { item: SilverDataItem; t: any; locale: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isPositive = item.trend === 'up';
@@ -93,13 +50,13 @@ function SilverPriceCard({ item, t, locale }: { item: SilverDataItem; t: any; lo
 
   return (
     <>
-      <div className="group relative bg-white dark:bg-card rounded-lg border border-slate-200 dark:border-border shadow-sm transition-all hover:shadow-md hover:border-slate-300 dark:hover:border-border">
+      <div className="group relative card-surface transition-shadow hover:shadow-gold">
         <div className="space-y-4 p-5">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-              <h3 className="text-base font-semibold text-slate-900 dark:text-foreground">
+              <div className="h-1.5 w-1.5 rounded-full bg-dim" />
+              <h3 className="font-heading text-base font-semibold text-text">
                 {item.name}
               </h3>
             </div>
@@ -108,10 +65,10 @@ function SilverPriceCard({ item, t, locale }: { item: SilverDataItem; t: any; lo
 
           {/* Main Price (Sell) */}
           <div>
-            <p className="text-xs font-medium text-slate-500 dark:text-muted-foreground mb-1">
+            <p className="text-xs font-medium text-muted mb-1">
               {isOunce ? (locale === 'ar-EG' ? 'السعر الحالى' : 'Current Price') : t.gold.sellPrice}
             </p>
-            <p className="text-3xl font-bold text-slate-900 dark:text-foreground tabular-nums">
+            <p className="num text-3xl font-bold text-text">
               {formatPriceWithCurrency(item.sellPrice, item.currency, locale)}
             </p>
           </div>
@@ -119,8 +76,8 @@ function SilverPriceCard({ item, t, locale }: { item: SilverDataItem; t: any; lo
           {/* Buy Price */}
           {!isOunce && (
             <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-muted-foreground mb-0.5">{t.gold.buyPrice}</p>
-              <p className="text-lg font-medium text-slate-600 dark:text-muted-foreground tabular-nums">
+              <p className="text-xs font-medium text-muted mb-0.5">{t.gold.buyPrice}</p>
+              <p className="num text-lg font-medium text-muted">
                 {formatPriceWithCurrency(item.buyPrice, item.currency, locale)}
               </p>
             </div>
@@ -128,10 +85,10 @@ function SilverPriceCard({ item, t, locale }: { item: SilverDataItem; t: any; lo
 
           {/* Spread */}
           {!isOunce && (
-            <div className="pt-2 border-t border-slate-100 dark:border-border">
+            <div className="pt-2 border-t border-line">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-500 dark:text-muted-foreground">{t.gold.spread}</span>
-                <span className="text-sm font-semibold text-slate-700 dark:text-foreground tabular-nums">
+                <span className="text-xs font-medium text-muted">{t.gold.spread}</span>
+                <span className="num text-sm font-semibold text-text">
                   {formatPriceWithCurrency(spread, item.currency, locale)}
                 </span>
               </div>
@@ -143,16 +100,16 @@ function SilverPriceCard({ item, t, locale }: { item: SilverDataItem; t: any; lo
             <div className="flex items-center gap-1.5">
               {item.trend === 'neutral' ? (
                 <>
-                  <Minus className="h-4 w-4 text-slate-400" />
-                  <span className="text-sm font-semibold text-slate-400 tabular-nums">0%</span>
+                  <Minus className="h-4 w-4 text-dim" />
+                  <span className="num text-sm font-semibold text-dim">0%</span>
                 </>
               ) : (
                 <>
                   <TrendIcon
-                    className={`h-4 w-4 ${isPositive ? 'text-green-600 dark:text-success' : 'text-red-600 dark:text-red-400'}`}
+                    className={cn('h-4 w-4', isPositive ? 'text-up' : 'text-down')}
                   />
                   <span
-                    className={`text-sm font-semibold tabular-nums ${isPositive ? 'text-green-600 dark:text-success' : 'text-red-600 dark:text-red-400'}`}
+                    className={cn('num text-sm font-semibold', isPositive ? 'text-up' : 'text-down')}
                   >
                     {formatPercent(item.spreadPercent)}
                   </span>
@@ -160,7 +117,7 @@ function SilverPriceCard({ item, t, locale }: { item: SilverDataItem; t: any; lo
               )}
             </div>
             {item.chartPoints.length > 1 && (
-              <Sparkline data={item.chartPoints} isPositive={isPositive} />
+              <Sparkline data={item.chartPoints} width={120} height={32} tone={item.trend === 'neutral' ? 'gold' : isPositive ? 'up' : 'down'} />
             )}
           </div>
         </div>
@@ -168,7 +125,7 @@ function SilverPriceCard({ item, t, locale }: { item: SilverDataItem; t: any; lo
         {/* Notification Bell - Hover */}
         <button
           onClick={() => setIsModalOpen(true)}
-          className="absolute top-2 end-2 p-1.5 rounded-full bg-primary-600 text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-primary-700 hover:scale-110 transform"
+          className="absolute top-2 end-2 p-1.5 rounded-full bg-gold text-on-gold opacity-0 group-hover:opacity-100 transition-opacity shadow-gold hover:scale-110 transform"
         >
           <Bell className="h-4 w-4" />
         </button>
@@ -206,7 +163,7 @@ function transformApiItem(key: string, data: SilverOverviewItem, isRTL: boolean)
 
 function LoadingSkeleton() {
   return (
-    <div className="bg-white dark:bg-card rounded-lg border border-slate-200 dark:border-border shadow-sm p-5">
+    <div className="card-surface p-5">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Skeleton className="h-6 w-24" />
@@ -261,53 +218,40 @@ export default function SilverPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <section>
-        <div className="mb-6">
+      <PageHeader
+        eyebrow={isRTL ? 'الفضة' : 'Silver'}
+        title={isRTL ? 'أسعار الفضة' : 'Silver Prices'}
+        lead={isRTL ? 'أسعار الفضة المحدثة لحظياً - جميع الأنواع' : 'Live silver prices - All types'}
+      />
+
+      {/* Silver Price Cards */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <LoadingSkeleton key={i} />
+          ))}
+        </div>
+      ) : error || !data ? (
+        <div className="card-surface p-6 border border-down/20">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
-              <Sparkles className="h-8 w-8 text-slate-600 dark:text-slate-400" />
-            </div>
+            <AlertCircle className="h-6 w-6 text-down" />
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
-                {isRTL ? 'أسعار الفضة' : 'Silver Prices'}
-              </h1>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                {isRTL ? 'أسعار الفضة المحدثة لحظياً - جميع الأنواع' : 'Live silver prices - All types'}
+              <h3 className="font-semibold text-text">
+                {isRTL ? 'خطأ في تحميل البيانات' : 'Error loading data'}
+              </h3>
+              <p className="text-sm text-muted">
+                {error instanceof Error ? error.message : (isRTL ? 'فشل في تحميل أسعار الفضة' : 'Failed to load silver prices')}
               </p>
             </div>
           </div>
         </div>
-
-        {/* Silver Price Cards */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <LoadingSkeleton key={i} />
-            ))}
-          </div>
-        ) : error || !data ? (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="h-6 w-6 text-red-600" />
-              <div>
-                <h3 className="font-semibold text-red-900">
-                  {isRTL ? 'خطأ في تحميل البيانات' : 'Error loading data'}
-                </h3>
-                <p className="text-sm text-red-700">
-                  {error instanceof Error ? error.message : (isRTL ? 'فشل في تحميل أسعار الفضة' : 'Failed to load silver prices')}
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {silverItems.map((item) => (
-              <SilverPriceCard key={item.id} item={item} t={t} locale={locale} />
-            ))}
-          </div>
-        )}
-      </section>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {silverItems.map((item) => (
+            <SilverPriceCard key={item.id} item={item} t={t} locale={locale} />
+          ))}
+        </div>
+      )}
 
       {/* Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -315,15 +259,15 @@ export default function SilverPage() {
           <Link
             key={feature.href}
             href={feature.href}
-            className="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 hover:shadow-lg transition-all"
+            className="group card-surface p-6 hover:shadow-gold transition-shadow"
           >
-            <div className={`inline-flex p-3 rounded-lg ${feature.bgColor} mb-4`}>
-              <feature.icon className={`h-6 w-6 ${feature.color}`} />
+            <div className="inline-flex p-3 rounded-lg bg-gold-soft mb-4">
+              <feature.icon className="h-6 w-6 text-gold" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            <h3 className="font-heading text-lg font-bold text-text mb-2 group-hover:text-gold transition-colors">
               {feature.title}
             </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-sm text-muted">
               {feature.description}
             </p>
           </Link>

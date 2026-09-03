@@ -132,7 +132,7 @@ export function Footer() {
               {isRTL ? (
                 <>
                   الأسعار المعروضة للإشارة فقط ويتم تحديثها دورياً. قد تختلف الأسعار
-                  الفعلية. مرصادنا ليس مسؤولاً عن قرارات التداول. يرجى استشارة مستشار مالي
+                  الفعلية. قدامك ليس مسؤولاً عن قرارات التداول. يرجى استشارة مستشار مالي
                   قبل اتخاذ قرارات استثمارية.
                 </>
               ) : (
@@ -152,7 +152,7 @@ export function Footer() {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Coins className="h-4 w-4" />
             <span>
-              © {new Date().getFullYear()} {isRTL ? 'مرصادنا' : 'Odamak'}
+              © {new Date().getFullYear()} {isRTL ? 'قدامك' : 'Odamak'}
             </span>
           </div>
 

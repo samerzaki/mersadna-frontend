@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/language-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { AuthCard } from "@/components/auth/auth-card";
 import { PhoneInputField, type PhoneInputValue } from "@/components/ui/phone-input";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import { checkEmailExists, sendOtp } from "@/lib/api-auth";
 import { Turnstile } from "@/components/auth/turnstile";
 
@@ -28,7 +28,6 @@ export default function RegisterPage() {
     inputValue: "",
   });
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const router = useRouter();
@@ -45,7 +44,6 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
     if (!turnstileToken) {
       setError(language === "ar" ? "يرجى إكمال التحقق الأمني" : "Please complete the security check.");
       return;
@@ -92,201 +90,136 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-start justify-center bg-slate-50 dark:bg-slate-950 pt-20 sm:pt-28 pb-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Decorative background */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-amber-200/20 dark:bg-amber-500/[0.07] blur-3xl" />
-        <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent" />
+    <AuthCard appTitle={t.pages.register.appTitle} appSubtitle={t.pages.register.appSubtitle}>
+      <div className="text-center mb-6">
+        <h2 className="font-heading text-[18px] font-semibold text-text">{t.pages.register.title}</h2>
+        <p className="text-[13px] text-muted mt-1">{t.pages.register.subtitle}</p>
       </div>
-      <div className="relative z-10 max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            {t.pages.register.appTitle}
-          </h1>
-          <p className="text-slate-600 dark:text-slate-300">
-            {t.pages.register.appSubtitle}
-          </p>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="firstName">{t.pages.register.firstNameLabel}</Label>
+            <Input
+              id="firstName"
+              type="text"
+              placeholder={t.pages.register.firstNamePlaceholder}
+              value={formData.firstName}
+              onChange={handleChange}
+              required
+              disabled={isLoading}
+              className="w-full"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="lastName">{t.pages.register.lastNameLabel}</Label>
+            <Input
+              id="lastName"
+              type="text"
+              placeholder={t.pages.register.lastNamePlaceholder}
+              value={formData.lastName}
+              onChange={handleChange}
+              required
+              disabled={isLoading}
+              className="w-full"
+            />
+          </div>
         </div>
 
-        <Card className="border-slate-200 dark:border-slate-800">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">{t.pages.register.title}</CardTitle>
-            <CardDescription>
-              {t.pages.register.subtitle}
-            </CardDescription>
-          </CardHeader>
+        <div className="space-y-2">
+          <Label htmlFor="email">{t.pages.register.emailLabel}</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="example@email.com"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            disabled={isLoading}
+            className="w-full"
+          />
+        </div>
 
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">
-                    {t.pages.register.firstNameLabel}
-                  </Label>
-                  <Input
-                    id="firstName"
-                    type="text"
-                    placeholder={t.pages.register.firstNamePlaceholder}
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    required
-                    disabled={isLoading}
-                    className="w-full"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">
-                    {t.pages.register.lastNameLabel}
-                  </Label>
-                  <Input
-                    id="lastName"
-                    type="text"
-                    placeholder={t.pages.register.lastNamePlaceholder}
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    required
-                    disabled={isLoading}
-                    className="w-full"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">
-                  {t.pages.register.emailLabel}
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="example@email.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  disabled={isLoading}
-                  className="w-full"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">
-                  {t.pages.register.phoneLabel}
-                </Label>
-                <PhoneInputField
-                  value={phoneData.phone}
-                  onChange={setPhoneData}
-                  defaultCountry="eg"
-                  disabled={isLoading}
-                  placeholder="+201234567890"
-                />
-                {phoneData.phone && phoneData.phone.length > 4 && !phoneData.isValid && (
-                  <p className="text-xs text-yellow-600 dark:text-yellow-400">
-                    يرجى إدخال رقم هاتف صحيح
-                  </p>
-                )}
-                {phoneData.isValid && (
-                  <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
-                    <CheckCircle className="h-3 w-3" />
-                    رقم الهاتف صحيح
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">
-                  {t.pages.register.passwordLabel}
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder={t.pages.register.passwordPlaceholder}
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  disabled={isLoading}
-                  className="w-full"
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t.pages.register.passwordHint}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">
-                  {t.pages.register.confirmPasswordLabel}
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder={t.pages.register.confirmPasswordPlaceholder}
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  disabled={isLoading}
-                  className="w-full"
-                />
-              </div>
-
-              {error && (
-                <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-md border border-red-200 dark:border-red-800">
-                  {error}
-                </div>
-              )}
-
-              {success && (
-                <div className="p-3 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 rounded-md border border-green-200 dark:border-green-800">
-                  {success}
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? t.pages.register.submitting : t.pages.register.submitButton}
-              </Button>
-
-              <Turnstile
-                onVerify={handleTurnstileVerify}
-                onExpire={handleTurnstileExpire}
-                language={language}
-              />
-            </form>
-
-            <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">
-                {t.pages.register.hasAccount}{" "}
-              </span>
-              <Link
-                href="/auth/login"
-                className="font-medium text-primary hover:underline"
-              >
-                {t.pages.register.loginLink}
-              </Link>
-            </div>
-          </CardContent>
-
-          <CardFooter>
-            <p className="text-xs text-center text-muted-foreground w-full">
-              {t.pages.register.termsText}{" "}
-              <Link href="/terms" className="underline">
-                {t.pages.register.termsLink}
-              </Link>{" "}
-              {t.pages.register.and}{" "}
-              <Link href="/privacy" className="underline">
-                {t.pages.register.privacyLink}
-              </Link>
+        <div className="space-y-2">
+          <Label htmlFor="phone">{t.pages.register.phoneLabel}</Label>
+          <PhoneInputField
+            value={phoneData.phone}
+            onChange={setPhoneData}
+            defaultCountry="eg"
+            disabled={isLoading}
+            placeholder="+201234567890"
+          />
+          {phoneData.phone && phoneData.phone.length > 4 && !phoneData.isValid && (
+            <p className="text-[12px] text-muted">
+              {isRTL ? "يرجى إدخال رقم هاتف صحيح" : "Please enter a valid phone number"}
             </p>
-          </CardFooter>
-        </Card>
-
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground">
-            {t.pages.register.footerText}
-          </p>
+          )}
+          {phoneData.isValid && (
+            <p className="text-[12px] text-up flex items-center gap-1">
+              <CheckCircle className="h-3 w-3" />
+              {isRTL ? "رقم الهاتف صحيح" : "Phone number is valid"}
+            </p>
+          )}
         </div>
-      </div>
-    </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="password">{t.pages.register.passwordLabel}</Label>
+          <Input
+            id="password"
+            type="password"
+            placeholder={t.pages.register.passwordPlaceholder}
+            value={formData.password}
+            onChange={handleChange}
+            required
+            disabled={isLoading}
+            className="w-full"
+          />
+          <p className="text-[12px] text-dim">{t.pages.register.passwordHint}</p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword">{t.pages.register.confirmPasswordLabel}</Label>
+          <Input
+            id="confirmPassword"
+            type="password"
+            placeholder={t.pages.register.confirmPasswordPlaceholder}
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+            disabled={isLoading}
+            className="w-full"
+          />
+        </div>
+
+        {error && (
+          <div className="p-3 text-[13px] text-down bg-down-soft rounded-[10px]">
+            {error}
+          </div>
+        )}
+
+        <Button type="submit" className="w-full h-12" size="lg" disabled={isLoading}>
+          {isLoading && <Loader2 className="animate-spin" />}
+          {isLoading ? t.pages.register.submitting : t.pages.register.submitButton}
+        </Button>
+
+        <Turnstile
+          onVerify={handleTurnstileVerify}
+          onExpire={handleTurnstileExpire}
+          language={language}
+        />
+      </form>
+
+      <p className="mt-6 text-[12.5px] text-center text-dim leading-relaxed">
+        {t.pages.register.termsText}{" "}
+        <Link href="/terms" className="underline hover:text-gold">
+          {t.pages.register.termsLink}
+        </Link>{" "}
+        {t.pages.register.and}{" "}
+        <Link href="/privacy" className="underline hover:text-gold">
+          {t.pages.register.privacyLink}
+        </Link>
+      </p>
+    </AuthCard>
   );
 }

@@ -6,7 +6,7 @@ export const metadata: Metadata = buildMetadata('terms', {
   canonicalPath: '/disclaimer',
   overrides: {
     title: 'إخلاء المسؤولية | Odamak',
-    description: 'إخلاء مسؤولية منصة مرصادنا.',
+    description: 'إخلاء مسؤولية منصة قدامك.',
   },
 });
 

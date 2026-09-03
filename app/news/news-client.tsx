@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Newspaper } from 'lucide-react';
 import { useNewsList, useFeaturedNews } from '@/hooks/use-news';
 import { useLanguage } from '@/contexts/language-context';
 import {
@@ -9,11 +8,12 @@ import {
   NewsList,
   FeaturedNews,
 } from '@/components/news';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { ApiError } from '@/components/ui/api-error';
 
 export default function NewsPage() {
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
   const isRTL = language === 'ar';
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -54,27 +54,15 @@ export default function NewsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
-      {/* Page Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-            <Newspaper className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              {isRTL ? 'آخر الأخبار' : 'Latest News'}
-            </h1>
-          </div>
-        </div>
-      </div>
+    <div>
+      <PageHeader title={t.pages.news.title} lead={t.pages.news.subtitle} />
 
-      {/* Search */}
+      {/* Search (no category taxonomy in the API — search takes the pills slot) */}
       <div className="flex justify-end mb-6">
         <NewsSearch
           value={search}
           onChange={handleSearchChange}
-          className="max-w-md"
+          className="w-full max-w-sm"
         />
       </div>
 
@@ -116,10 +104,8 @@ export default function NewsPage() {
               >
                 {isRTL ? 'السابق' : 'Previous'}
               </Button>
-              <span className="px-4 py-2 text-sm text-slate-600 dark:text-slate-400">
-                {isRTL
-                  ? `صفحة ${pagination.currentPage} من ${pagination.totalPages}`
-                  : `Page ${pagination.currentPage} of ${pagination.totalPages}`}
+              <span className="num px-4 py-2 text-[13px] text-muted">
+                {pagination.currentPage} / {pagination.totalPages}
               </span>
               <Button
                 variant="outline"

@@ -54,7 +54,7 @@ export function adaptApiNewsToNewsItem(apiNews: ApiNewsItem): NewsItem {
     source: {
       id: 'odamak',
       name: 'Odamak',
-      nameAr: 'مرصادنا',
+      nameAr: 'قدامك',
     },
     publishedAt,
     readingTimeMinutes: readingTime,

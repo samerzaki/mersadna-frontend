@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { PricingCard } from '@/components/pricing/pricing-card';
+import { PageHeader } from '@/components/ui/page-header';
 import { cn } from '@/lib/utils';
 
 type BillingPeriod = 'monthly' | 'yearly';
@@ -51,16 +52,7 @@ export default function PricingPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <section>
-        <div className="mb-4">
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            
-            خطط الاشتراك
-            
-          </h2>
-        </div>
-      </section>
+      <PageHeader title="خطط الاشتراك" className="py-0 pb-0 md:py-0 md:pb-0" />
 
       {/* Billing Toggle */}
       <div className="flex items-center gap-2">
@@ -69,8 +61,8 @@ export default function PricingPage() {
           className={cn(
             'px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
             billingPeriod === 'monthly'
-              ? 'bg-primary text-white'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+              ? 'bg-gold text-on-gold'
+              : 'bg-panel2 text-muted hover:bg-hover'
           )}
         >
           شهري
@@ -80,12 +72,12 @@ export default function PricingPage() {
           className={cn(
             'px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1',
             billingPeriod === 'yearly'
-              ? 'bg-primary text-white'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+              ? 'bg-gold text-on-gold'
+              : 'bg-panel2 text-muted hover:bg-hover'
           )}
         >
           سنوي
-          <span className="text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded">
+          <span className="text-[10px] bg-up-soft text-up px-1.5 py-0.5 rounded">
             وفر 20%
           </span>
         </button>
@@ -120,7 +112,7 @@ export default function PricingPage() {
 
       {/* Footer Note */}
       <div className="text-center pt-4">
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-muted">
           يمكن إلغاء الاشتراك في أي وقت • جميع الخطط تشمل الدعم الفني
         </p>
       </div>

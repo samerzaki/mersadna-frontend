@@ -48,6 +48,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sparkline } from "@/components/currency/sparkline";
 import { ApiError } from "@/components/ui/api-error";
+import { PageHeader } from "@/components/ui/page-header";
+import { SectionCard } from "@/components/ui/section-card";
+import { StatTile } from "@/components/ui/stat-tile";
 import {
   usePortfolio,
   useCreatePortfolioItem,
@@ -209,6 +212,7 @@ export default function PortfolioPage() {
   if (isLoading) {
     return (
       <div className="space-y-4 pb-24">
+        <PageHeader title={t.pages.portfolio.title} lead={t.pages.portfolio.subtitle} />
         {/* Hero skeleton */}
         <div className="rounded-lg border p-6">
           <div className="h-6 w-32 bg-muted rounded animate-pulse mb-4" />
@@ -245,14 +249,18 @@ export default function PortfolioPage() {
   // Error state
   if (error) {
     return (
-      <div className="py-12">
-        <ApiError error={error} retry={refetch} />
+      <div className="pb-24">
+        <PageHeader title={t.pages.portfolio.title} lead={t.pages.portfolio.subtitle} />
+        <div className="py-12">
+          <ApiError error={error} retry={refetch} />
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-4 pb-24">
+      <PageHeader title={t.pages.portfolio.title} lead={t.pages.portfolio.subtitle} />
       {/* ═══════════════════════════════════════════════════════
           Section 1 + 3: Hero Card + Asset Allocation (same row)
           ═══════════════════════════════════════════════════════ */}
@@ -297,7 +305,7 @@ export default function PortfolioPage() {
 
             {/* Total value */}
             <div className={cn("mb-3", isHidden && "blur-md select-none")}>
-              <p className="text-4xl md:text-5xl font-bold tabular-nums mb-1">
+              <p className="num text-4xl md:text-5xl font-bold mb-1">
                 {formatPrice(summary?.total_current_value ?? 0)}
               </p>
               <span className="text-sm text-muted-foreground">
@@ -308,10 +316,10 @@ export default function PortfolioPage() {
             {/* Profit/Loss pill */}
             <div
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold mb-4",
+                "num inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold mb-4",
                 isProfit
-                  ? "bg-success/10 text-success"
-                  : "bg-destructive/10 text-destructive",
+                  ? "bg-up-soft text-up"
+                  : "bg-down-soft text-down",
                 isHidden && "blur-md select-none"
               )}
             >
@@ -431,7 +439,7 @@ export default function PortfolioPage() {
                     <div className="text-end">
                       <p
                         className={cn(
-                          "text-sm font-bold tabular-nums",
+                          "num text-sm font-bold",
                           isHidden && "blur-sm"
                         )}
                       >
@@ -439,7 +447,7 @@ export default function PortfolioPage() {
                       </p>
                       <p
                         className={cn(
-                          "text-xs text-muted-foreground tabular-nums",
+                          "num text-xs text-muted-foreground",
                           isHidden && "blur-sm"
                         )}
                       >
@@ -460,103 +468,50 @@ export default function PortfolioPage() {
       {items.length > 0 && summary && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 animate-in fade-in-50 slide-in-from-bottom-4 duration-500 delay-100">
           {/* Total Assets */}
-          <Card className="hover:shadow-md transition-shadow duration-300">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between mb-2">
-                <div className="h-8 w-8 rounded-lg bg-primary-50 dark:bg-primary-950/10 flex items-center justify-center">
-                  <Wallet className="h-4 w-4 text-primary" />
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mb-0.5">
-                إجمالي الأصول
-              </p>
-              <p className="text-xl font-bold tabular-nums">
-                {counts?.all ?? items.length}
-              </p>
-            </CardContent>
-          </Card>
+          <StatTile
+            label="إجمالي الأصول"
+            value={counts?.all ?? items.length}
+          />
 
           {/* Best Performer */}
-          <Card className="hover:shadow-md transition-shadow duration-300">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between mb-2">
-                <div className="h-8 w-8 rounded-lg bg-success/10 flex items-center justify-center">
-                  <TrendingUp className="h-4 w-4 text-success" />
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mb-0.5 truncate">
-                {summary.best_performer?.name ?? "—"}
-              </p>
-              <p
-                className={cn(
-                  "text-sm font-bold text-success tabular-nums",
-                  isHidden && "blur-sm"
-                )}
-              >
+          <StatTile
+            label={summary.best_performer?.name ?? "—"}
+            value={
+              <span className={cn("text-up", isHidden && "blur-sm")}>
                 {summary.best_performer
                   ? `+${summary.best_performer.profit_loss_percent.toFixed(1)}%`
                   : "—"}
-              </p>
-            </CardContent>
-          </Card>
+              </span>
+            }
+          />
 
           {/* Worst Performer */}
-          <Card className="hover:shadow-md transition-shadow duration-300">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between mb-2">
-                <div className="h-8 w-8 rounded-lg bg-destructive/10 flex items-center justify-center">
-                  <TrendingDown className="h-4 w-4 text-destructive" />
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mb-0.5 truncate">
-                {summary.worst_performer?.name ?? "—"}
-              </p>
-              <p
-                className={cn(
-                  "text-sm font-bold text-destructive tabular-nums",
-                  isHidden && "blur-sm"
-                )}
-              >
+          <StatTile
+            label={summary.worst_performer?.name ?? "—"}
+            value={
+              <span className={cn("text-down", isHidden && "blur-sm")}>
                 {summary.worst_performer
                   ? `${summary.worst_performer.profit_loss_percent.toFixed(1)}%`
                   : "—"}
-              </p>
-            </CardContent>
-          </Card>
+              </span>
+            }
+          />
 
           {/* Overall Change */}
-          <Card className="hover:shadow-md transition-shadow duration-300">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between mb-2">
-                <div
-                  className={cn(
-                    "h-8 w-8 rounded-lg flex items-center justify-center",
-                    isProfit ? "bg-success/10" : "bg-destructive/10"
-                  )}
-                >
-                  <Activity
-                    className={cn(
-                      "h-4 w-4",
-                      isProfit ? "text-success" : "text-destructive"
-                    )}
-                  />
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mb-0.5">
-                إجمالي التغير
-              </p>
-              <p
+          <StatTile
+            label="إجمالي التغير"
+            value={
+              <span
                 className={cn(
-                  "text-sm font-bold tabular-nums",
-                  isProfit ? "text-success" : "text-destructive",
+                  isProfit ? "text-up" : "text-down",
                   isHidden && "blur-sm"
                 )}
               >
                 {(summary.profit_loss_percent ?? 0) >= 0 ? "+" : ""}
                 {(summary.profit_loss_percent ?? 0).toFixed(2)}%
-              </p>
-            </CardContent>
-          </Card>
+              </span>
+            }
+          />
         </div>
       )}
 
@@ -694,7 +649,7 @@ export default function PortfolioPage() {
                       {/* Current Value */}
                       <p
                         className={cn(
-                          "text-base font-bold tabular-nums mb-1",
+                          "num text-base font-bold mb-1",
                           isHidden && "blur-md select-none"
                         )}
                       >
@@ -704,7 +659,7 @@ export default function PortfolioPage() {
                       {/* Buy price (compact) */}
                       <p
                         className={cn(
-                          "text-[10px] text-muted-foreground tabular-nums mb-2",
+                          "num text-[10px] text-muted-foreground mb-2",
                           isHidden && "blur-sm select-none"
                         )}
                       >
@@ -715,10 +670,10 @@ export default function PortfolioPage() {
                       <div className="flex items-end justify-between gap-1">
                         <div
                           className={cn(
-                            "inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold leading-tight",
+                            "num inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold leading-tight",
                             itemIsProfit
-                              ? "bg-success/10 text-success"
-                              : "bg-destructive/10 text-destructive",
+                              ? "bg-up-soft text-up"
+                              : "bg-down-soft text-down",
                             isHidden && "blur-sm select-none"
                           )}
                         >

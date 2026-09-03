@@ -6,6 +6,8 @@ import { useNewsBookmarks } from '@/hooks/use-news';
 import { useLanguage } from '@/contexts/language-context';
 import { newsDetailPath } from '@/lib/news-routes';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/ui/page-header';
+import { SectionCard } from '@/components/ui/section-card';
 import Image from 'next/image';
 
 export default function SavedNewsPage() {
@@ -16,23 +18,14 @@ export default function SavedNewsPage() {
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
       {/* Page Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-            <Bookmark className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              {isRTL ? 'الأخبار المحفوظة' : 'Saved News'}
-            </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              {isRTL
-                ? `${bookmarks.length} خبر محفوظ`
-                : `${bookmarks.length} saved article${bookmarks.length !== 1 ? 's' : ''}`}
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title={isRTL ? 'الأخبار المحفوظة' : 'Saved News'}
+        lead={
+          isRTL
+            ? `${bookmarks.length} خبر محفوظ`
+            : `${bookmarks.length} saved article${bookmarks.length !== 1 ? 's' : ''}`
+        }
+      />
 
       {/* Loading state */}
       {!isLoaded && (
@@ -78,7 +71,8 @@ export default function SavedNewsPage() {
 
       {/* Saved news list */}
       {isLoaded && bookmarks.length > 0 && (
-        <div className="space-y-4">
+        <SectionCard>
+          <div className="divide-y divide-line">
           {bookmarks.map((bookmark) => {
             const title = isRTL ? bookmark.titleAr : bookmark.title;
             const excerpt = isRTL ? bookmark.excerptAr : bookmark.excerpt;
@@ -86,7 +80,7 @@ export default function SavedNewsPage() {
             return (
               <div
                 key={bookmark.id}
-                className="group flex gap-4 p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:shadow-md transition-all"
+                className="group flex gap-4 p-4 hover:bg-hover transition-colors"
               >
                 {/* Thumbnail */}
                 <Link
@@ -143,7 +137,8 @@ export default function SavedNewsPage() {
               </div>
             );
           })}
-        </div>
+          </div>
+        </SectionCard>
       )}
     </div>
   );

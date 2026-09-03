@@ -2,138 +2,98 @@
 
 import { useGoldOverview } from '@/hooks/use-gold-prices';
 import { useCurrencyAverages } from '@/hooks/use-currency-prices';
-import { TrendingUp, TrendingDown, Minus, Clock } from 'lucide-react';
-import { formatPrice, formatPercent, formatRelativeTime, isPriceLive } from '@/lib/format';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useLanguage } from '@/contexts/language-context';
+import { useSilverOverview } from '@/hooks/use-silver-prices';
+import { useCryptoTop } from '@/hooks/use-crypto-prices';
+import { formatPercent } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 interface PriceTickerProps {
   className?: string;
 }
 
+type TickerItem = {
+  key: string;
+  name: string;
+  price: string;
+  change?: number;
+};
+
+function TickerRow({ items }: { items: TickerItem[] }) {
+  return (
+    <div className="flex items-center gap-0 h-10 whitespace-nowrap flex-shrink-0" aria-hidden={false}>
+      {items.map((item, i) => (
+        <span
+          key={item.key + i}
+          className="flex items-baseline gap-2 text-[12.5px] text-dim px-[22px] border-s border-line2"
+        >
+          <span>{item.name}</span>
+          <b className="num text-[13.5px] text-text font-medium">{item.price}</b>
+          {item.change !== undefined && (
+            <span className={cn('num text-[12px]', item.change >= 0 ? 'text-up' : 'text-down')}>
+              {item.change >= 0 ? '↑' : '↓'} {formatPercent(Math.abs(item.change))}
+            </span>
+          )}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function PriceTicker({ className }: PriceTickerProps) {
-  const { t, language } = useLanguage();
-  const isRTL = language === 'ar';
+  const { data: goldData } = useGoldOverview();
+  const { data: usdData } = useCurrencyAverages('USD', 'EGP');
+  const { data: silverData } = useSilverOverview();
+  const { data: cryptoData } = useCryptoTop();
 
-  const { data: goldData, isLoading: goldLoading, dataUpdatedAt } = useGoldOverview();
-  const { data: usdData, isLoading: usdLoading } = useCurrencyAverages('USD', 'EGP');
-  const { data: eurData, isLoading: eurLoading } = useCurrencyAverages('EUR', 'EGP');
+  const gold = goldData?.data?.gold;
+  const usd = usdData?.data;
+  const silver999 = silverData?.data?.silver?.['999_egyptian'];
 
-  const isLoading = goldLoading || usdLoading || eurLoading;
+  const items: TickerItem[] = [];
 
-  if (isLoading) {
-    return (
-      <div className={cn(
-        "bg-slate-900 dark:bg-slate-950 border-b border-slate-800",
-        className
-      )}>
-        <div className="container mx-auto px-4 py-2.5">
-          <div className="flex gap-6 overflow-x-auto scrollbar-hide">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-8 w-36 flex-shrink-0 bg-slate-800" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+  (['24', '21', '18'] as const).forEach((k) => {
+    const item = gold?.[k];
+    if (!item) return;
+    items.push({
+      key: `g${k}`,
+      name: `عيار ${k}`,
+      price: item.sell_price.toLocaleString('en-US'),
+      change: item.spread_percent,
+    });
+  });
+
+  if (usd?.banks?.avg_sell_rate) {
+    items.push({ key: 'usd-bank', name: 'دولار بنكي', price: usd.banks.avg_sell_rate.toFixed(2) });
+  }
+  if (usd?.parallel_market?.avg_sell_rate) {
+    items.push({ key: 'usd-par', name: 'دولار موازي', price: usd.parallel_market.avg_sell_rate.toFixed(2) });
+  }
+  if (silver999) {
+    items.push({
+      key: 'silver',
+      name: 'فضة 999',
+      price: silver999.sell_price.toLocaleString('en-US'),
+      change: silver999.spread_percent,
+    });
+  }
+  (cryptoData ?? []).slice(0, 2).forEach((c) => {
+    items.push({
+      key: c.symbol,
+      name: c.symbol,
+      price: `$${c.price_usd.toLocaleString('en-US')}`,
+      change: c.change_24h,
+    });
+  });
+
+  if (items.length === 0) {
+    return <div className={cn('h-10 border-b border-line bg-panel', className)} />;
   }
 
-  // Get gold 24k data
-  const gold24 = goldData?.data?.gold?.['24'];
-  const gold24Price = gold24?.sell_price;
-  const gold24Change = gold24?.spread_percent || 0;
-  const gold24RecordedAt = gold24?.recorded_at;
-
-  // Get USD average
-  const usdPrice = usdData?.data?.banks?.avg_buy_rate;
-  const usdChange = 0; // API doesn't provide change for currency averages
-
-  // Get EUR average
-  const eurPrice = eurData?.data?.banks?.avg_buy_rate;
-  const eurChange = 0;
-
-  const stats = [
-    {
-      icon: '🥇',
-      label: t.gold.karat24,
-      value: gold24Price ? formatPrice(gold24Price) : '-',
-      change: gold24Change,
-      isLive: gold24RecordedAt ? isPriceLive(gold24RecordedAt) : false,
-    },
-    {
-      icon: '💵',
-      label: t.currency.dollar,
-      value: usdPrice ? `${usdPrice.toFixed(2)} ${t.common.egp}` : '-',
-      change: usdChange,
-      isLive: false,
-    },
-    {
-      icon: '💶',
-      label: t.currency.euro,
-      value: eurPrice ? `${eurPrice.toFixed(2)} ${t.common.egp}` : '-',
-      change: eurChange,
-      isLive: false,
-    },
-  ];
-
   return (
-    <div className={cn(
-      "bg-slate-900 dark:bg-slate-950 border-b border-slate-800",
-      className
-    )}>
-      <div className="container mx-auto px-4 py-2.5">
-        <div className="flex items-center justify-between gap-4">
-          {/* Stats */}
-          <div className="flex gap-6 overflow-x-auto scrollbar-hide">
-            {stats.map((stat, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-2.5 flex-shrink-0 group cursor-pointer hover:opacity-80 transition-opacity"
-              >
-                <span className="text-lg">{stat.icon}</span>
-                <div className="flex items-center gap-2">
-                  <div>
-                    <p className="text-[10px] text-slate-400 leading-none mb-0.5">{stat.label}</p>
-                    <p className="text-sm font-bold text-white leading-none">{stat.value}</p>
-                  </div>
-                  <div className={cn(
-                    "flex items-center gap-0.5 text-[10px] font-semibold",
-                    stat.change === 0
-                      ? 'text-slate-500'
-                      : stat.change > 0
-                        ? 'text-green-400'
-                        : 'text-red-400'
-                  )}>
-                    {stat.change === 0 ? (
-                      <Minus className="h-2.5 w-2.5" />
-                    ) : stat.change > 0 ? (
-                      <TrendingUp className="h-2.5 w-2.5" />
-                    ) : (
-                      <TrendingDown className="h-2.5 w-2.5" />
-                    )}
-                    <span>{formatPercent(Math.abs(stat.change))}</span>
-                  </div>
-                  {stat.isLive && (
-                    <span className="relative flex h-1.5 w-1.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Last Update */}
-          <div className={cn(
-            "hidden sm:flex items-center gap-1.5 text-[10px] text-slate-400 flex-shrink-0",
-            isRTL ? "border-r border-slate-700 pr-4" : "border-l border-slate-700 pl-4"
-          )}>
-            <Clock className="h-3 w-3" />
-            <span>{formatRelativeTime(new Date(dataUpdatedAt))}</span>
-          </div>
-        </div>
+    <div className={cn('overflow-hidden border-b border-line bg-panel', className)}>
+      <div className="flex w-max animate-[msTicker_80s_linear_infinite] motion-reduce:animate-none hover:[animation-play-state:paused]">
+        <TickerRow items={items} />
+        <TickerRow items={items} />
       </div>
     </div>
   );

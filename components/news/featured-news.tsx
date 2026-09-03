@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { Zap } from 'lucide-react';
 import { NewsItem } from '@/types';
 import { useLanguage } from '@/contexts/language-context';
 import { newsDetailPath } from '@/lib/news-routes';
+import { formatRelativeTime } from '@/lib/format';
+import { NewsImage } from '@/components/ui/news-image';
+import { SectionCard } from '@/components/ui/section-card';
 import { cn } from '@/lib/utils';
 
 interface FeaturedNewsProps {
@@ -14,116 +16,73 @@ interface FeaturedNewsProps {
   className?: string;
 }
 
-function OverlayCard({ news, className, titleClass }: { news: NewsItem; className?: string; titleClass?: string }) {
-  const { language } = useLanguage();
-  const isRTL = language === 'ar';
-  const title = isRTL ? news.titleAr : news.title;
-
-  return (
-    <Link
-      href={newsDetailPath(news.id, news.slug, news.title)}
-      className={cn(
-        'group relative block rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800',
-        className
-      )}
-    >
-      <Image
-        src={news.thumbnail}
-        alt={title}
-        fill
-        className="object-cover group-hover:scale-105 transition-transform duration-500"
-        unoptimized
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-
-      {/* Category badge */}
-      <div className="absolute top-3 start-3 flex items-center gap-2">
-        {news.isBreaking && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold bg-red-600 text-white rounded-full animate-pulse">
-            <Zap className="w-3 h-3" />
-          </span>
-        )}
-      </div>
-
-      {/* Title overlay */}
-      <div className="absolute bottom-0 start-0 end-0 p-4">
-        <h3 className={cn(
-          'font-bold text-white line-clamp-2 group-hover:text-primary-300 transition-colors',
-          titleClass || 'text-sm'
-        )}>
-          {title}
-        </h3>
-      </div>
-    </Link>
-  );
-}
+const MOST_FOLLOWED_COUNT = 5;
 
 export function FeaturedNews({ featured, breaking, className }: FeaturedNewsProps) {
+  const { language, t } = useLanguage();
+  const isRTL = language === 'ar';
+
   const topNews = [...breaking, ...featured.filter((f) => !breaking.some((b) => b.id === f.id))];
 
   if (topNews.length === 0) {
     return null;
   }
 
-  // 1 big + 5 surrounding
   const mainNews = topNews[0];
-  const surrounding = topNews.slice(1, 6);
+  const mostFollowed = topNews.slice(1, 1 + MOST_FOLLOWED_COUNT);
+  const title = isRTL ? mainNews.titleAr : mainNews.title;
+  const tag = mainNews.isBreaking ? (isRTL ? 'عاجل' : 'Breaking') : (isRTL ? mainNews.source.nameAr : mainNews.source.name);
+  const timeAgo = formatRelativeTime(mainNews.publishedAt, language);
 
   return (
-    <section className={cn(className)}>
-      {/*
-        Bento grid layout (RTL):
-        ┌────────┬────────────────┬────────┐
-        │ side1  │                │ side2  │
-        ├────────┤   BIG (main)   ├────────┤
-        │ side3  │                │ side4  │
-        ├────────┴────────────────┴────────┤
-        │            bottom                │
-        └──────────────────────────────────┘
-      */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 lg:grid-rows-[200px_200px] gap-3">
-        {/* Main featured - right side in RTL, spans 2 cols & 2 rows */}
-        <div className="lg:col-span-2 lg:row-span-2">
-          <OverlayCard
-            news={mainNews}
-            className="relative aspect-video lg:aspect-auto lg:h-full"
-            titleClass="text-xl md:text-2xl"
-          />
+    <section className={cn('grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-4', className)}>
+      {/* Main featured story */}
+      <Link
+        href={newsDetailPath(mainNews.id, mainNews.slug, mainNews.title)}
+        className="group relative block card-surface overflow-hidden h-[320px]"
+      >
+        <NewsImage src={mainNews.thumbnail} alt={title} className="w-full h-full" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+
+        <div className="absolute bottom-0 start-0 end-0 p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white text-[11px] font-semibold text-black">
+              {mainNews.isBreaking && <Zap className="w-3 h-3" />}
+              {tag}
+            </span>
+            <span className="num text-[12px] text-white/75">{timeAgo}</span>
+          </div>
+          <h2 className="font-heading text-2xl font-semibold text-white line-clamp-2 leading-snug">
+            {title}
+          </h2>
         </div>
+      </Link>
 
-        {/* Side 1 */}
-        {surrounding[0] && (
-          <OverlayCard
-            news={surrounding[0]}
-            className="relative aspect-video lg:aspect-auto lg:h-full"
-          />
-        )}
-
-        {/* Side 2 */}
-        {surrounding[1] && (
-          <OverlayCard
-            news={surrounding[1]}
-            className="relative aspect-video lg:aspect-auto lg:h-full"
-          />
-        )}
-
-        {/* Side 3 */}
-        {surrounding[2] && (
-          <OverlayCard
-            news={surrounding[2]}
-            className="relative aspect-video lg:aspect-auto lg:h-full"
-          />
-        )}
-
-        {/* Side 4 */}
-        {surrounding[3] && (
-          <OverlayCard
-            news={surrounding[3]}
-            className="relative aspect-video lg:aspect-auto lg:h-full"
-          />
-        )}
-      </div>
-
+      {/* Most followed */}
+      {mostFollowed.length > 0 && (
+        <SectionCard title={t.pages.news.mostFollowed}>
+          <ol className="divide-y divide-line2">
+            {mostFollowed.map((item, index) => {
+              const itemTitle = isRTL ? item.titleAr : item.title;
+              return (
+                <li key={item.id}>
+                  <Link
+                    href={newsDetailPath(item.id, item.slug, item.title)}
+                    className="group flex items-start gap-3 px-5 py-3 hover:bg-hover transition-colors"
+                  >
+                    <span className="num text-[13px] font-semibold text-gold shrink-0 w-5">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className="font-heading text-[13.5px] leading-snug text-text line-clamp-2 group-hover:text-gold transition-colors">
+                      {itemTitle}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ol>
+        </SectionCard>
+      )}
     </section>
   );
 }
