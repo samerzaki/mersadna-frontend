@@ -3,6 +3,7 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  allowedDevOrigins: ['odamak.test', 'api.odamak.test'],
   // Turbopack configuration (default in Next.js 16)
   // Empty config allows Turbopack to use its default module resolution
   turbopack: {},
