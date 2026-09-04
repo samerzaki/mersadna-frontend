@@ -10,7 +10,7 @@ interface BankBadgeProps {
   name: string;
   initials?: string;
   logoUrl?: string;
-  size?: 34 | 40;
+  size?: 34 | 40 | 64;
   className?: string;
 }
 

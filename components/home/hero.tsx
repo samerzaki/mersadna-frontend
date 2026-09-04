@@ -176,7 +176,7 @@ export function Hero({ karat21, lastCheckedAt, lastCheckedAtForHuman, history30d
 
       {/* Right */}
       <SectionCard
-        title={t.home2026.allKaratsNow}
+        title={<Link href="/gold" className="hover:text-gold transition-colors">{t.home2026.allKaratsNow}</Link>}
         action={
           <Link href="/gold" className="text-[13px] text-gold hover:opacity-75 transition-opacity">
             {t.home2026.details}

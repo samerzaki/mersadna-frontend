@@ -40,6 +40,7 @@ function RateCard({
   price,
   loading,
   chip,
+  titleHref,
 }: {
   label: string;
   tone: 'up' | 'down' | 'gold';
@@ -48,6 +49,7 @@ function RateCard({
   price?: string;
   loading?: boolean;
   chip?: string;
+  titleHref?: string;
 }) {
   const { t } = useLanguage();
   const toneClass = tone === 'up' ? 'text-up' : tone === 'down' ? 'text-down' : 'text-gold';
@@ -57,7 +59,7 @@ function RateCard({
       <div className="flex items-center justify-between mb-4">
         <span className="flex items-center gap-1.5 font-heading text-[15px] font-semibold text-text">
           <span className={toneClass}>{icon}</span>
-          {label}
+          {titleHref ? <Link href={titleHref} className="hover:text-gold transition-colors">{label}</Link> : label}
         </span>
         {chip && <span className="chip">{chip}</span>}
       </div>
@@ -66,15 +68,13 @@ function RateCard({
         <div className="h-10 w-32 bg-panel2 rounded animate-pulse" />
       ) : (
         <>
-          <div className="flex items-start gap-2.5">
-            <BankBadge name={bank.name} logoUrl={bank.bank_logo_url} size={34} />
-            <div className="min-w-0">
-              <span className="block text-[13px] text-muted truncate">{bank.name}</span>
-              <div className={`num mt-1 text-right text-[36px] md:text-[40px] font-medium leading-none ${toneClass}`}>
-                {parseFloat(price).toFixed(2)}
-              </div>
-              <div className="mt-1.5 text-right text-[11px] text-dim">{t.home2026.egyptianPound}</div>
+          <span className="block text-[13px] text-muted truncate">{bank.name}</span>
+          <div className="mt-1 grid grid-cols-[minmax(0,max-content)_64px] items-center justify-between gap-x-4">
+            <div className={`num text-right text-[36px] md:text-[40px] font-medium leading-none ${toneClass}`}>
+              {parseFloat(price).toFixed(2)}
             </div>
+            <BankBadge name={bank.name} logoUrl={bank.bank_logo_url} size={64} className="shrink-0" />
+            <div className="mt-1.5 text-right text-[11px] text-dim">{t.home2026.egyptianPound}</div>
           </div>
         </>
       )}
@@ -101,7 +101,7 @@ function ParallelCard({
       <div className="flex items-center justify-between mb-4">
         <span className="flex items-center gap-1.5 font-heading text-[15px] font-semibold text-text">
           <Shuffle className="size-[15px] text-gold" />
-          {t.home2026.parallelMarket}
+          <Link href="/currencies" className="hover:text-gold transition-colors">{t.home2026.parallelMarket}</Link>
         </span>
         <span className="flex items-center gap-1.5 text-[11.5px] text-dim">
           <span>{t.home2026.gapVsBanks}</span>
@@ -222,6 +222,7 @@ export function BestRatesWidgetClient({ initialData }: BestRatesWidgetClientProp
           bank={bestBuy?.bank}
           price={bestBuy?.price}
           loading={buyLoading}
+          titleHref="/currencies"
         />
         <RateCard
           label={t.home2026.lowestSellPrice}
@@ -230,6 +231,7 @@ export function BestRatesWidgetClient({ initialData }: BestRatesWidgetClientProp
           bank={lowestSell?.bank}
           price={lowestSell?.price}
           loading={sellLoading}
+          titleHref="/currencies"
         />
         <ParallelCard averages={averages} loading={averagesLoading} />
       </div>

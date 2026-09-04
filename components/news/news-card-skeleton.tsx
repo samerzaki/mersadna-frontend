@@ -31,7 +31,7 @@ export function NewsCardSkeleton({ variant = 'default' }: NewsCardSkeletonProps)
   // Default variant
   return (
     <div className="card-surface overflow-hidden">
-      <Skeleton className="h-[100px] w-full" />
+      <Skeleton className="h-[200px] w-full" />
       <div className="p-4 space-y-2.5">
         <Skeleton className="h-3 w-16" />
         <Skeleton className="h-4 w-full" />

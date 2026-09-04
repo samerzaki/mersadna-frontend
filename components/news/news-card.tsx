@@ -80,13 +80,13 @@ export function NewsCard({ news, variant = 'default', showBookmark = true }: New
     );
   }
 
-  // Default variant — per design: 100px thumbnail, tag + time row, 14px Kufi title
+  // Default variant: 200px thumbnail, tag + time row, 14px Kufi title
   return (
     <Link
       href={newsDetailPath(news.id, news.slug, news.title)}
       className="group block card-surface overflow-hidden"
     >
-      <div className="relative h-[100px]">
+      <div className="relative h-[200px]">
         <NewsImage src={news.thumbnail} alt={title} className="w-full h-full" />
         {showBookmark && (
           <div

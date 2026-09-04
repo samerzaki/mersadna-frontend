@@ -35,9 +35,9 @@ export type NavGroup = {
 /** Flat top-nav items for the Odamak header / active-route highlighting. */
 export const primaryNav: NavItem[] = [
   { titleEn: "Gold", titleAr: "الذهب", href: "/gold", icon: Coins },
-  { titleEn: "Currencies", titleAr: "العملات", href: "/currencies", icon: DollarSign },
+  { titleEn: "Currencies", titleAr: "أسعار العملات", href: "/currencies", icon: DollarSign },
   { titleEn: "Silver", titleAr: "الفضة", href: "/silver", icon: Gem },
-  { titleEn: "Crypto", titleAr: "الرقمية", href: "/crypto", icon: Bitcoin },
+  { titleEn: "Crypto", titleAr: "العملات الرقمية", href: "/crypto", icon: Bitcoin },
   { titleEn: "News", titleAr: "الأخبار", href: "/news", icon: Newspaper },
 ];
 

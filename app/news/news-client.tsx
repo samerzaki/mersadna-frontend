@@ -91,7 +91,7 @@ export default function NewsPage() {
             news={news}
             isLoading={newsLoading}
             showBookmark={true}
-            columns={3}
+            columns={4}
           />
 
           {/* Pagination */}

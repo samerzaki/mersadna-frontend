@@ -59,10 +59,10 @@ interface SilverWidgetClientProps {
 }
 
 export function SilverWidgetClient({ silverItems }: SilverWidgetClientProps) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   return (
     <SectionCard
-      title={t.home2026.silver}
+      title={<Link href="/silver" className="hover:text-gold transition-colors">{t.home2026.silver}</Link>}
       action={
         <Link href="/silver" className="text-[13px] text-gold hover:opacity-75 transition-opacity">
           {t.home2026.details}

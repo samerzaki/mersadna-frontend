@@ -41,7 +41,7 @@ export function HotNewsSectionClient({ news, referenceTime }: HotNewsSectionClie
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {news.map((item) => {
           const title = isRTL ? item.titleAr : item.title;
           const tag = item.tags?.[0] || item.source?.nameAr || item.source?.name;
@@ -56,7 +56,7 @@ export function HotNewsSectionClient({ news, referenceTime }: HotNewsSectionClie
               href={newsDetailPath(item.id, item.slug, item.title)}
               className="card-surface overflow-hidden group hover:shadow-gold transition-shadow"
             >
-              <NewsImage src={item.thumbnail} alt={title} className="h-[150px] w-full" />
+              <NewsImage src={item.thumbnail} alt={title} className="h-[200px] w-full" />
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2 text-[11px]">
                   {tag && <span className="text-gold font-semibold">{tag}</span>}
