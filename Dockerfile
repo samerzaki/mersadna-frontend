@@ -34,6 +34,10 @@ ENV HOSTNAME=0.0.0.0
 COPY --from=frontend-build /app/.next/standalone ./
 COPY --from=frontend-build /app/.next/static ./.next/static
 COPY --from=frontend-build /app/public ./public
+# The Next server updates ISR/revalidation files below .next at runtime.  The
+# build stages run as root, so hand the assembled runtime tree to the
+# unprivileged process before switching users.
+RUN chown -R node:node /app
 USER node
 EXPOSE 3000
 CMD ["node", "server.js"]
