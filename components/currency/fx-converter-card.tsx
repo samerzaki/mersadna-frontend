@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowUpDown } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { SectionCard } from '@/components/ui/section-card';
 import { TogglePair } from '@/components/ui/toggle-pair';
@@ -7,27 +8,53 @@ import { useCurrencyAverages } from '@/hooks/use-currency-prices';
 import { useLanguage } from '@/contexts/language-context';
 import { CURRENCIES, type CurrencyCode } from '@/lib/mock-currency-data';
 
+type ConverterCurrency = CurrencyCode | 'EGP';
+
 export function FxConverterCard() {
   const { t } = useLanguage();
   const [amount, setAmount] = useState('1000');
-  const [currency, setCurrency] = useState<CurrencyCode>('USD');
+  const [fromCurrency, setFromCurrency] = useState<ConverterCurrency>('USD');
+  const [toCurrency, setToCurrency] = useState<ConverterCurrency>('EGP');
   const [source, setSource] = useState<'bank' | 'parallel'>('bank');
 
-  const { data: avgData, isLoading } = useCurrencyAverages(currency, 'EGP');
+  // Rates are stored relative to EGP. Fetching both sides lets us derive a
+  // cross-currency rate while continuing to use the available market data.
+  const { data: fromData, isLoading: isFromLoading } = useCurrencyAverages(
+    fromCurrency,
+    'EGP',
+    fromCurrency !== 'EGP'
+  );
+  const { data: toData, isLoading: isToLoading } = useCurrencyAverages(
+    toCurrency,
+    'EGP',
+    toCurrency !== 'EGP'
+  );
+  const isLoading = isFromLoading || isToLoading;
 
-  const currencyNames: Record<CurrencyCode, string> = {
+  const currencyNames: Record<ConverterCurrency, string> = {
     USD: t.currency.usdName,
     EUR: t.currency.eurName,
     SAR: t.currency.sarName,
     AED: t.currency.aedName,
     KWD: t.currency.kwdName,
     GBP: t.currency.gbpName,
+    EGP: t.currency.egpName,
   };
 
   const rate = useMemo(() => {
-    if (source === 'bank') return avgData?.data?.banks?.avg_sell_rate ?? null;
-    return avgData?.data?.parallel_market?.avg_sell_rate ?? null;
-  }, [avgData, source]);
+    if (fromCurrency === toCurrency) return 1;
+
+    const rateFor = (currency: ConverterCurrency, data: typeof fromData) => {
+      if (currency === 'EGP') return 1;
+      return source === 'bank'
+        ? data?.data?.banks?.avg_sell_rate ?? null
+        : data?.data?.parallel_market?.avg_sell_rate ?? null;
+    };
+
+    const fromRate = rateFor(fromCurrency, fromData);
+    const toRate = rateFor(toCurrency, toData);
+    return fromRate !== null && toRate !== null && toRate > 0 ? fromRate / toRate : null;
+  }, [fromCurrency, fromData, source, toCurrency, toData]);
 
   const numericAmount = parseFloat(amount) || 0;
   const result = rate ? numericAmount * rate : null;
@@ -37,6 +64,21 @@ export function FxConverterCard() {
     if (value === '' || /^\d*\.?\d*$/.test(value)) {
       setAmount(value);
     }
+  };
+
+  const handleSwap = () => {
+    setFromCurrency(toCurrency);
+    setToCurrency(fromCurrency);
+  };
+
+  const selectFromCurrency = (nextCurrency: ConverterCurrency) => {
+    if (nextCurrency === toCurrency) setToCurrency(fromCurrency);
+    setFromCurrency(nextCurrency);
+  };
+
+  const selectToCurrency = (nextCurrency: ConverterCurrency) => {
+    if (nextCurrency === fromCurrency) setFromCurrency(toCurrency);
+    setToCurrency(nextCurrency);
   };
 
   return (
@@ -53,19 +95,45 @@ export function FxConverterCard() {
           />
         </div>
 
-        <div>
-          <label className="block text-[12px] text-muted mb-1.5">{t.currency.currencyName}</label>
+        <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2">
+          <div>
+            <label className="block text-[12px] text-muted mb-1.5">{t.currency.from}</label>
           <select
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
+            value={fromCurrency}
+            onChange={(e) => selectFromCurrency(e.target.value as ConverterCurrency)}
             className="w-full h-11 px-3.5 rounded-[11px] border border-line bg-bg text-[14px] text-text focus:border-gold focus:outline-none"
           >
-            {CURRENCIES.map((c) => (
+            <option value="EGP">{currencyNames.EGP} (EGP)</option>
+            {CURRENCIES.filter((c) => c !== toCurrency).map((c) => (
               <option key={c} value={c}>
                 {currencyNames[c]} ({c})
               </option>
             ))}
           </select>
+          </div>
+          <button
+            type="button"
+            onClick={handleSwap}
+            aria-label="Swap currencies"
+            className="h-11 w-11 inline-flex items-center justify-center rounded-[11px] border border-line bg-panel2 text-muted hover:text-gold hover:border-gold-line transition-colors"
+          >
+            <ArrowUpDown className="h-4 w-4" />
+          </button>
+          <div>
+            <label className="block text-[12px] text-muted mb-1.5">{t.currency.to}</label>
+            <select
+              value={toCurrency}
+              onChange={(e) => selectToCurrency(e.target.value as ConverterCurrency)}
+              className="w-full h-11 px-3.5 rounded-[11px] border border-line bg-bg text-[14px] text-text focus:border-gold focus:outline-none"
+            >
+              <option value="EGP">{currencyNames.EGP} (EGP)</option>
+              {CURRENCIES.filter((c) => c !== fromCurrency).map((c) => (
+                <option key={c} value={c}>
+                  {currencyNames[c]} ({c})
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div>
@@ -87,12 +155,12 @@ export function FxConverterCard() {
           ) : (
             <div className="num text-[32px] font-medium text-gold leading-none">
               {result !== null ? result.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '—'}
-              <span className="text-[15px] text-muted font-normal"> {t.common.egp}</span>
+              <span className="text-[15px] text-muted font-normal"> {toCurrency}</span>
             </div>
           )}
           {rate !== null && (
             <div className="num text-[12.5px] text-dim mt-2">
-              1 {currency} = {rate.toFixed(2)} {t.common.egp}
+              1 {fromCurrency} = {rate.toFixed(4)} {toCurrency}
             </div>
           )}
         </div>

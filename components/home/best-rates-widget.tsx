@@ -7,16 +7,29 @@ import { CURRENCIES } from '@/lib/currency-constants';
 import type { CurrencyCode } from '@/lib/mock-currency-data';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { BankBadge } from '@/components/ui/bank-badge';
-import { MonoNumber } from '@/components/ui/mono-number';
 import { formatSigned } from '@/lib/format';
-import { useHighestBuyPrice, useHighestSellPrice, useCurrencyAverages } from '@/hooks/use-currency-prices';
+import { useHighestBuyPrice, useCurrencyAverages, useCurrencyBanks } from '@/hooks/use-currency-prices';
 import { useLanguage } from '@/contexts/language-context';
+import { localizedText } from '@/lib/localized-text';
 import type { BestRatesInitialData, BestRatesBank } from './best-rates-widget-server';
 
 const SEGMENTED_ITEMS = CURRENCIES.map((c) => ({ value: c.code, label: c.name, mono: c.code }));
 
 interface BestRatesWidgetClientProps {
   initialData: BestRatesInitialData;
+}
+
+type DisplayBank = Omit<BestRatesBank, 'name'> & { name: string };
+
+function displayRate(
+  rate: { price: string; bank: BestRatesBank } | null | undefined,
+  language: 'ar' | 'en'
+) {
+  if (!rate?.bank) return null;
+  return {
+    ...rate,
+    bank: { ...rate.bank, name: localizedText(rate.bank.name, language) },
+  };
 }
 
 function RateCard({
@@ -31,7 +44,7 @@ function RateCard({
   label: string;
   tone: 'up' | 'down' | 'gold';
   icon: React.ReactNode;
-  bank?: BestRatesBank;
+  bank?: DisplayBank;
   price?: string;
   loading?: boolean;
   chip?: string;
@@ -76,10 +89,12 @@ function ParallelCard({
   averages: BestRatesInitialData['averages'];
   loading?: boolean;
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const parallel = averages?.parallel_market;
   const banks = averages?.banks;
   const gap = parallel && banks ? parallel.avg_sell_rate - banks.avg_sell_rate : null;
+  const contentDirection = language === 'ar' ? 'rtl' : 'ltr';
+  const contentTextAlign = language === 'ar' ? 'right' : 'left';
 
   return (
     <div className="card-surface p-5">
@@ -101,32 +116,80 @@ function ParallelCard({
       {loading || !parallel ? (
         <div className="h-10 w-32 bg-panel2 rounded animate-pulse" />
       ) : (
-        <>
-          <div className="flex items-baseline justify-between mb-2">
-            <span className="text-[12px] text-muted">{t.home2026.buy}</span>
-            <MonoNumber value={parallel.avg_buy_rate} currency="EGP" className="text-[22px] font-medium text-text" />
+        <div className="grid grid-cols-2 gap-3" dir={contentDirection} style={{ direction: contentDirection }}>
+          <div className="min-w-0" dir={contentDirection} style={{ direction: contentDirection, textAlign: contentTextAlign }}>
+            <span
+              className="block text-[12px] text-muted"
+              dir={contentDirection}
+              style={{ direction: contentDirection, textAlign: contentTextAlign }}
+            >
+              {t.home2026.buy}
+            </span>
+            <div
+              className="num mt-2 text-[30px] md:text-[34px] font-medium leading-none text-text"
+              dir={contentDirection}
+              style={{ direction: contentDirection, textAlign: contentTextAlign }}
+            >
+              {parallel.avg_buy_rate.toFixed(2)}
+            </div>
+            <div
+              className="mt-1.5 w-full text-[10.5px] text-dim"
+              dir={contentDirection}
+              style={{ direction: contentDirection, textAlign: contentTextAlign }}
+            >
+              {t.home2026.egyptianPound}
+            </div>
           </div>
-          <div className="flex items-baseline justify-between">
-            <span className="text-[12px] text-muted">{t.home2026.sell}</span>
-            <MonoNumber value={parallel.avg_sell_rate} currency="EGP" className="text-[22px] font-medium text-text" />
+          <div className="min-w-0 border-s border-line2 ps-3" dir={contentDirection} style={{ direction: contentDirection, textAlign: contentTextAlign }}>
+            <span
+              className="block text-[12px] text-muted"
+              dir={contentDirection}
+              style={{ direction: contentDirection, textAlign: contentTextAlign }}
+            >
+              {t.home2026.sell}
+            </span>
+            <div
+              className="num mt-2 text-[30px] md:text-[34px] font-medium leading-none text-text"
+              dir={contentDirection}
+              style={{ direction: contentDirection, textAlign: contentTextAlign }}
+            >
+              {parallel.avg_sell_rate.toFixed(2)}
+            </div>
+            <div
+              className="mt-1.5 w-full text-[10.5px] text-dim"
+              dir={contentDirection}
+              style={{ direction: contentDirection, textAlign: contentTextAlign }}
+            >
+              {t.home2026.egyptianPound}
+            </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
 }
 
 export function BestRatesWidgetClient({ initialData }: BestRatesWidgetClientProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('USD');
   const isDefaultCurrency = selectedCurrency === 'USD';
 
   const { data: highestBuyData, isLoading: buyLoadingClient } = useHighestBuyPrice(selectedCurrency, !isDefaultCurrency);
-  const { data: highestSellData, isLoading: sellLoadingClient } = useHighestSellPrice(selectedCurrency, !isDefaultCurrency);
+  const { data: banksData, isLoading: banksLoadingClient } = useCurrencyBanks(selectedCurrency, 'EGP', '24h', !isDefaultCurrency);
   const { data: averagesData, isLoading: averagesLoadingClient } = useCurrencyAverages(selectedCurrency, 'EGP', !isDefaultCurrency);
 
-  const bestBuy = isDefaultCurrency ? initialData.highestBuy : highestBuyData?.data ?? null;
-  const bestSell = isDefaultCurrency ? initialData.highestSell : highestSellData?.data ?? null;
+  const bestBuy = displayRate(isDefaultCurrency ? initialData.highestBuy : highestBuyData?.data, language);
+  const clientLowestSell = banksData?.data?.banks.reduce((lowest, bank) =>
+    bank.price.sell < lowest.price.sell ? bank : lowest
+  );
+  const lowestSell = displayRate(
+    isDefaultCurrency
+      ? initialData.lowestSell
+      : clientLowestSell
+        ? { price: String(clientLowestSell.price.sell), bank: clientLowestSell }
+        : null,
+    language
+  );
   const averages = isDefaultCurrency
     ? initialData.averages
     : averagesData?.data
@@ -134,7 +197,7 @@ export function BestRatesWidgetClient({ initialData }: BestRatesWidgetClientProp
       : null;
 
   const buyLoading = isDefaultCurrency ? false : buyLoadingClient;
-  const sellLoading = isDefaultCurrency ? false : sellLoadingClient;
+  const sellLoading = isDefaultCurrency ? false : banksLoadingClient;
   const averagesLoading = isDefaultCurrency ? false : averagesLoadingClient;
 
   const currencyMeta = CURRENCIES.find((c) => c.code === selectedCurrency);
@@ -161,11 +224,11 @@ export function BestRatesWidgetClient({ initialData }: BestRatesWidgetClientProp
           loading={buyLoading}
         />
         <RateCard
-          label={t.home2026.highestSellPrice}
+          label={t.home2026.lowestSellPrice}
           tone="down"
           icon={<ArrowUpRight className="size-[15px]" />}
-          bank={bestSell?.bank}
-          price={bestSell?.price}
+          bank={lowestSell?.bank}
+          price={lowestSell?.price}
           loading={sellLoading}
         />
         <ParallelCard averages={averages} loading={averagesLoading} />

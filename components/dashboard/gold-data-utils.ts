@@ -1,4 +1,4 @@
-import { GoldOverviewItem, GoldOunceItem } from '@/types';
+import { GoldOverviewItem } from '@/types';
 
 /**
  * Shared data structure for gold items
@@ -27,7 +27,7 @@ export interface GoldDataItem {
  */
 export function transformApiDataToGoldDataItem(
   key: string,
-  data: GoldOverviewItem | GoldOunceItem,
+  data: GoldOverviewItem,
   lastCheckedAt?: string,
   lastCheckedAtForHuman?: string
 ): GoldDataItem {
@@ -40,33 +40,24 @@ export function transformApiDataToGoldDataItem(
   };
 
   const mapping = keyMap[key];
-  const isOunce = key === 'ounce';
-
   let trend: 'up' | 'down' | 'neutral' = 'neutral';
-  if (!isOunce && 'spread_percent' in data) {
-    if (data.spread_percent > 0) trend = 'up';
-    else if (data.spread_percent < 0) trend = 'down';
-  }
-
-  const spread_egp = isOunce ? 0 : (data as GoldOverviewItem).spread_egp;
-  const spread_percent = isOunce ? 0 : (data as GoldOverviewItem).spread_percent;
-  const chartPoints = isOunce ? [] : (data as GoldOverviewItem).chart_points;
-  const chartColor = isOunce ? 'gray' : (data as GoldOverviewItem).chart_color;
+  if (data.change.color === 'green') trend = 'up';
+  else if (data.change.color === 'red') trend = 'down';
 
   return {
     id: mapping.id,
     nameKey: mapping.nameKey,
     karat: mapping.karat,
-    sellPrice: data.sell_price,
-    buyPrice: data.buy_price,
-    change: spread_egp,
-    changePercent: spread_percent,
+    sellPrice: data.price.sell,
+    buyPrice: data.price.buy,
+    change: data.change.value,
+    changePercent: data.change.percent,
     trend,
     currency: data.currency,
-    recordedAt: data.recorded_at,
-    chartPoints: Array.isArray(chartPoints) ? chartPoints : [],
-    chartColor,
-    lastCheckedAt,
-    lastCheckedAtForHuman,
+    recordedAt: data.last_checked.last_checked_at,
+    chartPoints: Array.isArray(data.chart_points) ? data.chart_points : [],
+    chartColor: data.chart_color,
+    lastCheckedAt: lastCheckedAt ?? data.last_checked.last_checked_at,
+    lastCheckedAtForHuman: lastCheckedAtForHuman ?? data.last_checked.last_checked_at_for_human,
   };
 }

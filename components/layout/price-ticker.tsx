@@ -18,6 +18,12 @@ type TickerItem = {
   change?: number;
 };
 
+function formatTickerPrice(value: unknown): string | null {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? value.toLocaleString('en-US')
+    : null;
+}
+
 function TickerRow({ items }: { items: TickerItem[] }) {
   return (
     <div className="flex items-center gap-0 h-10 whitespace-nowrap flex-shrink-0" aria-hidden={false}>
@@ -53,12 +59,15 @@ export function PriceTicker({ className }: PriceTickerProps) {
 
   (['24', '21', '18'] as const).forEach((k) => {
     const item = gold?.[k];
-    if (!item) return;
+    // The source can temporarily omit a quote while it is being refreshed.
+    // Do not let one incomplete record take down the global ticker.
+    const sellPrice = formatTickerPrice(item?.price?.sell);
+    if (!item || sellPrice === null) return;
     items.push({
       key: `g${k}`,
       name: `عيار ${k}`,
-      price: item.sell_price.toLocaleString('en-US'),
-      change: item.spread_percent,
+      price: sellPrice,
+      change: typeof item.change?.percent === 'number' ? item.change.percent : undefined,
     });
   });
 
@@ -68,19 +77,22 @@ export function PriceTicker({ className }: PriceTickerProps) {
   if (usd?.parallel_market?.avg_sell_rate) {
     items.push({ key: 'usd-par', name: 'دولار موازي', price: usd.parallel_market.avg_sell_rate.toFixed(2) });
   }
-  if (silver999) {
+  const silverPrice = formatTickerPrice(silver999?.price?.sell);
+  if (silver999 && silverPrice !== null) {
     items.push({
       key: 'silver',
       name: 'فضة 999',
-      price: silver999.sell_price.toLocaleString('en-US'),
-      change: silver999.spread_percent,
+      price: silverPrice,
+      change: typeof silver999.change?.percent === 'number' ? silver999.change.percent : undefined,
     });
   }
   (cryptoData ?? []).slice(0, 2).forEach((c) => {
+    const cryptoPrice = formatTickerPrice(c.price_usd);
+    if (cryptoPrice === null) return;
     items.push({
       key: c.symbol,
       name: c.symbol,
-      price: `$${c.price_usd.toLocaleString('en-US')}`,
+      price: `$${cryptoPrice}`,
       change: c.change_24h,
     });
   });

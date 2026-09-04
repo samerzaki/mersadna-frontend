@@ -244,9 +244,9 @@ export default function NewsDetailPage() {
                       </span>
                       <div className="flex items-center gap-2">
                         <span className="num text-[14px] font-semibold text-text">
-                          {formatPriceWithCurrency(gold21.sell_price, 'EGP', isRTL ? 'ar-EG' : 'en-US')}
+                          {formatPriceWithCurrency(gold21.price.sell, 'EGP', isRTL ? 'ar-EG' : 'en-US')}
                         </span>
-                        <ChangeText value={gold21.spread_percent} className="text-[11.5px]" />
+                        <ChangeText value={gold21.change.percent} className="text-[11.5px]" />
                       </div>
                     </div>
                   )}

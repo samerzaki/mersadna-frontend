@@ -4,27 +4,30 @@ import { formatPercent } from '@/lib/format';
 interface ChangeProps {
   value: number | null | undefined;
   withArrow?: boolean;
+  /** Lets API-provided semantic colors override the numerical sign. */
+  tone?: 'up' | 'down';
   className?: string;
+  direction?: 'rtl' | 'ltr';
 }
 
-export function ChangeText({ value, withArrow = true, className }: ChangeProps) {
+export function ChangeText({ value, withArrow = true, tone, className, direction }: ChangeProps) {
   if (value === null || value === undefined || Number.isNaN(value)) {
-    return <span className={cn('num text-dim', className)}>—</span>;
+    return <span className={cn('num text-dim', className)} dir={direction} style={{ direction }}>—</span>;
   }
-  const up = value >= 0;
+  const up = tone ? tone === 'up' : value >= 0;
   return (
-    <span className={cn('num', up ? 'text-up' : 'text-down', className)}>
+    <span className={cn('num', up ? 'text-up' : 'text-down', className)} dir={direction} style={{ direction }}>
       {withArrow && (up ? '↑ ' : '↓ ')}
-      {formatPercent(Math.abs(value))}
+      {formatPercent(value)}
     </span>
   );
 }
 
-export function ChangeChip({ value, className }: ChangeProps) {
+export function ChangeChip({ value, tone, className }: ChangeProps) {
   if (value === null || value === undefined || Number.isNaN(value)) {
     return null;
   }
-  const up = value >= 0;
+  const up = tone ? tone === 'up' : value >= 0;
   return (
     <span
       className={cn(
@@ -33,7 +36,7 @@ export function ChangeChip({ value, className }: ChangeProps) {
         className
       )}
     >
-      {up ? '▴' : '▾'} {formatPercent(Math.abs(value))}
+      {up ? '▴' : '▾'} {formatPercent(value)}
     </span>
   );
 }

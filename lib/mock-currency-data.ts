@@ -23,6 +23,7 @@ export interface MarketPulse {
 
 export interface Bank {
   id: string;
+  code?: string;
   name: string;
   logo: string;
   rates: Record<CurrencyCode, CurrencyRate>;

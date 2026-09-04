@@ -1,6 +1,6 @@
 import { AlertCircle } from 'lucide-react';
 import { fetchGoldOverview } from '@/lib/api';
-import { GoldOverviewItem, GoldOunceItem } from '@/types';
+import { GoldOverviewItem } from '@/types';
 import { ModernGoldPricesClient } from './modern-gold-prices';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -20,7 +20,7 @@ export interface ModernGoldDataItem {
 
 function transformToModernGoldDataItem(
   key: string,
-  data: GoldOverviewItem | GoldOunceItem
+  data: GoldOverviewItem
 ): ModernGoldDataItem {
   const keyMap: Record<string, { id: string; nameKey: ModernGoldDataItem['nameKey']; karat: string }> = {
     '21': { id: 'k21', nameKey: 'karat21', karat: 'k21' },
@@ -31,30 +31,22 @@ function transformToModernGoldDataItem(
   };
 
   const mapping = keyMap[key];
-  const isOunce = key === 'ounce';
-
   let trend: 'up' | 'down' | 'neutral' = 'neutral';
-  if (!isOunce && 'spread_percent' in data) {
-    if (data.spread_percent > 0) trend = 'up';
-    else if (data.spread_percent < 0) trend = 'down';
-  }
-
-  const spread_egp = isOunce ? 0 : (data as GoldOverviewItem).spread_egp;
-  const spread_percent = isOunce ? 0 : (data as GoldOverviewItem).spread_percent;
-  const chart_points = isOunce ? [] : (data as GoldOverviewItem).chart_points;
+  if (data.change.color === 'green') trend = 'up';
+  else if (data.change.color === 'red') trend = 'down';
 
   return {
     id: mapping.id,
     nameKey: mapping.nameKey,
     karat: mapping.karat,
-    sellPrice: data.sell_price,
-    buyPrice: data.buy_price,
-    change: spread_egp,
-    changePercent: spread_percent,
+    sellPrice: data.price.sell,
+    buyPrice: data.price.buy,
+    change: data.change.value,
+    changePercent: data.change.percent,
     trend,
-    history: chart_points.length > 0 ? chart_points : [data.sell_price],
+    history: data.chart_points.length > 0 ? data.chart_points : [data.price.sell],
     currency: data.currency,
-    recordedAt: data.recorded_at,
+    recordedAt: data.last_checked.last_checked_at,
   };
 }
 
@@ -65,7 +57,7 @@ export async function ModernGoldPricesServer() {
     const goldData: ModernGoldDataItem[] = [];
     if (data.data?.gold) {
       Object.entries(data.data.gold).forEach(([key, value]) => {
-        if (value && typeof value === 'object' && 'sell_price' in value) {
+        if (value && typeof value === 'object' && 'price' in value) {
           goldData.push(transformToModernGoldDataItem(key, value));
         }
       });

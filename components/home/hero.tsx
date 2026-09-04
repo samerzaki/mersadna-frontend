@@ -9,11 +9,11 @@ import { StatTile } from '@/components/ui/stat-tile';
 import { LiveDot } from '@/components/ui/live-dot';
 import { Sparkline } from '@/components/ui/sparkline';
 import { ChangeChip, ChangeText } from '@/components/ui/change-badge';
-import { MonoNumber } from '@/components/ui/mono-number';
 import { formatNumber, formatSigned, formatRelativeTime, cairoClock } from '@/lib/format';
 import { useLanguage } from '@/contexts/language-context';
 import { PriceAlertModal } from '@/components/dashboard/price-alert-modal';
-import type { GoldOverviewItem, GoldOunceItem } from '@/types';
+import type { GoldOverviewItem } from '@/types';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export interface HeroKaratRow {
   id: string;
@@ -21,15 +21,33 @@ export interface HeroKaratRow {
   sellPrice: number;
   currency: string;
   changePercent: number | null;
+  changeColor?: 'red' | 'green';
   chartPoints: number[];
+  lastCheckedAtForHuman?: string;
+  live?: boolean;
 }
 
 interface HeroProps {
-  karat21: GoldOverviewItem | GoldOunceItem | null;
+  karat21: GoldOverviewItem | null;
   lastCheckedAt?: string;
   lastCheckedAtForHuman?: string;
   history30d: number[];
   rows: HeroKaratRow[];
+}
+
+function getChangeTooltip(
+  value: number | null,
+  color: 'red' | 'green' | undefined,
+  language: string
+): string | undefined {
+  if (value === null || !Number.isFinite(value)) return undefined;
+
+  const increased = color ? color === 'green' : value >= 0;
+  const percentage = Math.abs(value).toFixed(2);
+
+  return language === 'ar'
+    ? `${increased ? 'ارتفع' : 'انخفض'} ${percentage}% منذ بداية اليوم`
+    : `${increased ? 'Up' : 'Down'} ${percentage}% since the start of day`;
 }
 
 function LiveClock() {
@@ -48,12 +66,14 @@ export function Hero({ karat21, lastCheckedAt, lastCheckedAtForHuman, history30d
   const { language, t } = useLanguage();
   const [alertOpen, setAlertOpen] = useState(false);
 
-  const sellPrice = karat21?.sell_price ?? 0;
-  const buyPrice = karat21?.buy_price ?? 0;
+  const sellPrice = karat21?.price.sell ?? 0;
+  const buyPrice = karat21?.price.buy ?? 0;
   const currency = karat21?.currency ?? 'EGP';
-  const spreadEgp = karat21 && 'spread_egp' in karat21 ? karat21.spread_egp : 0;
-  const spreadPercent = karat21 && 'spread_percent' in karat21 ? karat21.spread_percent : null;
-  const recordedAt = karat21?.recorded_at ?? lastCheckedAt;
+  const changeValue = karat21?.change.value ?? 0;
+  const changePercent = karat21?.change.percent ?? null;
+  const changeColor = karat21?.change.color;
+  const heroChangeTooltip = getChangeTooltip(changePercent, changeColor, language);
+  const recordedAt = karat21?.last_checked.last_checked_at ?? lastCheckedAt;
 
   const validHistory = history30d.filter(Number.isFinite);
   const move30d =
@@ -68,7 +88,7 @@ export function Hero({ karat21, lastCheckedAt, lastCheckedAtForHuman, history30d
       {/* Left */}
       <div>
         <div className="flex items-center gap-2 mb-6">
-          <LiveDot tone="gold" size={7} />
+          <LiveDot tone={karat21?.last_checked.live ? 'up' : 'down'} size={7} />
           <span className="text-[13px] text-muted">{t.home2026.liveCairo}</span>
           <LiveClock />
         </div>
@@ -82,19 +102,51 @@ export function Hero({ karat21, lastCheckedAt, lastCheckedAtForHuman, history30d
             {formatNumber(Math.round(sellPrice))}
           </span>
           <span className="text-muted text-[16px] md:text-[19px] mb-1 md:mb-3">{t.common.egp}</span>
-          <span className="mb-1 md:mb-3">
-            <ChangeChip value={spreadPercent} />
-          </span>
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="mb-1 md:mb-3 inline-flex cursor-help">
+                  <ChangeChip
+                    value={changePercent}
+                    tone={changeColor === 'green' ? 'up' : changeColor === 'red' ? 'down' : undefined}
+                  />
+                </span>
+              </TooltipTrigger>
+              {heroChangeTooltip && (
+                <TooltipContent className="!bg-black !text-white">{heroChangeTooltip}</TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         <p className="text-[13px] text-muted mb-7">
-          <span className="num">{formatSigned(spreadEgp, 0)}</span> {t.common.egp} {t.home2026.vsYesterday}
+          <span className="num">{formatSigned(changeValue, 0)}</span> {t.common.egp} {t.home2026.vsYesterday}
           {updatedAgo && <> · {t.home2026.lastUpdate} {updatedAgo}</>}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-7">
-          <StatTile label={t.home2026.consumerSell} value={formatNumber(Math.round(sellPrice))} compact />
-          <StatTile label={t.home2026.goldsmithBuy} value={formatNumber(Math.round(buyPrice))} compact />
+          <StatTile
+            label={t.home2026.consumerSell}
+            value={
+              <span className="flex items-baseline gap-1.5" dir={language === 'ar' ? 'rtl' : 'ltr'} style={{ unicodeBidi: 'isolate' }}>
+                {formatNumber(Math.round(sellPrice))}
+                <span className="font-sans text-[11px] font-normal text-dim">{t.home2026.egyptianPound}</span>
+              </span>
+            }
+            compact
+            valueDirection={language === 'ar' ? 'rtl' : 'ltr'}
+          />
+          <StatTile
+            label={t.home2026.goldsmithBuy}
+            value={
+              <span className="flex items-baseline gap-1.5" dir={language === 'ar' ? 'rtl' : 'ltr'} style={{ unicodeBidi: 'isolate' }}>
+                {formatNumber(Math.round(buyPrice))}
+                <span className="font-sans text-[11px] font-normal text-dim">{t.home2026.egyptianPound}</span>
+              </span>
+            }
+            compact
+            valueDirection={language === 'ar' ? 'rtl' : 'ltr'}
+          />
           <div className="stat-tile flex-1 flex flex-col justify-between">
             <div className="text-[11.5px] text-dim">{t.home2026.move30Days}</div>
             <div className="flex items-center gap-2 mt-2">
@@ -131,33 +183,66 @@ export function Hero({ karat21, lastCheckedAt, lastCheckedAtForHuman, history30d
           </Link>
         }
       >
-        <div className="p-2.5">
-          {rows.map((row) => (
+        <TooltipProvider delayDuration={150}>
+          <div className="p-2.5">
+            {rows.map((row) => (
             <div
               key={row.id}
               className="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-4 px-4 py-[18px] rounded-xl hover:bg-hover transition-colors"
             >
-              <LiveDot tone={row.changePercent === null ? 'gold' : row.changePercent >= 0 ? 'up' : 'down'} size={7} />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex cursor-help" aria-label={row.lastCheckedAtForHuman}>
+                    <LiveDot tone={row.live ? 'up' : 'down'} size={7} />
+                  </span>
+                </TooltipTrigger>
+                {row.lastCheckedAtForHuman && (
+                  <TooltipContent className="!bg-black !text-white">{row.lastCheckedAtForHuman}</TooltipContent>
+                )}
+              </Tooltip>
               <span className="font-heading text-[15px] text-text min-w-0 truncate">{row.name}</span>
+              <span className="flex items-baseline gap-3 justify-end">
+                <span
+                  className="flex items-baseline gap-1"
+                  dir={language === 'ar' ? 'rtl' : 'ltr'}
+                  style={{ direction: language === 'ar' ? 'rtl' : 'ltr', unicodeBidi: 'isolate' }}
+                >
+                  <span className="num text-[20px] md:text-[22px] font-medium text-text whitespace-nowrap">
+                    {formatNumber(row.sellPrice)}
+                  </span>
+                  <span className="text-[11px] text-dim whitespace-nowrap">
+                    {row.currency === 'USD' ? 'USD' : language === 'en' ? 'EGP' : t.home2026.egyptianPound}
+                  </span>
+                </span>
+                <span className="w-[58px] text-end shrink-0">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="inline-flex cursor-help">
+                        <ChangeText
+                          value={row.changePercent}
+                          withArrow={false}
+                          tone={row.changeColor === 'green' ? 'up' : row.changeColor === 'red' ? 'down' : undefined}
+                          className="text-[12.5px]"
+                        />
+                      </span>
+                    </TooltipTrigger>
+                    {getChangeTooltip(row.changePercent, row.changeColor, language) && (
+                      <TooltipContent className="!bg-black !text-white">
+                        {getChangeTooltip(row.changePercent, row.changeColor, language)}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </span>
+              </span>
               {row.chartPoints.length >= 2 ? (
                 <Sparkline data={row.chartPoints} width={60} height={18} tone="auto" />
               ) : (
                 <span className="w-[60px]" />
               )}
-              <span className="flex items-baseline gap-3 justify-end">
-                <MonoNumber
-                  value={row.sellPrice}
-                  currency={row.currency}
-                  locale={row.currency === 'USD' ? 'en-US' : 'ar-EG'}
-                  className="text-[20px] md:text-[22px] font-medium text-text whitespace-nowrap"
-                />
-                <span className="w-[58px] text-end shrink-0">
-                  <ChangeText value={row.changePercent} withArrow={false} className="text-[12.5px]" />
-                </span>
-              </span>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </TooltipProvider>
       </SectionCard>
 
       <PriceAlertModal

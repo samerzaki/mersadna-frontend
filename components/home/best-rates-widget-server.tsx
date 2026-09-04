@@ -1,16 +1,16 @@
-import { fetchHighestBuyPrice, fetchHighestSellPrice, fetchCurrencyAverages } from '@/lib/api';
+import { fetchHighestBuyPrice, fetchCurrencyAverages, fetchCurrencyBanks } from '@/lib/api';
 import { BestRatesWidgetClient } from './best-rates-widget';
 
 export interface BestRatesBank {
   id: number;
   code: string;
-  name: string;
+  name: unknown;
   bank_logo_url: string;
 }
 
 export interface BestRatesInitialData {
   highestBuy: { price: string; bank: BestRatesBank } | null;
-  highestSell: { price: string; bank: BestRatesBank } | null;
+  lowestSell: { price: string; bank: BestRatesBank } | null;
   averages: {
     banks: { avg_buy_rate: number; avg_sell_rate: number; count: number };
     parallel_market: { avg_buy_rate: number; avg_sell_rate: number; count: number };
@@ -19,15 +19,20 @@ export interface BestRatesInitialData {
 
 export async function BestRatesWidgetServer() {
   try {
-    const [buyRes, sellRes, avgRes] = await Promise.all([
+    const [buyRes, avgRes, banksRes] = await Promise.all([
       fetchHighestBuyPrice('USD'),
-      fetchHighestSellPrice('USD'),
       fetchCurrencyAverages('USD', 'EGP'),
+      fetchCurrencyBanks('USD', 'EGP', '24h'),
     ]);
+    const lowestSellBank = banksRes.data?.banks.reduce((lowest, bank) =>
+      bank.price.sell < lowest.price.sell ? bank : lowest
+    );
 
     const initialData: BestRatesInitialData = {
       highestBuy: buyRes.data ? { price: buyRes.data.price, bank: buyRes.data.bank } : null,
-      highestSell: sellRes.data ? { price: sellRes.data.price, bank: sellRes.data.bank } : null,
+      lowestSell: lowestSellBank
+        ? { price: String(lowestSellBank.price.sell), bank: lowestSellBank }
+        : null,
       averages: avgRes.data
         ? { banks: avgRes.data.banks, parallel_market: avgRes.data.parallel_market }
         : null,

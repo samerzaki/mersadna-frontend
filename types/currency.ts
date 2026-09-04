@@ -62,9 +62,7 @@ export interface CurrencyHighestPriceResponse {
     bank: {
       id: number;
       code: string;
-      name: string;
-      english_name: string;
-      arabic_name: string;
+      name: { en: string; ar: string };
       bank_logo_url: string;
     };
     recorded_at: string;
@@ -116,16 +114,16 @@ export interface CurrencyBankChart {
 export interface CurrencyBank {
   id: number;
   code: string;
-  name: string;
-  english_name: string;
-  arabic_name: string;
+  name: { en: string; ar: string };
   bank_logo_url: string;
-  latest_buy_rate: number;
-  latest_sell_rate: number;
-  difference: number;
-  difference_percentage: number;
+  price: { buy: number; sell: number };
+  difference: { egp: number; percent: number };
   chart: CurrencyBankChart;
-  last_update_at: string;
+  last_checked: {
+    last_checked_at: string;
+    last_checked_at_for_human: string;
+    live: boolean;
+  };
 }
 
 export interface CurrencyBanksResponse {

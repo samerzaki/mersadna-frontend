@@ -1,17 +1,17 @@
-import { fetchSilverOverview } from '@/lib/api';
+import { fetchGoldOverview } from '@/lib/api';
 import { SilverWidgetClient } from './silver-widget';
 import { transformSilverItem, HOMEPAGE_SILVER_KEYS, SilverDataItem } from './silver-data-utils';
 
 export async function SilverWidgetServer() {
   try {
-    const data = await fetchSilverOverview();
+    const data = await fetchGoldOverview();
     const silverItems: SilverDataItem[] = [];
     const silverData = data.data?.silver;
 
     if (silverData) {
       for (const key of HOMEPAGE_SILVER_KEYS) {
         const value = silverData[key as keyof typeof silverData];
-        if (value && typeof value === 'object' && 'sell_price' in value) {
+        if (value && typeof value === 'object' && 'price' in value) {
           silverItems.push(transformSilverItem(key, value));
         }
       }

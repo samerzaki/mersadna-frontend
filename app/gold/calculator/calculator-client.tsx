@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Calculator, TrendingUp, DollarSign, Coins, Plus, Trash2, Loader2, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { useGoldOverview } from "@/hooks/use-gold-prices";
@@ -61,12 +61,18 @@ export default function GoldCalculatorPage({
   // Fetch real gold prices from API
   const { data: goldData, isLoading: goldLoading, error: goldError } = useGoldOverview();
 
-  // Extract real prices from API (buy_price per gram)
+  // `buy` is what the goldsmith pays the customer; `sell` is what the
+  // customer pays the goldsmith. Keep both rates for the relevant action.
   const LIVE_PRICES = {
-    karat24: goldData?.data?.gold?.['24']?.buy_price || 0,
-    karat21: goldData?.data?.gold?.['21']?.buy_price || 0,
-    karat18: goldData?.data?.gold?.['18']?.buy_price || 0,
+    karat24: goldData?.data?.gold?.['24']?.price.buy || 0,
+    karat21: goldData?.data?.gold?.['21']?.price.buy || 0,
+    karat18: goldData?.data?.gold?.['18']?.price.buy || 0,
   };
+  const PURCHASE_PRICES = useMemo(() => ({
+    karat24: goldData?.data?.gold?.['24']?.price.sell || 0,
+    karat21: goldData?.data?.gold?.['21']?.price.sell || 0,
+    karat18: goldData?.data?.gold?.['18']?.price.sell || 0,
+  }), [goldData]);
 
   // Tab 1: P&L Calculator State (Refactored)
   const [plItems, setPlItems] = useState<PLItem[]>([
@@ -85,15 +91,15 @@ export default function GoldCalculatorPage({
 
   // Auto-fill buy price when karat changes or prices load
   useEffect(() => {
-    if (LIVE_PRICES.karat21 > 0 && LIVE_PRICES.karat24 > 0 && LIVE_PRICES.karat18 > 0) {
+    if (PURCHASE_PRICES.karat21 > 0 && PURCHASE_PRICES.karat24 > 0 && PURCHASE_PRICES.karat18 > 0) {
       setPlItems((items) =>
         items.map((item) => ({
           ...item,
-          buyPrice: LIVE_PRICES[item.karat].toString(),
+          buyPrice: PURCHASE_PRICES[item.karat].toString(),
         }))
       );
     }
-  }, [LIVE_PRICES.karat24, LIVE_PRICES.karat21, LIVE_PRICES.karat18]);
+  }, [PURCHASE_PRICES]);
 
   // P&L Item Management
   const addPLItem = () => {
@@ -103,7 +109,7 @@ export default function GoldCalculatorPage({
       ...plItems,
       {
         id: newId,
-        buyPrice: LIVE_PRICES[defaultKarat].toString(),
+        buyPrice: PURCHASE_PRICES[defaultKarat].toString(),
         weight: "",
         workmanship: "",
         karat: defaultKarat,
@@ -124,7 +130,7 @@ export default function GoldCalculatorPage({
           const updatedItem = { ...item, [field]: value };
           // Auto-update buyPrice when karat changes
           if (field === "karat") {
-            updatedItem.buyPrice = LIVE_PRICES[value as "karat24" | "karat21" | "karat18"].toString();
+            updatedItem.buyPrice = PURCHASE_PRICES[value as "karat24" | "karat21" | "karat18"].toString();
           }
           return updatedItem;
         }
@@ -225,7 +231,7 @@ export default function GoldCalculatorPage({
 
     buyItems.forEach((item) => {
       const weight = parseFloat(item.weight) || 0;
-      const livePrice = LIVE_PRICES[item.karat];
+      const livePrice = PURCHASE_PRICES[item.karat];
       const customWork = parseFloat(item.customWorkmanship);
       const workmanship = !isNaN(customWork) && customWork >= 0
         ? customWork

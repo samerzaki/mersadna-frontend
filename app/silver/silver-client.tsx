@@ -5,7 +5,7 @@ import { TrendingUp, TrendingDown, Minus, AlertCircle, Calculator, Bell } from '
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/language-context';
 import { useAllSilverPrices } from '@/hooks/use-silver-prices';
-import { SilverOverviewItem } from '@/types';
+import { SilverAllPricesItem } from '@/types';
 import { formatPriceWithCurrency, formatPercent } from '@/lib/format';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LastUpdateIndicator } from '@/components/ui/last-update-indicator';
@@ -142,7 +142,7 @@ function SilverPriceCard({ item, t, locale }: { item: SilverDataItem; t: any; lo
   );
 }
 
-function transformApiItem(key: string, data: SilverOverviewItem, isRTL: boolean): SilverDataItem {
+function transformApiItem(key: string, data: SilverAllPricesItem, isRTL: boolean): SilverDataItem {
   let trend: 'up' | 'down' | 'neutral' = 'neutral';
   if (data.spread_percent > 0) trend = 'up';
   else if (data.spread_percent < 0) trend = 'down';
@@ -211,7 +211,7 @@ export default function SilverPage() {
   if (data?.data?.silver) {
     Object.entries(data.data.silver).forEach(([key, value]) => {
       if (value && typeof value === 'object' && 'sell_price' in value) {
-        silverItems.push(transformApiItem(key, value as SilverOverviewItem, isRTL));
+        silverItems.push(transformApiItem(key, value as SilverAllPricesItem, isRTL));
       }
     });
   }

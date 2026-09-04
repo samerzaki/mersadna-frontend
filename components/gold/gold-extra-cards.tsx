@@ -42,14 +42,14 @@ export function GoldExtraCards() {
           <div className="flex items-center justify-between">
             <span className="text-[13px] text-muted">{t.gold.goldOunceLabel}</span>
             <span className="num text-[14px] text-text">
-              {ounceGold ? formatPriceWithCurrency(ounceGold.sell_price, ounceGold.currency, 'en-US') : '—'}
+              {ounceGold ? formatPriceWithCurrency(ounceGold.price.sell, ounceGold.currency, 'en-US') : '—'}
             </span>
           </div>
           {ounceSilver && (
             <div className="flex items-center justify-between">
               <span className="text-[13px] text-muted">{t.gold.silverOunceLabel}</span>
               <span className="num text-[14px] text-text">
-                {formatPriceWithCurrency(ounceSilver.sell_price, ounceSilver.currency, 'en-US')}
+                {formatPriceWithCurrency(ounceSilver.price.sell, ounceSilver.currency, 'en-US')}
               </span>
             </div>
           )}

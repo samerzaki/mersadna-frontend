@@ -7,20 +7,29 @@ import {
 } from "@/lib/mock-currency-data";
 import { BankRatesTable } from "./bank-rates-table";
 import { FxConverterCard } from "./fx-converter-card";
-import { useCurrencyAverages, useHighestBuyPrice, useHighestSellPrice, useCurrencyBanks } from '@/hooks/use-currency-prices';
+import { useCurrencyAverages, useHighestBuyPrice, useCurrencyBanks } from '@/hooks/use-currency-prices';
 import { useLanguage } from "@/contexts/language-context";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { StatTile } from "@/components/ui/stat-tile";
 import { SectionCard } from "@/components/ui/section-card";
+import { localizedText } from '@/lib/localized-text';
+import { BankBadge } from '@/components/ui/bank-badge';
 import type { CurrencyDashboardInitialData } from './unified-dashboard-server';
 
 interface UnifiedDashboardProps {
   initialData?: CurrencyDashboardInitialData;
 }
 
+const formatRate = (value: unknown) => {
+  const rate = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(rate) ? rate.toFixed(2) : '—';
+};
+
 export function UnifiedDashboard({ initialData }: UnifiedDashboardProps) {
   const { t, language } = useLanguage();
   const isRTL = language === 'ar';
+  const contentDirection = isRTL ? 'rtl' : 'ltr';
+  const statisticAlignment = isRTL ? 'text-right' : 'text-left';
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('USD');
 
   const currencyNames: Record<CurrencyCode, string> = {
@@ -37,14 +46,7 @@ export function UnifiedDashboard({ initialData }: UnifiedDashboardProps) {
   // Fetch data from API only when not using default currency
   const { data: avgData } = useCurrencyAverages(selectedCurrency as string, 'EGP', !isDefaultCurrency || !initialData);
   const { data: highestBuyData } = useHighestBuyPrice(selectedCurrency as string, !isDefaultCurrency || !initialData);
-  const { data: highestSellData } = useHighestSellPrice(selectedCurrency as string, !isDefaultCurrency || !initialData);
-  const { data: banksHookData } = useCurrencyBanks(selectedCurrency, 'EGP', '24h', !isDefaultCurrency || !initialData);
-
-  const bankList = useMemo(() => {
-    if (isDefaultCurrency && initialData?.bankRates) return initialData.bankRates.banks;
-    if (banksHookData?.success && banksHookData.data?.banks) return banksHookData.data.banks;
-    return [];
-  }, [isDefaultCurrency, initialData, banksHookData]);
+  const { data: banksData } = useCurrencyBanks(selectedCurrency, 'EGP', '24h', !isDefaultCurrency || !initialData);
 
   const bankAverage = isDefaultCurrency && initialData ? {
     buy: initialData.averages?.banks?.avg_buy_rate || 0,
@@ -71,56 +73,66 @@ export function UnifiedDashboard({ initialData }: UnifiedDashboardProps) {
     ? (initialData.highestBuy?.price || '0')
     : (highestBuyData?.data?.price || '0');
   const bestBuyBank = isDefaultCurrency && initialData
-    ? (initialData.highestBuy?.bank?.name || '-')
-    : (highestBuyData?.data?.bank?.name || '-');
-  const bestSellPrice = isDefaultCurrency && initialData
-    ? (initialData.highestSell?.price || '0')
-    : (highestSellData?.data?.price || '0');
-  const bestSellBank = isDefaultCurrency && initialData
-    ? (initialData.highestSell?.bank?.name || '-')
-    : (highestSellData?.data?.bank?.name || '-');
+    ? localizedText(initialData.highestBuy?.bank?.name, language, '-')
+    : localizedText(highestBuyData?.data?.bank?.name, language, '-');
+  const bestBuyLogo = isDefaultCurrency && initialData
+    ? initialData.highestBuy?.bank?.bank_logo_url
+    : highestBuyData?.data?.bank?.bank_logo_url;
+  const lowestSell = useMemo(() => {
+    const banks = isDefaultCurrency
+      ? initialData?.bankRates?.banks.map((bank) => ({
+          rate: bank.latest_sell_rate,
+          name: bank.name,
+          logo: bank.bank_logo_url,
+        }))
+      : banksData?.data?.banks.map((bank) => ({
+          rate: bank.price.sell,
+          name: bank.name,
+          logo: bank.bank_logo_url,
+        }));
 
-  // Lowest buy / sell computed from the full bank list
-  const { lowestBuy, lowestSell } = useMemo(() => {
-    if (!bankList.length) return { lowestBuy: null as null | { rate: number; bank: string }, lowestSell: null as null | { rate: number; bank: string } };
-    const buyMin = bankList.reduce((min, b) => (b.latest_buy_rate < min.latest_buy_rate ? b : min));
-    const sellMin = bankList.reduce((min, b) => (b.latest_sell_rate < min.latest_sell_rate ? b : min));
-    return {
-      lowestBuy: { rate: buyMin.latest_buy_rate, bank: buyMin.name },
-      lowestSell: { rate: sellMin.latest_sell_rate, bank: sellMin.name },
-    };
-  }, [bankList]);
+    if (!banks?.length) return null;
+    return banks.reduce((lowest, bank) => bank.rate < lowest.rate ? bank : lowest);
+  }, [banksData, initialData, isDefaultCurrency]);
 
   const segmentedItems = CURRENCIES.map((c) => ({ value: c, label: currencyNames[c], mono: c }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={contentDirection}>
       <SegmentedControl items={segmentedItems} value={selectedCurrency} onChange={(v) => setSelectedCurrency(v as CurrencyCode)} />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6 items-start">
         {/* Left column */}
         <div className="space-y-6 min-w-0">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4" dir={contentDirection}>
             <StatTile
               label={t.currency.highestBuyPrice}
-              value={parseFloat(bestBuyPrice).toFixed(2)}
+              value={formatRate(bestBuyPrice)}
               sub={<span className="text-[11px] text-dim truncate block">{bestBuyBank}</span>}
-            />
-            <StatTile
-              label={t.currency.highestSellPrice}
-              value={parseFloat(bestSellPrice).toFixed(2)}
-              sub={<span className="text-[11px] text-dim truncate block">{bestSellBank}</span>}
-            />
-            <StatTile
-              label={t.currency.lowestBuyPrice}
-              value={typeof lowestBuy?.rate === 'number' && Number.isFinite(lowestBuy.rate) ? lowestBuy.rate.toFixed(2) : '—'}
-              sub={<span className="text-[11px] text-dim truncate block">{lowestBuy?.bank ?? ''}</span>}
+              className={statisticAlignment}
+              leftAdornment={<BankBadge name={bestBuyBank} logoUrl={bestBuyLogo} size={34} />}
             />
             <StatTile
               label={t.currency.lowestSellPrice}
-              value={typeof lowestSell?.rate === 'number' && Number.isFinite(lowestSell.rate) ? lowestSell.rate.toFixed(2) : '—'}
-              sub={<span className="text-[11px] text-dim truncate block">{lowestSell?.bank ?? ''}</span>}
+              value={formatRate(lowestSell?.rate)}
+              sub={<span className="text-[11px] text-dim truncate block">{localizedText(lowestSell?.name, language, '-')}</span>}
+              className={statisticAlignment}
+              leftAdornment={<BankBadge name={localizedText(lowestSell?.name, language, '-')} logoUrl={lowestSell?.logo} size={34} />}
             />
+            {/*
+              label={t.currency.lowestBuyPrice}
+              value={lowestBuy ? lowestBuy.rate.toFixed(2) : '—'}
+              sub={<span className="text-[11px] text-dim truncate block">{lowestBuy?.bank ?? ''}</span>}
+              className={statisticAlignment}
+              leftAdornment={<BankBadge name={lowestBuy?.bank ?? ''} logoUrl={lowestBuy?.logo} size={34} />}
+            */}
+            {/*
+              label={t.currency.lowestSellPrice}
+              value={lowestSell ? lowestSell.rate.toFixed(2) : '—'}
+              sub={<span className="text-[11px] text-dim truncate block">{lowestSell?.bank ?? ''}</span>}
+              className={statisticAlignment}
+              leftAdornment={<BankBadge name={lowestSell?.bank ?? ''} logoUrl={lowestSell?.logo} size={34} />}
+            */}
           </div>
 
           <BankRatesTable
@@ -134,11 +146,11 @@ export function UnifiedDashboard({ initialData }: UnifiedDashboardProps) {
             <div className="flex items-center justify-between gap-6 flex-wrap">
               <div>
                 <div className="text-[12px] text-muted mb-1">{t.currency.buy}</div>
-                <div className="num text-[22px] text-text">{parallelRate.buy.toFixed(2)}</div>
+                <div className="num text-[22px] text-text">{formatRate(parallelRate.buy)}</div>
               </div>
               <div>
                 <div className="text-[12px] text-muted mb-1">{t.currency.sell}</div>
-                <div className="num text-[22px] text-text">{parallelRate.sell.toFixed(2)}</div>
+                <div className="num text-[22px] text-text">{formatRate(parallelRate.sell)}</div>
               </div>
               <div>
                 <div className="text-[12px] text-muted mb-1">{t.currency.gapVsBanks}</div>

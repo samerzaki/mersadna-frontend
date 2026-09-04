@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import type { NewsItem } from '@/types/news';
 import { newsDetailPath } from '@/lib/news-routes';
 
-export function QuickSearch() {
+export function QuickSearch({ autoFocus = false }: { autoFocus?: boolean }) {
   const { language } = useLanguage();
   const isRTL = language === 'ar';
   const [searchQuery, setSearchQuery] = useState('');
@@ -77,6 +77,12 @@ export function QuickSearch() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  useEffect(() => {
+    if (autoFocus) {
+      inputRef.current?.focus();
+    }
+  }, [autoFocus]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     setIsOpen(true);
@@ -89,7 +95,7 @@ export function QuickSearch() {
   };
 
   return (
-    <div ref={searchRef} className="relative w-full max-w-md">
+    <div ref={searchRef} className="w-full">
       {/* Search Input */}
       <div className="relative">
         <Search
@@ -106,11 +112,11 @@ export function QuickSearch() {
           onChange={handleInputChange}
           onFocus={() => setIsOpen(true)}
           className={cn(
-            'h-9 w-full',
+            'h-10 w-full',
             isRTL ? 'pr-9 pl-4' : 'pl-9 pr-4',
-            'bg-muted/50 border-muted-foreground/20',
-            'focus-visible:ring-1 focus-visible:ring-primary',
-            'placeholder:text-muted-foreground/60'
+            'bg-panel2 border-line',
+            'focus-visible:border-gold focus-visible:ring-0',
+            'placeholder:text-dim'
           )}
         />
       </div>
@@ -119,10 +125,7 @@ export function QuickSearch() {
       {isOpen && searchQuery.trim() && (
         <div
           className={cn(
-            'absolute top-full mt-2 w-full',
-            'bg-popover border border-border rounded-lg shadow-lg',
-            'max-h-125 overflow-y-auto',
-            'z-50',
+            'mt-2 max-h-[min(22rem,calc(100vh-10rem))] w-full overflow-y-auto border-t border-line2 pt-2',
             'animate-in fade-in slide-in-from-top-2 duration-200'
           )}
         >

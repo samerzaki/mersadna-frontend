@@ -1,6 +1,6 @@
 import { fetchGoldOverview, fetchGoldHistory } from '@/lib/api';
 import { Hero, type HeroKaratRow } from './hero';
-import type { GoldOverviewItem, GoldOunceItem } from '@/types';
+import type { GoldOverviewItem } from '@/types';
 
 type GoldKey = '24' | '21' | '18' | 'gold_pound' | 'ounce';
 
@@ -25,16 +25,18 @@ export async function HeroServer() {
     const karat21 = goldData?.['21'] ?? null;
 
     const rows: HeroKaratRow[] = ROW_META.map((meta) => {
-      const item = goldData?.[meta.dataKey] as GoldOverviewItem | GoldOunceItem | null | undefined;
+      const item = goldData?.[meta.dataKey] as GoldOverviewItem | null | undefined;
       if (!item) return null;
-      const overviewItem = 'spread_percent' in item ? (item as GoldOverviewItem) : null;
       const row: HeroKaratRow = {
         id: meta.dataKey,
         name: meta.name,
-        sellPrice: item.sell_price,
+        sellPrice: item.price.sell,
         currency: item.currency,
-        changePercent: overviewItem ? overviewItem.spread_percent : null,
-        chartPoints: overviewItem?.chart_points ?? [],
+        changePercent: item.change.percent,
+        changeColor: item.change.color,
+        chartPoints: item.chart_points,
+        lastCheckedAtForHuman: item.last_checked.last_checked_at_for_human,
+        live: item.last_checked.live,
       };
       return row;
     }).filter((row): row is HeroKaratRow => row !== null);
@@ -47,8 +49,8 @@ export async function HeroServer() {
     return (
       <Hero
         karat21={karat21}
-        lastCheckedAt={goldData?.last_checked_at}
-        lastCheckedAtForHuman={goldData?.last_checked_at_for_human}
+        lastCheckedAt={karat21?.last_checked.last_checked_at}
+        lastCheckedAtForHuman={karat21?.last_checked.last_checked_at_for_human}
         history30d={history30d}
         rows={rows}
       />

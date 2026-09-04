@@ -1,5 +1,5 @@
 import { AlertCircle } from 'lucide-react';
-import { fetchCurrencyAverages, fetchHighestBuyPrice, fetchHighestSellPrice, fetchCurrencyBanks, fetchBlackMarketRates } from '@/lib/api';
+import { fetchCurrencyAverages, fetchHighestBuyPrice, fetchCurrencyBanks, fetchBlackMarketRates } from '@/lib/api';
 import { UnifiedDashboard } from './unified-dashboard';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -12,13 +12,10 @@ export interface CurrencyDashboardInitialData {
     price: string;
     bank: { name: string; bank_logo_url: string } | null;
   } | null;
-  highestSell: {
-    price: string;
-    bank: { name: string; bank_logo_url: string } | null;
-  } | null;
   bankRates: {
     banks: Array<{
       id: number;
+      code: string;
       name: string;
       bank_logo_url: string;
       latest_buy_rate: number;
@@ -33,12 +30,23 @@ export interface CurrencyDashboardInitialData {
   } | null;
 }
 
+function bankDisplayName(bank: { name?: unknown; arabic_name?: unknown; english_name?: unknown }): string {
+  if (typeof bank.arabic_name === 'string') return bank.arabic_name;
+  if (typeof bank.name === 'string') return bank.name;
+  if (bank.name && typeof bank.name === 'object') {
+    const localizedName = bank.name as { ar?: unknown; en?: unknown };
+    if (typeof localizedName.ar === 'string') return localizedName.ar;
+    if (typeof localizedName.en === 'string') return localizedName.en;
+  }
+  if (typeof bank.english_name === 'string') return bank.english_name;
+  return '—';
+}
+
 export async function UnifiedDashboardServer() {
   try {
-    const [avgRes, buyRes, sellRes, banksRes, blackMarketRes] = await Promise.all([
+    const [avgRes, buyRes, banksRes, blackMarketRes] = await Promise.all([
       fetchCurrencyAverages('USD', 'EGP'),
       fetchHighestBuyPrice('USD'),
-      fetchHighestSellPrice('USD'),
       fetchCurrencyBanks('USD', 'EGP', '24h'),
       fetchBlackMarketRates(undefined, 'EGP'),
     ]);
@@ -51,24 +59,18 @@ export async function UnifiedDashboardServer() {
       highestBuy: buyRes.data ? {
         price: buyRes.data.price,
         bank: buyRes.data.bank ? {
-          name: buyRes.data.bank.name,
+          name: bankDisplayName(buyRes.data.bank),
           bank_logo_url: buyRes.data.bank.bank_logo_url,
-        } : null,
-      } : null,
-      highestSell: sellRes.data ? {
-        price: sellRes.data.price,
-        bank: sellRes.data.bank ? {
-          name: sellRes.data.bank.name,
-          bank_logo_url: sellRes.data.bank.bank_logo_url,
         } : null,
       } : null,
       bankRates: banksRes.success && banksRes.data?.banks ? {
         banks: banksRes.data.banks.map(bank => ({
           id: bank.id,
-          name: bank.name,
+          code: bank.code,
+          name: bankDisplayName(bank),
           bank_logo_url: bank.bank_logo_url,
-          latest_buy_rate: bank.latest_buy_rate,
-          latest_sell_rate: bank.latest_sell_rate,
+          latest_buy_rate: bank.price.buy,
+          latest_sell_rate: bank.price.sell,
           chart: { data: bank.chart.data.map(d => ({ buy_rate: d.buy_rate })) },
         })),
       } : null,

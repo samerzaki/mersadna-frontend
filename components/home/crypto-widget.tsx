@@ -24,17 +24,17 @@ function CryptoRow({ crypto }: { crypto: CryptoPrice }) {
         <span className="num text-[13px] font-semibold text-text">{crypto.symbol}</span>
         <span className="ms-1.5 text-[12px] text-dim truncate">{displayName}</span>
       </div>
-      {crypto.chart_points.length >= 2 ? (
-        <Sparkline data={crypto.chart_points} width={48} height={16} tone="auto" />
-      ) : (
-        <span className="w-12" />
-      )}
       <MonoNumber
         value={crypto.price_usd}
         currency="USD"
         locale="en-US"
         className="text-[15px] font-medium text-text whitespace-nowrap"
       />
+      {crypto.chart_points.length >= 2 ? (
+        <Sparkline data={crypto.chart_points} width={48} height={16} tone="auto" />
+      ) : (
+        <span className="w-12" />
+      )}
       <span className="w-[56px] text-end shrink-0">
         <ChangeText value={crypto.change_24h} withArrow={false} className="text-[11.5px]" />
       </span>

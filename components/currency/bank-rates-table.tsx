@@ -14,10 +14,12 @@ import { SectionCard } from "@/components/ui/section-card";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { BankBadge } from "@/components/ui/bank-badge";
 import { Sparkline } from "@/components/ui/sparkline";
+import { localizedText } from '@/lib/localized-text';
 
 interface InitialBankData {
   banks: Array<{
     id: number;
+    code: string;
     name: string;
     bank_logo_url: string;
     latest_buy_rate: number;
@@ -48,7 +50,9 @@ export function BankRatesTable({
   searchTerm: externalSearchTerm,
   initialBankData
 }: BankRatesTableProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const tableDirection = language === 'ar' ? 'rtl' : 'ltr';
+  const valueAlignment = language === 'ar' ? 'right' : 'left';
   const [internalCurrency, setInternalCurrency] = useState<CurrencyCode>('USD');
 
   // Use external currency if provided, otherwise use internal state
@@ -130,7 +134,8 @@ export function BankRatesTable({
     if (hasInitialData && initialBankData) {
       const transformedBanks = initialBankData.banks.map(bank => ({
         id: bank.id.toString(),
-        name: bank.name,
+        code: bank.code,
+        name: localizedText(bank.name, language),
         logo: bank.bank_logo_url,
         rates: {
           [selectedCurrency]: {
@@ -144,19 +149,20 @@ export function BankRatesTable({
     } else if (bankData?.success && bankData.data.banks) {
       const transformedBanks = bankData.data.banks.map(bank => ({
         id: bank.id.toString(),
-        name: bank.name,
+        code: bank.code,
+        name: localizedText(bank.name, language),
         logo: bank.bank_logo_url,
         rates: {
           [selectedCurrency]: {
-            buy: bank.latest_buy_rate,
-            sell: bank.latest_sell_rate,
+            buy: bank.price.buy,
+            sell: bank.price.sell,
             history: bank.chart.data.map(d => d.buy_rate),
           }
         }
       })) as Bank[];
       setBanks(transformedBanks);
     }
-  }, [bankData, selectedCurrency, hasInitialData, initialBankData]);
+  }, [bankData, selectedCurrency, hasInitialData, initialBankData, language]);
 
   // Reset sort to default (buy desc) when currency changes
   useEffect(() => {
@@ -268,22 +274,22 @@ export function BankRatesTable({
       ) : !banks.length ? (
         <div className="flex items-center justify-center py-16 text-muted text-sm">{t.currency.noDataAvailable}</div>
       ) : (
-        <div className="overflow-x-auto">
-          <div className="min-w-[560px]">
+        <div className="overflow-x-auto" dir={tableDirection}>
+          <div className="min-w-[560px]" dir={tableDirection}>
             <div
               className="hidden md:grid items-center px-[22px] py-3.5 bg-panel2 text-[12px] text-muted"
-              style={{ gridTemplateColumns: '1.6fr 1fr 1fr 0.9fr' }}
+              style={{ gridTemplateColumns: '2.25fr 1fr 1fr 0.7fr', direction: tableDirection }}
             >
               <button onClick={() => handleSort('name')} className="text-start hover:text-text transition-colors">
-                {t.currency.bankColumn} — {selectedCurrency}
+                {t.currency.bankNameColumn} — {selectedCurrency}
               </button>
-              <button onClick={() => handleSort('buy')} className="text-end hover:text-text transition-colors">
+              <button onClick={() => handleSort('buy')} className="hover:text-text transition-colors" style={{ textAlign: valueAlignment }}>
                 {t.currency.buy}
               </button>
-              <button onClick={() => handleSort('sell')} className="text-end hover:text-text transition-colors">
+              <button onClick={() => handleSort('sell')} className="hover:text-text transition-colors" style={{ textAlign: valueAlignment }}>
                 {t.currency.sell}
               </button>
-              <span className="text-end">{t.currency.todayColumn}</span>
+              <span style={{ textAlign: valueAlignment }}>{t.currency.todayColumn}</span>
             </div>
 
             {filteredBanks.length === 0 && searchTerm ? (
@@ -301,11 +307,9 @@ export function BankRatesTable({
                   <div
                     key={bank.id}
                     className="grid items-center gap-3 px-[22px] py-4 border-t border-[var(--line2)] hover:bg-hover transition-colors"
-                    style={{ gridTemplateColumns: '1.6fr 1fr 1fr 0.9fr' }}
+                    style={{ gridTemplateColumns: '2.25fr 1fr 1fr 0.7fr', direction: tableDirection }}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <BankBadge name={bank.name} logoUrl={bank.logo?.startsWith('http') ? bank.logo : undefined} size={34} />
-                      <span className="text-[14px] text-text truncate">{bank.name}</span>
+                    <div className="flex items-center gap-3 min-w-0" dir={tableDirection}>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -316,14 +320,18 @@ export function BankRatesTable({
                       >
                         <Pin className={cn('h-3.5 w-3.5 transition-all', isPinned ? 'fill-gold text-gold rotate-45' : 'text-dim')} />
                       </button>
+                      <BankBadge name={bank.name} logoUrl={bank.logo?.startsWith('http') ? bank.logo : undefined} size={34} />
+                      <span className="text-[14px] text-text truncate">
+                        {bank.name}{bank.code ? ` (${bank.code.toUpperCase()})` : ''}
+                      </span>
                     </div>
-                    <span className={cn('num text-end text-[15px]', isBestBuy ? 'text-up' : 'text-text')}>
-                      {bankRate.buy.toFixed(2)}
+                    <span className={cn('num text-[15px]', isBestBuy ? 'text-up' : 'text-text')} dir="ltr" style={{ textAlign: valueAlignment }}>
+                      {Number(bankRate.buy ?? 0).toFixed(2)}
                     </span>
-                    <span className={cn('num text-end text-[15px]', isBestSell ? 'text-down' : 'text-text')}>
-                      {bankRate.sell.toFixed(2)}
+                    <span className={cn('num text-[15px]', isBestSell ? 'text-down' : 'text-text')} dir="ltr" style={{ textAlign: valueAlignment }}>
+                      {Number(bankRate.sell ?? 0).toFixed(2)}
                     </span>
-                    <span className="flex justify-end">
+                    <span className={`flex ${language === 'ar' ? 'justify-end' : 'justify-start'}`}>
                       {bankRate.history && bankRate.history.length > 1 && (
                         <Sparkline data={bankRate.history} width={56} height={20} />
                       )}

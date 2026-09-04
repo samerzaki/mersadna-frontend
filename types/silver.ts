@@ -5,22 +5,29 @@ export type SilverProductKey = '999_swiss' | '999_egyptian' | '925' | '800' | 'o
 // Standard silver product item (EGP-based products)
 export interface SilverOverviewItem {
   currency: string;
-  sell_price: number;
-  buy_price: number;
-  spread_egp: number;
-  spread_percent: number;
+  price: {
+    buy: number;
+    sell: number;
+  };
+  spread: {
+    egp: number;
+    percent: number;
+  };
+  change: {
+    value: number | null;
+    percent: number | null;
+    color: 'red' | 'green' | 'gray' | null;
+  };
   chart_points: number[];
   chart_color: string;
-  recorded_at: string;
+  last_checked: {
+    last_checked_at: string | null;
+    last_checked_at_for_human: string | null;
+    live: boolean;
+  };
 }
 
-// Ounce has a simplified structure (USD, no spread/chart data)
-export interface SilverOunceItem {
-  buy_price: number;
-  sell_price: number;
-  currency: string;
-  recorded_at: string;
-}
+export type SilverOunceItem = SilverOverviewItem;
 
 export interface SilverOverviewResponse {
   status: number;
@@ -40,6 +47,18 @@ export interface SilverAllPricesResponse {
   status: number;
   success: boolean;
   data: {
-    silver: Record<string, SilverOverviewItem>;
+    silver: Record<string, SilverAllPricesItem>;
   };
+}
+
+/** The get-all-prices endpoint still exposes its legacy flat fields. */
+export interface SilverAllPricesItem {
+  currency: string;
+  sell_price: number;
+  buy_price: number;
+  spread_egp: number;
+  spread_percent: number;
+  chart_points: number[];
+  chart_color: string;
+  recorded_at: string;
 }

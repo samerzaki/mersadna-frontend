@@ -33,9 +33,9 @@ export default function GoldZakatPage() {
   const { data: goldData } = useGoldOverview();
   const { data: silverData } = useSilverOverview();
 
-  const gold21Price = goldData?.data?.gold?.['21']?.buy_price ?? 0;
-  const gold24Price = goldData?.data?.gold?.['24']?.buy_price ?? 0;
-  const silver999Price = silverData?.data?.silver?.['999_egyptian']?.buy_price ?? 0;
+  const gold21Price = goldData?.data?.gold?.['21']?.price.buy ?? 0;
+  const gold24Price = goldData?.data?.gold?.['24']?.price.buy ?? 0;
+  const silver999Price = silverData?.data?.silver?.['999_egyptian']?.price.buy ?? 0;
 
   const FIELDS: FieldConfig[] = [
     {

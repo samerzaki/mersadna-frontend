@@ -1,5 +1,7 @@
 // Gold-related type definitions
 
+import type { SilverOverviewItem } from './silver';
+
 export type KaratCode = 'k24' | 'k21' | 'k18';
 
 // Extended to include all gold product types from API
@@ -45,22 +47,30 @@ export type TimeRange = '24h' | '7d' | '30d' | '90d' | '1y' | 'all';
 // API Response types based on Postman collection
 export interface GoldOverviewItem {
   currency: string;
-  sell_price: number;
-  buy_price: number;
-  spread_egp: number;
-  spread_percent: number;
+  price: {
+    buy: number;
+    sell: number;
+  };
+  spread: {
+    egp: number;
+    percent: number;
+  };
+  change: {
+    value: number;
+    percent: number;
+    color: 'red' | 'green';
+  };
   chart_points: number[];
   chart_color: string;
-  recorded_at: string;
+  last_checked: {
+    last_checked_at: string;
+    last_checked_at_for_human: string;
+    live: boolean;
+  };
 }
 
-// Ounce has a simplified structure (no spread or chart data)
-export interface GoldOunceItem {
-  buy_price: number;
-  sell_price: number;
-  currency: string;
-  recorded_at: string;
-}
+/** The overview endpoint currently returns no ounce quote when it is unavailable. */
+export type GoldOunceItem = GoldOverviewItem;
 
 export interface GoldOverviewResponse {
   status: number;
@@ -72,10 +82,13 @@ export interface GoldOverviewResponse {
       '24': GoldOverviewItem | null;
       '18': GoldOverviewItem | null;
       ounce: GoldOunceItem | null;
-      /** Timestamp when the configured gold-price sources were last checked. */
-      last_checked_at?: string;
-      /** Localized, API-provided relative representation of last_checked_at. */
-      last_checked_at_for_human?: string;
+    };
+    silver: {
+      '999_swiss': SilverOverviewItem | null;
+      '999_egyptian': SilverOverviewItem | null;
+      '925': SilverOverviewItem | null;
+      '800': SilverOverviewItem | null;
+      ounce: SilverOverviewItem | null;
     };
   };
 }

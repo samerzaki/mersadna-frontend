@@ -1,12 +1,9 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { ArrowUpDown, TrendingUp, TrendingDown, Info, ChevronDown } from "lucide-react";
+import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  CURRENCIES,
-  CurrencyCode,
-} from "@/lib/mock-currency-data";
+import { CurrencyCode } from "@/lib/mock-currency-data";
 import { useCurrencyAverages } from '@/hooks/use-currency-prices';
 import { useLanguage } from "@/contexts/language-context";
 import {
@@ -18,7 +15,7 @@ import {
 import { CURRENCIES as CURRENCY_DATA } from "@/lib/currency-constants";
 
 export function SmartCurrencyCalculator() {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const [amount, setAmount] = useState<string>("1000");
   const [sourceCurrency, setSourceCurrency] = useState<CurrencyCode | 'EGP'>('USD');
   const [targetCurrency, setTargetCurrency] = useState<CurrencyCode | 'EGP'>('EGP');
@@ -45,70 +42,62 @@ export function SmartCurrencyCalculator() {
     return { ...data, name: currencyNameMap[data.code] || data.name };
   };
 
-  // Determine which currency to fetch rates for
-  // Always fetch the non-EGP currency against EGP
-  const foreignCurrency = sourceCurrency !== 'EGP' ? sourceCurrency : targetCurrency;
-  const isSourceForeign = sourceCurrency !== 'EGP';
-
-  // Fetch real currency averages
-  const { data: avgData, isLoading } = useCurrencyAverages(
-    foreignCurrency as string,
-    'EGP'
+  // Rates are quoted against EGP. Load each non-EGP side and derive a
+  // cross-currency rate, so every pair in the selector can be converted.
+  const { data: sourceData, isLoading: isSourceLoading } = useCurrencyAverages(
+    sourceCurrency,
+    'EGP',
+    sourceCurrency !== 'EGP'
   );
+  const { data: targetData, isLoading: isTargetLoading } = useCurrencyAverages(
+    targetCurrency,
+    'EGP',
+    targetCurrency !== 'EGP'
+  );
+  const isLoading = isSourceLoading || isTargetLoading;
 
   // Calculate conversion scenarios with real API data
   const scenarios = useMemo(() => {
-    // Get rates from API data
-    const officialRate = avgData?.data?.banks?.avg_sell_rate || 48.50;
-    const parallelRate = avgData?.data?.parallel_market?.avg_sell_rate || 63.50;
+    const rateAgainstEgp = (
+      currency: CurrencyCode | 'EGP',
+      data: typeof sourceData,
+      market: 'official' | 'parallel'
+    ) => {
+      if (currency === 'EGP') return 1;
+      return market === 'official'
+        ? data?.data?.banks?.avg_sell_rate ?? 0
+        : data?.data?.parallel_market?.avg_sell_rate ?? 0;
+    };
+
+    const sourceOfficial = rateAgainstEgp(sourceCurrency, sourceData, 'official');
+    const targetOfficial = rateAgainstEgp(targetCurrency, targetData, 'official');
+    const sourceParallel = rateAgainstEgp(sourceCurrency, sourceData, 'parallel');
+    const targetParallel = rateAgainstEgp(targetCurrency, targetData, 'parallel');
+    const officialRate = targetOfficial > 0 ? sourceOfficial / targetOfficial : 0;
+    const parallelRate = targetParallel > 0 ? sourceParallel / targetParallel : 0;
     const creditCardRate = officialRate * 1.1;
 
-    if (isSourceForeign) {
-      // Foreign Currency -> EGP
-      return [
-        {
-          label: t.pages.currencies.cashOfficial,
-          amount: numericAmount * officialRate,
-          rate: officialRate,
-          description: t.pages.currencies.officialDescription,
-        },
-        {
-          label: t.pages.currencies.blackMarket,
-          amount: numericAmount * parallelRate,
-          rate: parallelRate,
-          description: t.pages.currencies.parallelDescription,
-        },
-        {
-          label: t.pages.currencies.creditCard,
-          amount: numericAmount * creditCardRate,
-          rate: creditCardRate,
-          description: t.pages.currencies.creditCardDescription,
-        },
-      ];
-    } else {
-      // EGP -> Foreign Currency (reverse calculation)
-      return [
-        {
-          label: t.pages.currencies.cashOfficial,
-          amount: numericAmount / officialRate,
-          rate: officialRate,
-          description: t.pages.currencies.officialDescription,
-        },
-        {
-          label: t.pages.currencies.blackMarket,
-          amount: numericAmount / parallelRate,
-          rate: parallelRate,
-          description: t.pages.currencies.parallelDescription,
-        },
-        {
-          label: t.pages.currencies.creditCard,
-          amount: numericAmount / creditCardRate,
-          rate: creditCardRate,
-          description: t.pages.currencies.creditCardDescription,
-        },
-      ];
-    }
-  }, [numericAmount, isSourceForeign, t, avgData]);
+    return [
+      {
+        label: t.pages.currencies.cashOfficial,
+        amount: numericAmount * officialRate,
+        rate: officialRate,
+        description: t.pages.currencies.officialDescription,
+      },
+      {
+        label: t.pages.currencies.blackMarket,
+        amount: numericAmount * parallelRate,
+        rate: parallelRate,
+        description: t.pages.currencies.parallelDescription,
+      },
+      {
+        label: t.pages.currencies.creditCard,
+        amount: numericAmount * creditCardRate,
+        rate: creditCardRate,
+        description: t.pages.currencies.creditCardDescription,
+      },
+    ];
+  }, [numericAmount, sourceCurrency, sourceData, t, targetCurrency, targetData]);
 
   const handleSwap = () => {
     const temp = sourceCurrency;

@@ -51,11 +51,11 @@ export function SimpleCalculator({ defaultType = 'g21' }: SimpleCalculatorProps)
     const gold = goldData?.data?.gold;
     const silver = silverData?.data?.silver;
     const map: Record<MetalType, { buy: number; sell: number } | null> = {
-      g24: gold?.['24'] ? { buy: gold['24'].buy_price, sell: gold['24'].sell_price } : null,
-      g21: gold?.['21'] ? { buy: gold['21'].buy_price, sell: gold['21'].sell_price } : null,
-      g18: gold?.['18'] ? { buy: gold['18'].buy_price, sell: gold['18'].sell_price } : null,
-      s999: silver?.['999_egyptian'] ? { buy: silver['999_egyptian'].buy_price, sell: silver['999_egyptian'].sell_price } : null,
-      s925: silver?.['925'] ? { buy: silver['925'].buy_price, sell: silver['925'].sell_price } : null,
+      g24: gold?.['24'] ? gold['24'].price : null,
+      g21: gold?.['21'] ? gold['21'].price : null,
+      g18: gold?.['18'] ? gold['18'].price : null,
+      s999: silver?.['999_egyptian'] ? silver['999_egyptian'].price : null,
+      s925: silver?.['925'] ? silver['925'].price : null,
     };
     return map;
   }, [goldData, silverData]);

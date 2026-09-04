@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LogOut, Menu, Search } from 'lucide-react';
@@ -31,9 +31,22 @@ export function Header() {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
 
+  useEffect(() => {
+    const openSearchWithShortcut = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setShowMobileSearch(true);
+      }
+    };
+
+    document.addEventListener('keydown', openSearchWithShortcut);
+    return () => document.removeEventListener('keydown', openSearchWithShortcut);
+  }, []);
+
   return (
     <header className="sticky top-0 z-50 h-[66px] bg-bg border-b border-line">
-      <div className="mx-auto flex h-full max-w-[1300px] items-center gap-3 md:gap-6 px-4 md:px-8">
+      <div className="h-full px-4 md:px-0">
+        <div className="mx-auto flex h-full max-w-[1300px] items-center gap-3 md:gap-6">
       <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Odamak home">
         {/* The light logo is the legible counterpart for the dark site theme. */}
         <img
@@ -83,19 +96,26 @@ export function Header() {
 
       <div className="flex-1" />
 
-      <button
-        type="button"
-        onClick={() => setShowMobileSearch((v) => !v)}
-        className="hidden md:flex items-center gap-2 h-[38px] px-3 rounded-[10px] bg-panel2 border border-line text-dim text-sm hover:border-gold hover:text-text transition-colors"
-      >
-        <Search className="w-[15px] h-[15px]" />
-        <span>{isRTL ? 'بحث سريع' : 'Quick search'}</span>
-        <span className="font-mono text-[11px] text-dim border border-line rounded-[5px] px-1">⌘K</span>
-      </button>
-
-      <Button variant="outline" size="icon" className="md:hidden" onClick={() => setShowMobileSearch((v) => !v)}>
-        <Search className="h-4 w-4" />
-      </Button>
+      <DropdownMenu open={showMobileSearch} onOpenChange={setShowMobileSearch} modal={false}>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="flex h-[38px] w-[38px] items-center justify-center rounded-[10px] border border-line bg-panel2 text-dim transition-colors hover:border-gold hover:text-text md:w-auto md:gap-2 md:px-3 md:text-sm"
+            aria-label={isRTL ? 'بحث سريع' : 'Quick search'}
+          >
+            <Search className="h-4 w-4 md:h-[15px] md:w-[15px]" />
+            <span className="hidden md:inline">{isRTL ? 'بحث سريع' : 'Quick search'}</span>
+            <span className="hidden rounded-[5px] border border-line px-1 font-mono text-[11px] text-dim md:inline">⌘K</span>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align={isRTL ? 'start' : 'end'}
+          sideOffset={8}
+          className="w-[calc(100vw-2rem)] overflow-visible rounded-[14px] border-line bg-panel p-3 shadow-card md:w-[22rem]"
+        >
+          <QuickSearch autoFocus />
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <div className="hidden md:flex items-center gap-2">
         <LanguageSwitcher />
@@ -155,13 +175,8 @@ export function Header() {
         <Menu className="h-5 w-5" />
       </button>
 
-      {showMobileSearch && (
-        <div className="absolute top-full inset-x-0 md:hidden border-t border-line bg-bg px-4 py-3">
-          <QuickSearch />
-        </div>
-      )}
-
       <NavSheet open={navOpen} onClose={() => setNavOpen(false)} />
+      </div>
       </div>
     </header>
   );

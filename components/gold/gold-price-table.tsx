@@ -36,6 +36,8 @@ export function GoldPriceTable({ goldData }: GoldPriceTableProps) {
 
   const t = translations[displayLanguage];
   const locale = displayLanguage === 'en' ? 'en-US' : 'ar-EG';
+  const tableDirection = displayLanguage === 'ar' ? 'rtl' : 'ltr';
+  const columnTextAlign = displayLanguage === 'ar' ? 'right' : 'left';
 
   const rows = ROW_ORDER.map((key) => goldData.find((item) => item.nameKey === key)).filter(
     (item): item is ModernGoldDataItem => Boolean(item)
@@ -46,13 +48,13 @@ export function GoldPriceTable({ goldData }: GoldPriceTableProps) {
       <div className="min-w-[640px]">
         <div
           className="grid items-center px-[22px] py-3.5 bg-panel2 text-[12px] text-muted"
-          style={{ gridTemplateColumns: '1.2fr 1fr 1fr 0.8fr 0.8fr' }}
+          style={{ gridTemplateColumns: '1.2fr 1fr 1fr 0.8fr 0.8fr', direction: tableDirection }}
         >
-          <span>{t.gold.karatColumn}</span>
-          <span className="text-end">{t.gold.sellPrice}</span>
-          <span className="text-end">{t.gold.buyPrice}</span>
-          <span className="text-end">{t.gold.changeColumn}</span>
-          <span className="text-end">{t.gold.days30Column}</span>
+          <span dir={tableDirection} style={{ direction: tableDirection }}>{t.gold.karatColumn}</span>
+          <span dir={tableDirection} style={{ direction: tableDirection, textAlign: columnTextAlign }}>{t.gold.sellPrice}</span>
+          <span dir={tableDirection} style={{ direction: tableDirection, textAlign: columnTextAlign }}>{t.gold.buyPrice}</span>
+          <span dir={tableDirection} style={{ direction: tableDirection, textAlign: columnTextAlign }}>{t.gold.changeColumn}</span>
+          <span dir={tableDirection} style={{ direction: tableDirection, textAlign: displayLanguage === 'en' ? 'left' : undefined }} className="text-end">{t.gold.days30Column}</span>
         </div>
         {rows.map((item) => {
           const isOunce = item.nameKey === 'ounce';
@@ -60,19 +62,31 @@ export function GoldPriceTable({ goldData }: GoldPriceTableProps) {
             <div
               key={item.id}
               className="grid items-center px-[22px] py-4 border-t border-[var(--line2)] hover:bg-hover transition-colors"
-              style={{ gridTemplateColumns: '1.2fr 1fr 1fr 0.8fr 0.8fr' }}
+              style={{ gridTemplateColumns: '1.2fr 1fr 1fr 0.8fr 0.8fr', direction: tableDirection }}
             >
-              <span className="font-heading text-[15px] text-text">{getName(item.nameKey, t)}</span>
-              <span className="num text-end text-[16px] md:text-[18px] text-text">
-                {formatPriceWithCurrency(item.sellPrice, item.currency, locale)}
+              <span dir={tableDirection} style={{ direction: tableDirection }} className="font-heading text-[15px] text-text">{getName(item.nameKey, t)}</span>
+              <span dir={tableDirection} style={{ direction: tableDirection, textAlign: columnTextAlign }}>
+                <span className="num text-[16px] md:text-[18px] text-text" dir={tableDirection} style={{ direction: tableDirection }}>
+                  {formatPriceWithCurrency(item.sellPrice, item.currency, locale)}
+                </span>
               </span>
-              <span className="num text-end text-[16px] md:text-[18px] text-muted">
-                {isOunce ? '—' : formatPriceWithCurrency(item.buyPrice, item.currency, locale)}
+              <span dir={tableDirection} style={{ direction: tableDirection, textAlign: columnTextAlign }}>
+                <span className="num text-[16px] md:text-[18px] text-muted" dir={tableDirection} style={{ direction: tableDirection }}>
+                  {isOunce ? '—' : formatPriceWithCurrency(item.buyPrice, item.currency, locale)}
+                </span>
               </span>
-              <span className="text-end">
-                {isOunce ? <span className="num text-dim">—</span> : <ChangeText value={item.changePercent} />}
+              <span dir={tableDirection} style={{ direction: tableDirection, textAlign: columnTextAlign }}>
+                {isOunce ? (
+                  <span className="num text-dim" dir={tableDirection} style={{ direction: tableDirection }}>—</span>
+                ) : (
+                  <ChangeText value={item.changePercent} direction={tableDirection} />
+                )}
               </span>
-              <span className="flex justify-end">
+              <span
+                dir={tableDirection}
+                style={{ direction: tableDirection }}
+                className={`flex ${displayLanguage === 'en' ? 'justify-start' : 'justify-end'}`}
+              >
                 <Sparkline data={item.history} width={64} height={22} tone={isOunce ? 'gold' : 'auto'} />
               </span>
             </div>
