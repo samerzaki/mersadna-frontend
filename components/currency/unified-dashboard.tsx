@@ -113,12 +113,12 @@ export function UnifiedDashboard({ initialData }: UnifiedDashboardProps) {
             />
             <StatTile
               label={t.currency.lowestBuyPrice}
-              value={lowestBuy ? lowestBuy.rate.toFixed(2) : '—'}
+              value={typeof lowestBuy?.rate === 'number' && Number.isFinite(lowestBuy.rate) ? lowestBuy.rate.toFixed(2) : '—'}
               sub={<span className="text-[11px] text-dim truncate block">{lowestBuy?.bank ?? ''}</span>}
             />
             <StatTile
               label={t.currency.lowestSellPrice}
-              value={lowestSell ? lowestSell.rate.toFixed(2) : '—'}
+              value={typeof lowestSell?.rate === 'number' && Number.isFinite(lowestSell.rate) ? lowestSell.rate.toFixed(2) : '—'}
               sub={<span className="text-[11px] text-dim truncate block">{lowestSell?.bank ?? ''}</span>}
             />
           </div>
