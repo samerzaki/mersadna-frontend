@@ -5,8 +5,8 @@ import type { GoldOverviewItem } from '@/types';
 type GoldKey = '24' | '21' | '18' | 'gold_pound' | 'ounce';
 
 const ROW_META: { dataKey: GoldKey; name: string }[] = [
-  { dataKey: '24', name: 'عيار 24' },
   { dataKey: '21', name: 'عيار 21' },
+  { dataKey: '24', name: 'عيار 24' },
   { dataKey: '18', name: 'عيار 18' },
   { dataKey: 'gold_pound', name: 'جنيه ذهب' },
   { dataKey: 'ounce', name: 'أونصة $' },

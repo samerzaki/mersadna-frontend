@@ -1,11 +1,13 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { useGoldOverview } from '@/hooks/use-gold-prices';
 import { useCurrencyAverages } from '@/hooks/use-currency-prices';
 import { useSilverOverview } from '@/hooks/use-silver-prices';
 import { useCryptoTop } from '@/hooks/use-crypto-prices';
 import { formatPercent } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/language-context';
 
 interface PriceTickerProps {
   className?: string;
@@ -46,10 +48,14 @@ function TickerRow({ items }: { items: TickerItem[] }) {
 }
 
 export function PriceTicker({ className }: PriceTickerProps) {
+  const { language } = useLanguage();
   const { data: goldData } = useGoldOverview();
   const { data: usdData } = useCurrencyAverages('USD', 'EGP');
   const { data: silverData } = useSilverOverview();
   const { data: cryptoData } = useCryptoTop();
+  const tickerRef = useRef<HTMLDivElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [copies, setCopies] = useState(4);
 
   const gold = goldData?.data?.gold;
   const usd = usdData?.data;
@@ -97,15 +103,40 @@ export function PriceTicker({ className }: PriceTickerProps) {
     });
   });
 
+  // Keep enough copies in the track to cover wide screens throughout one loop.
+  // This prevents a blank gap between the final quote and the first quote.
+  useEffect(() => {
+    const updateCopies = () => {
+      const containerWidth = tickerRef.current?.clientWidth ?? 0;
+      const rowWidth = rowRef.current?.clientWidth ?? 0;
+      if (!containerWidth || !rowWidth) return;
+      setCopies(Math.max(2, Math.ceil(containerWidth / rowWidth) + 1));
+    };
+
+    updateCopies();
+    const observer = new ResizeObserver(updateCopies);
+    if (tickerRef.current) observer.observe(tickerRef.current);
+    if (rowRef.current) observer.observe(rowRef.current);
+    return () => observer.disconnect();
+  }, [items.length]);
+
   if (items.length === 0) {
     return <div className={cn('h-10 border-b border-line bg-panel', className)} />;
   }
 
   return (
-    <div className={cn('overflow-hidden border-b border-line bg-panel', className)}>
-      <div className="flex w-max animate-[msTicker_80s_linear_infinite] motion-reduce:animate-none hover:[animation-play-state:paused]">
-        <TickerRow items={items} />
-        <TickerRow items={items} />
+    <div ref={tickerRef} className={cn('overflow-hidden border-b border-line bg-panel', className)}>
+      <div
+        className="flex w-max animate-[msTicker_80s_linear_infinite] motion-reduce:animate-none hover:[animation-play-state:paused]"
+        style={{
+          '--ticker-shift': `${language === 'ar' ? '' : '-'}${100 / copies}%`,
+        } as React.CSSProperties}
+      >
+        {Array.from({ length: copies }, (_, index) => (
+          <div key={index} ref={index === 0 ? rowRef : undefined} aria-hidden={index > 0} className="flex-shrink-0">
+            <TickerRow items={items} />
+          </div>
+        ))}
       </div>
     </div>
   );

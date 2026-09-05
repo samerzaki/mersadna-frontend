@@ -114,9 +114,9 @@ export function QuickSearch({ autoFocus = false }: { autoFocus?: boolean }) {
           className={cn(
             'h-10 w-full',
             isRTL ? 'pr-9 pl-4' : 'pl-9 pr-4',
-            'bg-panel2 border-line',
+            '!bg-white !text-slate-900 border-line',
             'focus-visible:border-gold focus-visible:ring-0',
-            'placeholder:text-dim'
+            'placeholder:text-slate-500'
           )}
         />
       </div>

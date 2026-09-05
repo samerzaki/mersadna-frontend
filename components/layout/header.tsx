@@ -100,7 +100,7 @@ export function Header() {
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-[10px] border border-line bg-panel2 text-dim transition-colors hover:border-gold hover:text-text md:w-auto md:gap-2 md:px-3 md:text-sm"
+            className="flex h-[38px] w-[38px] items-center justify-center rounded-[10px] border border-line !bg-white text-slate-700 transition-colors hover:border-gold hover:text-text md:w-auto md:gap-2 md:px-3 md:text-sm"
             aria-label={isRTL ? 'بحث سريع' : 'Quick search'}
           >
             <Search className="h-4 w-4 md:h-[15px] md:w-[15px]" />

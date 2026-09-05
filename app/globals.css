@@ -277,7 +277,7 @@
 }
 @keyframes msTicker {
   from { transform: translateX(0); }
-  to { transform: translateX(50%); }
+  to { transform: translateX(var(--ticker-shift, -50%)); }
 }
 @keyframes msFlashUp {
   0% { background: var(--upSoft); }

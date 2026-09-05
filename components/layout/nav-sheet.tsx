@@ -7,6 +7,8 @@ import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
 import { navigation } from '@/lib/navigation';
+import { ThemeToggle } from './theme-toggle';
+import { LanguageSwitcher } from './language-switcher';
 
 type NavSheetProps = {
   open: boolean;
@@ -70,6 +72,15 @@ export function NavSheet({ open, onClose }: NavSheetProps) {
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+          <div className="flex items-center justify-between rounded-xl border border-line bg-panel2 p-3">
+            <span className="text-sm font-medium text-text">
+              {isRTL ? 'الإعدادات السريعة' : 'Quick settings'}
+            </span>
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <ThemeToggle />
+            </div>
+          </div>
           {navigation.reduce<React.JSX.Element[]>((acc, group, index, arr) => {
             const prev = index > 0 ? arr[index - 1] : null;
             const showSectionHeader = !prev || prev.sectionLabel !== group.sectionLabel;

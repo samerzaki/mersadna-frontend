@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Bell, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,8 +16,33 @@ import { PriceAlertModal } from '@/components/dashboard/price-alert-modal';
 import type { GoldOverviewItem } from '@/types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
+export type GoldItemType = '24' | '21' | '18' | 'gold_pound' | 'ounce';
+
+const GOLD_ITEM_IMAGES: Record<GoldItemType, string> = {
+  '24': '/gold-items/bar.webp',
+  '21': '/gold-items/ring.webp',
+  '18': '/gold-items/necklace.webp',
+  gold_pound: '/gold-items/coin.webp',
+  ounce: '/gold-items/ounce.webp',
+};
+
+function GoldItemIcon({ type }: { type: GoldItemType }) {
+  return (
+    <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#fff8e7] ring-1 ring-amber-900/5 sm:size-11">
+      <Image
+        src={GOLD_ITEM_IMAGES[type]}
+        alt=""
+        width={144}
+        height={144}
+        unoptimized
+        className="size-full object-contain"
+      />
+    </span>
+  );
+}
+
 export interface HeroKaratRow {
-  id: string;
+  id: GoldItemType;
   name: string;
   sellPrice: number;
   currency: string;
@@ -124,7 +150,7 @@ export function Hero({ karat21, lastCheckedAt, lastCheckedAtForHuman, history30d
           {updatedAgo && <> · {t.home2026.lastUpdate} {updatedAgo}</>}
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-7">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-7">
           <StatTile
             label={t.home2026.consumerSell}
             value={
@@ -188,8 +214,9 @@ export function Hero({ karat21, lastCheckedAt, lastCheckedAtForHuman, history30d
             {rows.map((row) => (
             <div
               key={row.id}
-              className="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-4 px-4 py-[18px] rounded-xl hover:bg-hover transition-colors"
+              className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto_auto] items-center gap-3 px-4 py-[18px] rounded-xl hover:bg-hover transition-colors"
             >
+              <GoldItemIcon type={row.id} />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span className="inline-flex cursor-help" aria-label={row.lastCheckedAtForHuman}>

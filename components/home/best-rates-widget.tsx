@@ -51,7 +51,7 @@ function RateCard({
   chip?: string;
   titleHref?: string;
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const toneClass = tone === 'up' ? 'text-up' : tone === 'down' ? 'text-down' : 'text-gold';
 
   return (
@@ -69,12 +69,14 @@ function RateCard({
       ) : (
         <>
           <span className="block text-[13px] text-muted truncate">{bank.name}</span>
-          <div className="mt-1 grid grid-cols-[minmax(0,max-content)_64px] items-center justify-between gap-x-4">
-            <div className={`num text-right text-[36px] md:text-[40px] font-medium leading-none ${toneClass}`}>
-              {parseFloat(price).toFixed(2)}
+          <div className="mt-1 flex items-center justify-between gap-4">
+            <div className="flex items-baseline gap-2" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+              <span className={`num text-[36px] md:text-[40px] font-medium leading-none ${toneClass}`}>
+                {parseFloat(price).toFixed(2)}
+              </span>
+              <span className="text-[11px] text-dim whitespace-nowrap">{t.home2026.egyptianPound}</span>
             </div>
             <BankBadge name={bank.name} logoUrl={bank.bank_logo_url} size={64} className="shrink-0" />
-            <div className="mt-1.5 text-right text-[11px] text-dim">{t.home2026.egyptianPound}</div>
           </div>
         </>
       )}
@@ -211,7 +213,14 @@ export function BestRatesWidgetClient({ initialData }: BestRatesWidgetClientProp
             {t.home2026.bestBankRatePrefix} {currencyName} {t.home2026.bestBankRateSuffix}
           </h2>
         </Link>
-        <SegmentedControl items={SEGMENTED_ITEMS} value={selectedCurrency} onChange={(v) => setSelectedCurrency(v as CurrencyCode)} />
+        <div className="min-w-0 max-w-full overflow-x-auto touch-pan-x pb-1 [-webkit-overflow-scrolling:touch]">
+          <SegmentedControl
+            items={SEGMENTED_ITEMS}
+            value={selectedCurrency}
+            onChange={(v) => setSelectedCurrency(v as CurrencyCode)}
+            className="min-w-max"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
