@@ -20,6 +20,8 @@ export interface CurrencyDashboardInitialData {
       bank_logo_url: string;
       latest_buy_rate: number;
       latest_sell_rate: number;
+      is_live: boolean;
+      last_checked_at_for_human: string;
       chart: { data: Array<{ buy_rate: number }> };
     }>;
   } | null;
@@ -71,7 +73,9 @@ export async function UnifiedDashboardServer() {
           bank_logo_url: bank.bank_logo_url,
           latest_buy_rate: bank.price.buy,
           latest_sell_rate: bank.price.sell,
-          chart: { data: bank.chart.data.map(d => ({ buy_rate: d.buy_rate })) },
+          is_live: bank.last_checked?.live ?? false,
+          last_checked_at_for_human: bank.last_checked?.last_checked_at_for_human ?? '',
+          chart: { data: (bank.chart?.data ?? []).map(d => ({ buy_rate: d.buy_rate })) },
         })),
       } : null,
       blackMarket: blackMarketRes.success && blackMarketRes.data ? {

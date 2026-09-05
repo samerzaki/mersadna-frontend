@@ -329,6 +329,12 @@
     padding: 14px 16px;
   }
 
+  .currency-stat-tile {
+    background: #fff !important;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+    border: 1px solid rgba(15, 23, 42, 0.05);
+  }
+
   .num {
     font-family: var(--font-plex-mono), ui-monospace, monospace;
     font-variant-numeric: tabular-nums;

@@ -14,6 +14,7 @@ import { SectionCard } from "@/components/ui/section-card";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { BankBadge } from "@/components/ui/bank-badge";
 import { Sparkline } from "@/components/ui/sparkline";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { localizedText } from '@/lib/localized-text';
 
 interface InitialBankData {
@@ -22,9 +23,11 @@ interface InitialBankData {
     code: string;
     name: string;
     bank_logo_url: string;
-    latest_buy_rate: number;
-    latest_sell_rate: number;
-    chart: { data: Array<{ buy_rate: number }> };
+  latest_buy_rate: number;
+  latest_sell_rate: number;
+  is_live: boolean;
+  last_checked_at_for_human: string;
+  chart: { data: Array<{ buy_rate: number }> };
   }>;
 }
 
@@ -130,6 +133,9 @@ export function BankRatesTable({
 
   // Transform API data or initialBankData to component format
   useEffect(() => {
+    // Clear the previous currency's rows while the active currency loads.
+    setBanks([]);
+
     // Use initialBankData for default currency
     if (hasInitialData && initialBankData) {
       const transformedBanks = initialBankData.banks.map(bank => ({
@@ -137,11 +143,13 @@ export function BankRatesTable({
         code: bank.code,
         name: localizedText(bank.name, language),
         logo: bank.bank_logo_url,
+        isLive: bank.is_live,
+        lastCheckedAtForHuman: bank.last_checked_at_for_human,
         rates: {
           [selectedCurrency]: {
             buy: bank.latest_buy_rate,
             sell: bank.latest_sell_rate,
-            history: bank.chart.data.map(d => d.buy_rate),
+            history: (bank.chart?.data ?? []).map(d => d.buy_rate),
           }
         }
       })) as Bank[];
@@ -152,11 +160,13 @@ export function BankRatesTable({
         code: bank.code,
         name: localizedText(bank.name, language),
         logo: bank.bank_logo_url,
+        isLive: bank.last_checked?.live ?? false,
+        lastCheckedAtForHuman: bank.last_checked?.last_checked_at_for_human ?? '',
         rates: {
           [selectedCurrency]: {
             buy: bank.price.buy,
             sell: bank.price.sell,
-            history: bank.chart.data.map(d => d.buy_rate),
+            history: (bank.chart?.data ?? []).map(d => d.buy_rate),
           }
         }
       })) as Bank[];
@@ -280,16 +290,16 @@ export function BankRatesTable({
               className="hidden md:grid items-center px-[22px] py-3.5 bg-panel2 text-[12px] text-muted"
               style={{ gridTemplateColumns: '2.25fr 1fr 1fr 0.7fr', direction: tableDirection }}
             >
-              <button onClick={() => handleSort('name')} className="text-start hover:text-text transition-colors">
+              <button onClick={() => handleSort('name')} className="text-start cursor-pointer hover:text-text transition-colors">
                 {t.currency.bankNameColumn} — {selectedCurrency}
               </button>
-              <button onClick={() => handleSort('buy')} className="hover:text-text transition-colors" style={{ textAlign: valueAlignment }}>
-                {t.currency.buy}
+              <button onClick={() => handleSort('buy')} className="cursor-pointer hover:text-text transition-colors" style={{ textAlign: valueAlignment }}>
+                {t.currency.highestBuyPrice}
               </button>
-              <button onClick={() => handleSort('sell')} className="hover:text-text transition-colors" style={{ textAlign: valueAlignment }}>
-                {t.currency.sell}
+              <button onClick={() => handleSort('sell')} className="cursor-pointer hover:text-text transition-colors" style={{ textAlign: valueAlignment }}>
+                {t.currency.lowestSellPrice}
               </button>
-              <span style={{ textAlign: valueAlignment }}>{t.currency.todayColumn}</span>
+              <span style={{ textAlign: valueAlignment }}>{language === 'ar' ? 'آخر 30 يوم' : 'Last 30d'}</span>
             </div>
 
             {filteredBanks.length === 0 && searchTerm ? (
@@ -320,6 +330,22 @@ export function BankRatesTable({
                       >
                         <Pin className={cn('h-3.5 w-3.5 transition-all', isPinned ? 'fill-gold text-gold rotate-45' : 'text-dim')} />
                       </button>
+                      <TooltipProvider delayDuration={150}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span
+                              className={cn(
+                                'h-2 w-2 shrink-0 rounded-full animate-pulse cursor-help',
+                                bank.isLive ? 'bg-emerald-500' : 'bg-red-500'
+                              )}
+                              aria-label={bank.isLive ? 'Live rate' : 'Inactive rate'}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent className="!bg-black !text-white">
+                            {bank.lastCheckedAtForHuman || (bank.isLive ? 'Live rate' : 'Inactive rate')}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <BankBadge name={bank.name} logoUrl={bank.logo?.startsWith('http') ? bank.logo : undefined} size={34} />
                       <span className="text-[14px] text-text truncate">
                         {bank.name}{bank.code ? ` (${bank.code.toUpperCase()})` : ''}

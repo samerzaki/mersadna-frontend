@@ -11,7 +11,6 @@ import { useCurrencyAverages, useHighestBuyPrice, useCurrencyBanks } from '@/hoo
 import { useLanguage } from "@/contexts/language-context";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { StatTile } from "@/components/ui/stat-tile";
-import { SectionCard } from "@/components/ui/section-card";
 import { localizedText } from '@/lib/localized-text';
 import { BankBadge } from '@/components/ui/bank-badge';
 import type { CurrencyDashboardInitialData } from './unified-dashboard-server';
@@ -48,14 +47,6 @@ export function UnifiedDashboard({ initialData }: UnifiedDashboardProps) {
   const { data: highestBuyData } = useHighestBuyPrice(selectedCurrency as string, !isDefaultCurrency || !initialData);
   const { data: banksData } = useCurrencyBanks(selectedCurrency, 'EGP', '24h', !isDefaultCurrency || !initialData);
 
-  const bankAverage = isDefaultCurrency && initialData ? {
-    buy: initialData.averages?.banks?.avg_buy_rate || 0,
-    sell: initialData.averages?.banks?.avg_sell_rate || 0,
-  } : {
-    buy: avgData?.data?.banks?.avg_buy_rate || 0,
-    sell: avgData?.data?.banks?.avg_sell_rate || 0,
-  };
-
   const parallelRate = isDefaultCurrency && initialData ? {
     buy: initialData.averages?.parallel_market?.avg_buy_rate || 0,
     sell: initialData.averages?.parallel_market?.avg_sell_rate || 0,
@@ -63,10 +54,6 @@ export function UnifiedDashboard({ initialData }: UnifiedDashboardProps) {
     buy: avgData?.data?.parallel_market?.avg_buy_rate || 0,
     sell: avgData?.data?.parallel_market?.avg_sell_rate || 0,
   };
-
-  const bankCount = isDefaultCurrency && initialData
-    ? (initialData.averages?.banks?.count || 0)
-    : (avgData?.data?.banks?.count || 0);
 
   // Extract best bank prices
   const bestBuyPrice = isDefaultCurrency && initialData
@@ -101,24 +88,37 @@ export function UnifiedDashboard({ initialData }: UnifiedDashboardProps) {
     <div className="space-y-6" dir={contentDirection}>
       <SegmentedControl items={segmentedItems} value={selectedCurrency} onChange={(v) => setSelectedCurrency(v as CurrencyCode)} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[2.2fr_0.8fr] gap-6 items-start">
         {/* Left column */}
         <div className="space-y-6 min-w-0">
-          <div className="grid grid-cols-2 gap-4" dir={contentDirection}>
+          <div className="grid grid-cols-2 xl:grid-cols-3 gap-4" dir={contentDirection}>
             <StatTile
               label={t.currency.highestBuyPrice}
               value={formatRate(bestBuyPrice)}
               sub={<span className="text-[11px] text-dim truncate block">{bestBuyBank}</span>}
-              className={statisticAlignment}
-              leftAdornment={<BankBadge name={bestBuyBank} logoUrl={bestBuyLogo} size={34} />}
+              className={`currency-stat-tile ${statisticAlignment}`}
+              endAdornment={<BankBadge name={bestBuyBank} logoUrl={bestBuyLogo} size={34} />}
             />
             <StatTile
               label={t.currency.lowestSellPrice}
               value={formatRate(lowestSell?.rate)}
               sub={<span className="text-[11px] text-dim truncate block">{localizedText(lowestSell?.name, language, '-')}</span>}
-              className={statisticAlignment}
-              leftAdornment={<BankBadge name={localizedText(lowestSell?.name, language, '-')} logoUrl={lowestSell?.logo} size={34} />}
+              className={`currency-stat-tile ${statisticAlignment}`}
+              endAdornment={<BankBadge name={localizedText(lowestSell?.name, language, '-')} logoUrl={lowestSell?.logo} size={34} />}
             />
+            <div className={`stat-tile currency-stat-tile ${statisticAlignment}`}>
+              <div className="text-[11.5px] text-dim mb-3">{t.pages.currencies.parallelMarket}</div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-[11px] text-dim mb-1.5">{t.currency.highestBuyPrice}</div>
+                  <div className="num text-[20px] font-medium leading-none text-text">{formatRate(parallelRate.buy)}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-dim mb-1.5">{t.currency.lowestSellPrice}</div>
+                  <div className="num text-[20px] font-medium leading-none text-text">{formatRate(parallelRate.sell)}</div>
+                </div>
+              </div>
+            </div>
             {/*
               label={t.currency.lowestBuyPrice}
               value={lowestBuy ? lowestBuy.rate.toFixed(2) : '—'}
@@ -142,7 +142,7 @@ export function UnifiedDashboard({ initialData }: UnifiedDashboardProps) {
             initialBankData={isDefaultCurrency ? initialData?.bankRates ?? undefined : undefined}
           />
 
-          <SectionCard title={t.pages.currencies.parallelMarket} action={<span className="chip">{t.currency.unofficialChip}</span>} padded>
+          {/* <SectionCard title={t.pages.currencies.parallelMarket} action={<span className="chip">{t.currency.unofficialChip}</span>} padded>
             <div className="flex items-center justify-between gap-6 flex-wrap">
               <div>
                 <div className="text-[12px] text-muted mb-1">{t.currency.buy}</div>
@@ -164,11 +164,11 @@ export function UnifiedDashboard({ initialData }: UnifiedDashboardProps) {
                 ? `أسعار استرشادية وقد تختلف عن السعر الفعلي · متوسط ${bankCount} بنكاً`
                 : `Indicative rates that may differ from the actual price · average of ${bankCount} banks`}
             </div>
-          </SectionCard>
+          </SectionCard> */}
         </div>
 
         {/* Right column */}
-        <FxConverterCard />
+        <FxConverterCard fromCurrency={selectedCurrency} />
       </div>
     </div>
   );

@@ -4,7 +4,6 @@ import { AutoRefreshWrapper } from "@/components/dashboard/auto-refresh-wrapper"
 import { PageHeader } from "@/components/ui/page-header";
 import type { Metadata } from "next";
 import { buildMetadata } from '@/lib/seo-config';
-import { MarketGuidance } from '@/components/seo/market-guidance';
 
 export const metadata: Metadata = buildMetadata('currencies', { canonicalPath: '/currencies' });
 export const revalidate = 60;
@@ -23,7 +22,7 @@ export default function CurrenciesPage() {
           <UnifiedDashboardServer />
         </Suspense>
 
-        <MarketGuidance
+        {/* <MarketGuidance
           title="قبل تحويل العملات"
           intro="قارن بين أكثر من سعر عند توفره، وراجع وقت التحديث وشروط البنك أو مزود الخدمة قبل تنفيذ التحويل."
           points={[
@@ -35,7 +34,7 @@ export default function CurrenciesPage() {
             { question: 'هل سعر التحويل في الحاسبة ملزم؟', answer: 'لا، هو تقدير مبني على البيانات المتاحة؛ السعر النهائي تحدده الجهة المنفذة.' },
             { question: 'ما الفرق بين سعر الشراء وسعر البيع؟', answer: 'سعر الشراء هو ما تدفعه الجهة لشراء العملة، وسعر البيع هو ما تطلبه لبيعها لك.' },
           ]}
-        />
+        /> */}
       </div>
     </AutoRefreshWrapper>
   );

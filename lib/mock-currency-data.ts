@@ -26,6 +26,8 @@ export interface Bank {
   code?: string;
   name: string;
   logo: string;
+  isLive?: boolean;
+  lastCheckedAtForHuman?: string;
   rates: Record<CurrencyCode, CurrencyRate>;
 }
 

@@ -1,7 +1,7 @@
 'use client';
 
-import { ArrowUpDown } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { ArrowLeftRight } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { SectionCard } from '@/components/ui/section-card';
 import { TogglePair } from '@/components/ui/toggle-pair';
 import { useCurrencyAverages } from '@/hooks/use-currency-prices';
@@ -10,12 +10,20 @@ import { CURRENCIES, type CurrencyCode } from '@/lib/mock-currency-data';
 
 type ConverterCurrency = CurrencyCode | 'EGP';
 
-export function FxConverterCard() {
+interface FxConverterCardProps {
+  fromCurrency?: CurrencyCode;
+}
+
+export function FxConverterCard({ fromCurrency: activeCurrency }: FxConverterCardProps) {
   const { t } = useLanguage();
   const [amount, setAmount] = useState('1000');
   const [fromCurrency, setFromCurrency] = useState<ConverterCurrency>('USD');
   const [toCurrency, setToCurrency] = useState<ConverterCurrency>('EGP');
   const [source, setSource] = useState<'bank' | 'parallel'>('bank');
+
+  useEffect(() => {
+    if (activeCurrency) setFromCurrency(activeCurrency);
+  }, [activeCurrency]);
 
   // Rates are stored relative to EGP. Fetching both sides lets us derive a
   // cross-currency rate while continuing to use the available market data.
@@ -30,16 +38,6 @@ export function FxConverterCard() {
     toCurrency !== 'EGP'
   );
   const isLoading = isFromLoading || isToLoading;
-
-  const currencyNames: Record<ConverterCurrency, string> = {
-    USD: t.currency.usdName,
-    EUR: t.currency.eurName,
-    SAR: t.currency.sarName,
-    AED: t.currency.aedName,
-    KWD: t.currency.kwdName,
-    GBP: t.currency.gbpName,
-    EGP: t.currency.egpName,
-  };
 
   const rate = useMemo(() => {
     if (fromCurrency === toCurrency) return 1;
@@ -103,10 +101,10 @@ export function FxConverterCard() {
             onChange={(e) => selectFromCurrency(e.target.value as ConverterCurrency)}
             className="w-full h-11 px-3.5 rounded-[11px] border border-line bg-bg text-[14px] text-text focus:border-gold focus:outline-none"
           >
-            <option value="EGP">{currencyNames.EGP} (EGP)</option>
+            <option value="EGP">EGP</option>
             {CURRENCIES.filter((c) => c !== toCurrency).map((c) => (
               <option key={c} value={c}>
-                {currencyNames[c]} ({c})
+                {c}
               </option>
             ))}
           </select>
@@ -117,7 +115,7 @@ export function FxConverterCard() {
             aria-label="Swap currencies"
             className="h-11 w-11 inline-flex items-center justify-center rounded-[11px] border border-line bg-panel2 text-muted hover:text-gold hover:border-gold-line transition-colors"
           >
-            <ArrowUpDown className="h-4 w-4" />
+            <ArrowLeftRight className="h-4 w-4" />
           </button>
           <div>
             <label className="block text-[12px] text-muted mb-1.5">{t.currency.to}</label>
@@ -126,10 +124,10 @@ export function FxConverterCard() {
               onChange={(e) => selectToCurrency(e.target.value as ConverterCurrency)}
               className="w-full h-11 px-3.5 rounded-[11px] border border-line bg-bg text-[14px] text-text focus:border-gold focus:outline-none"
             >
-              <option value="EGP">{currencyNames.EGP} (EGP)</option>
+              <option value="EGP">EGP</option>
               {CURRENCIES.filter((c) => c !== fromCurrency).map((c) => (
                 <option key={c} value={c}>
-                  {currencyNames[c]} ({c})
+                  {c}
                 </option>
               ))}
             </select>
